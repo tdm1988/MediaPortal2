@@ -81,7 +81,9 @@ namespace MediaPortal.Extensions.MediaServer
       ServiceRegistration.Get<IBackendServer>().UPnPBackendServer.AddRootDevice(_device);
 
       LoadSettings();
-      ProfileManager.LoadProfiles();
+
+      ProfileManager.LoadProfiles(false);
+      ProfileManager.LoadProfiles(true);
       ProfileManager.LoadProfileLinks();
       ProfileManager.LoadPreferredLanguages();
     }

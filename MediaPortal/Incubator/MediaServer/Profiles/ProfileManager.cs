@@ -49,6 +49,9 @@ namespace MediaPortal.Extensions.MediaServer.Profiles
   public class ProfileManager
   {
     private const string DLNA_DEFAULT_PROFILE_ID = "DLNADefault";
+    private const string PROFILE_FILE = "DLNAProfiles.xml";
+    private const string PROFILE_LINK_FILE = "MediaPortal.Extensions.MediaServer.Links.xml";
+    private const string LANGUAGE_FILE = "MediaPortal.Extensions.MediaServer.PreferredLanguages.xml";
 
     public static Dictionary<IPAddress, EndPointSettings> ProfileLinks = new Dictionary<IPAddress, EndPointSettings>();
     private static EndPointSettings PreferredLanguages;
@@ -213,11 +216,18 @@ namespace MediaPortal.Extensions.MediaServer.Profiles
       return GetEndPointSettings(DLNA_DEFAULT_PROFILE_ID);
     }
 
-    public static void LoadProfiles()
+    public static void LoadProfiles(bool userProfiles)
     {
       try
       {
-        var profileFile = FileUtils.BuildAssemblyRelativePath("DLNAProfiles.xml");
+        string profileFile = FileUtils.BuildAssemblyRelativePath(PROFILE_FILE);
+        if (userProfiles)
+        {
+          IPathManager pathManager = ServiceRegistration.Get<IPathManager>();
+          string dataPath = pathManager.GetPath("<CONFIG>");
+          profileFile = Path.Combine(dataPath, PROFILE_FILE);
+        }
+
         if (File.Exists(profileFile) == true)
         {
           XmlTextReader reader = new XmlTextReader(profileFile);
@@ -730,7 +740,15 @@ namespace MediaPortal.Extensions.MediaServer.Profiles
             }
             else if (nodeName == "Profile" && reader.NodeType == XmlNodeType.EndElement)
             {
-              Profiles.Add(profile.ID, profile);
+              if (Profiles.ContainsKey(profile.ID))
+              {
+                //User profiles can override defaults
+                Profiles[profile.ID] = profile;
+              }
+              else
+              {
+                Profiles.Add(profile.ID, profile);
+              }
             }
           }
           reader.Close();
@@ -1134,7 +1152,7 @@ namespace MediaPortal.Extensions.MediaServer.Profiles
       {
         IPathManager pathManager = ServiceRegistration.Get<IPathManager>();
         string dataPath = pathManager.GetPath("<CONFIG>");
-        string linkFile = Path.Combine(dataPath, "MediaPortal.Extensions.MediaServer.Links.xml");
+        string linkFile = Path.Combine(dataPath, PROFILE_LINK_FILE);
         if (File.Exists(linkFile) == true)
         {
           XmlDocument document = new XmlDocument();
@@ -1227,7 +1245,7 @@ namespace MediaPortal.Extensions.MediaServer.Profiles
       {
         IPathManager pathManager = ServiceRegistration.Get<IPathManager>();
         string dataPath = pathManager.GetPath("<CONFIG>");
-        string linkFile = Path.Combine(dataPath, "MediaPortal.Extensions.MediaServer.Links.xml");
+        string linkFile = Path.Combine(dataPath, PROFILE_LINK_FILE);
         if (Profiles.Count == 0) return; //Avoid overwriting of exisitng links if no profiles.xml found
         XmlDocument document = new XmlDocument();
         if (File.Exists(linkFile) == true)
@@ -1324,7 +1342,7 @@ namespace MediaPortal.Extensions.MediaServer.Profiles
       {
         IPathManager pathManager = ServiceRegistration.Get<IPathManager>();
         string dataPath = pathManager.GetPath("<CONFIG>");
-        string linkFile = Path.Combine(dataPath, "MediaPortal.Extensions.MediaServer.PreferredLanguages.xml");
+        string linkFile = Path.Combine(dataPath, LANGUAGE_FILE);
         if (File.Exists(linkFile))
         {
           XmlDocument document = new XmlDocument();
@@ -1386,7 +1404,7 @@ namespace MediaPortal.Extensions.MediaServer.Profiles
       {
         IPathManager pathManager = ServiceRegistration.Get<IPathManager>();
         string dataPath = pathManager.GetPath("<CONFIG>");
-        string linkFile = Path.Combine(dataPath, "MediaPortal.Extensions.MediaServer.PreferredLanguages.xml");
+        string linkFile = Path.Combine(dataPath, LANGUAGE_FILE);
         XmlDocument document = new XmlDocument();
         if (File.Exists(linkFile))
         {
