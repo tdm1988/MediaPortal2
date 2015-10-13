@@ -759,10 +759,9 @@ namespace MediaPortal.Plugins.Transcoding.Service
 
     #endregion
 
-
     #region Transcoding
 
-    public TranscodeContext GetMediaStream(BaseTranscoding transcodingInfo, bool waitForBuffer)
+    public TranscodeContext GetMediaStream(BaseTranscoding transcodingInfo, double timeStart, double timeDuration, bool waitForBuffer)
     {
       InitSettings();
       if (((ILocalFsResourceAccessor)transcodingInfo.SourceFile).Exists == false)
@@ -776,17 +775,17 @@ namespace MediaPortal.Plugins.Transcoding.Service
       }
       else if (transcodingInfo is AudioTranscoding)
       {
-        return TranscodeAudioFile(transcodingInfo as AudioTranscoding, waitForBuffer);
+        return TranscodeAudioFile(transcodingInfo as AudioTranscoding, timeStart, timeDuration, waitForBuffer);
       }
       else if (transcodingInfo is VideoTranscoding)
       {
-        return TranscodeVideoFile(transcodingInfo as VideoTranscoding, waitForBuffer);
+        return TranscodeVideoFile(transcodingInfo as VideoTranscoding, timeStart, timeDuration, waitForBuffer);
       }
       if (Logger != null) Logger.Error("MediaConverter: Transcoding info is not valid for transcode '{0}'", transcodingInfo.TranscodeId);
       return null;
     }
 
-    private TranscodeContext TranscodeVideoFile(VideoTranscoding video, bool waitForBuffer)
+    private TranscodeContext TranscodeVideoFile(VideoTranscoding video, double timeStart, double timeDuration, bool waitForBuffer)
     {
       TranscodeContext context = new TranscodeContext { Failed = false };
       if(video.TargetVideoContainer == VideoContainer.Unknown)
@@ -890,6 +889,8 @@ namespace MediaPortal.Plugins.Transcoding.Service
         bool useX26XLib = video.TargetVideoCodec == VideoCodec.H264 || video.TargetVideoCodec == VideoCodec.H265;
         _ffMpegCommandline.AddTranscodingThreadsParameters(!useX26XLib, ref data);
 
+        _ffMpegCommandline.AddTimeParameters(timeStart, timeDuration, video.SourceDuration.TotalSeconds, ref data);
+
         FFMpegEncoderConfig encoderConfig = _ffMpegEncoderHandler.GetEncoderConfig(data.Encoder);
         _ffMpegCommandline.AddVideoParameters(video, data.TranscodeId, currentSub, encoderConfig, ref data);
 
@@ -914,7 +915,7 @@ namespace MediaPortal.Plugins.Transcoding.Service
       return context;
     }
 
-    private TranscodeContext TranscodeAudioFile(AudioTranscoding audio, bool waitForBuffer)
+    private TranscodeContext TranscodeAudioFile(AudioTranscoding audio, double timeStart, double timeDuration, bool waitForBuffer)
     {
       TranscodeContext context = new TranscodeContext { Failed = false };
       if (audio.TargetAudioContainer == AudioContainer.Unknown)
@@ -995,6 +996,7 @@ namespace MediaPortal.Plugins.Transcoding.Service
       {
         _ffMpegCommandline.InitTranscodingParameters(audio.SourceFile, ref data);
         _ffMpegCommandline.AddTranscodingThreadsParameters(true, ref data);
+        _ffMpegCommandline.AddTimeParameters(timeStart, timeDuration, audio.SourceDuration.TotalSeconds, ref data);
 
         _ffMpegCommandline.AddAudioParameters(audio, ref data);
 

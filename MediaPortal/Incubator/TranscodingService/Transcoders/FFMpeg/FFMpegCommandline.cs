@@ -142,16 +142,6 @@ namespace MediaPortal.Plugins.Transcoding.Service.Transcoders.FFMpeg
         data.HlsBaseUrl = video.HlsBaseUrl;
         string fileSegments = Path.Combine(pathName, _hlsSegmentFileTemplate);
 
-        //Segment muxer
-        //data.OutputArguments.Add(string.Format("-f {0}", GetVideoContainer(video.TargetVideoContainer)));
-        //data.OutputArguments.Add(string.Format("-segment_format {0}", GetVideoContainer(VideoContainer.Mpeg2Ts)));
-        //data.OutputArguments.Add(string.Format("-segment_time {0}", HLSSegmentTimeInSeconds));
-        //data.OutputArguments.Add("-segment_list_flags live");
-        //data.OutputArguments.Add("-segment_list_type hls");
-        //data.OutputArguments.Add("-segment_list_size 0");
-        //data.OutputArguments.Add(string.Format("-segment_list {0}", "\"" + data.SegmentPlaylist + "\""));
-        //data.OutputFilePath = HLSSegmentFileTemplate;
-
         //HLS muxer
         data.OutputArguments.Add("-hls_list_size 0");
         data.OutputArguments.Add("-hls_allow_cache 0");
@@ -713,6 +703,19 @@ namespace MediaPortal.Plugins.Transcoding.Service.Transcoders.FFMpeg
       if (channels > 0)
       {
         data.OutputArguments.Add(string.Format("-ac {0}", channels));
+      }
+    }
+
+    internal void AddTimeParameters(double timeStart, double timeDuration, double mediaDuration, ref FFMpegTranscodeData data)
+    {
+      if (timeStart > 0.0 && (timeStart < mediaDuration || mediaDuration <= 0))
+      {
+        data.InputArguments.Add(string.Format("-ss {0:0.0}", timeStart));
+        data.OutputArguments.Add("-avoid_negative_ts 1");
+      }
+      if (timeDuration > 0)
+      {
+        data.OutputArguments.Add(string.Format("-t {0:0.0}", timeDuration));
       }
     }
 
