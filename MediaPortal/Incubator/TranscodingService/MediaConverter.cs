@@ -922,50 +922,6 @@ namespace MediaPortal.Plugins.Transcoding.Service
       {
         audio.TargetAudioContainer = audio.SourceAudioContainer;
       }
-      if (audio.TargetAudioCodec == AudioCodec.Unknown)
-      {
-        switch (audio.TargetAudioContainer)
-        {
-          case AudioContainer.Unknown:
-            break;
-          case AudioContainer.Ac3:
-            audio.TargetAudioCodec = AudioCodec.Ac3;
-            break;
-          case AudioContainer.Adts:
-            audio.TargetAudioCodec = AudioCodec.Aac;
-            break;
-          case AudioContainer.Asf:
-            audio.TargetAudioCodec = AudioCodec.Wma;
-            break;
-          case AudioContainer.Flac:
-            audio.TargetAudioCodec = AudioCodec.Flac;
-            break;
-          case AudioContainer.Lpcm:
-            audio.TargetAudioCodec = AudioCodec.Lpcm;
-            break;
-          case AudioContainer.Mp4:
-            audio.TargetAudioCodec = AudioCodec.Aac;
-            break;
-          case AudioContainer.Mp3:
-            audio.TargetAudioCodec = AudioCodec.Mp3;
-            break;
-          case AudioContainer.Mp2:
-            audio.TargetAudioCodec = AudioCodec.Mp2;
-            break;
-          case AudioContainer.Ogg:
-            audio.TargetAudioCodec = AudioCodec.Vorbis;
-            break;
-          case AudioContainer.Rtp:
-            audio.TargetAudioCodec = AudioCodec.Lpcm;
-            break;
-          case AudioContainer.Rtsp:
-            audio.TargetAudioCodec = AudioCodec.Lpcm;
-            break;
-          default:
-            audio.TargetAudioCodec = audio.SourceAudioCodec;
-            break;
-        }
-      }
       string transcodingFile = Path.Combine(TranscoderCachePath, audio.TranscodeId + ".mpta");
       if (File.Exists(transcodingFile) == true)
       {

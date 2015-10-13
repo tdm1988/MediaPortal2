@@ -86,8 +86,56 @@ namespace MediaPortal.Plugins.Transcoding.Service.Transcoders.Base.Metadata
         TargetAudioContainer = audio.TargetAudioContainer,
         TargetAudioFrequency = audio.TargetAudioFrequency
       };
+      if (audio.TargetAudioContainer == AudioContainer.Unknown)
+      {
+        metadata.TargetAudioContainer = audio.SourceAudioContainer;
+      }
       if (Checks.IsAudioStreamChanged(audio))
       {
+        if (audio.TargetAudioCodec == AudioCodec.Unknown)
+        {
+          switch (audio.TargetAudioContainer)
+          {
+            case AudioContainer.Unknown:
+              break;
+            case AudioContainer.Ac3:
+              metadata.TargetAudioCodec = AudioCodec.Ac3;
+              break;
+            case AudioContainer.Adts:
+              metadata.TargetAudioCodec = AudioCodec.Aac;
+              break;
+            case AudioContainer.Asf:
+              metadata.TargetAudioCodec = AudioCodec.Wma;
+              break;
+            case AudioContainer.Flac:
+              metadata.TargetAudioCodec = AudioCodec.Flac;
+              break;
+            case AudioContainer.Lpcm:
+              metadata.TargetAudioCodec = AudioCodec.Lpcm;
+              break;
+            case AudioContainer.Mp4:
+              metadata.TargetAudioCodec = AudioCodec.Aac;
+              break;
+            case AudioContainer.Mp3:
+              metadata.TargetAudioCodec = AudioCodec.Mp3;
+              break;
+            case AudioContainer.Mp2:
+              metadata.TargetAudioCodec = AudioCodec.Mp2;
+              break;
+            case AudioContainer.Ogg:
+              metadata.TargetAudioCodec = AudioCodec.Vorbis;
+              break;
+            case AudioContainer.Rtp:
+              metadata.TargetAudioCodec = AudioCodec.Lpcm;
+              break;
+            case AudioContainer.Rtsp:
+              metadata.TargetAudioCodec = AudioCodec.Lpcm;
+              break;
+            default:
+              metadata.TargetAudioCodec = audio.SourceAudioCodec;
+              break;
+          }
+        }
         long frequency = Validators.GetAudioFrequency(audio.SourceAudioCodec, audio.TargetAudioCodec, audio.SourceAudioFrequency, audio.TargetAudioFrequency);
         if (frequency > 0)
         {
