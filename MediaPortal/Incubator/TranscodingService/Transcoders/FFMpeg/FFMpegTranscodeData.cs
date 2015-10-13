@@ -104,7 +104,7 @@ namespace MediaPortal.Plugins.Transcoding.Service.Transcoders.FFMpeg
           }
           if (string.IsNullOrEmpty(InputSubtitleFilePath) == false)
           {
-            arg = arg.Replace("{subtitle}", "\"" + InputSubtitleFilePath + "\"");
+            arg = arg.Replace("{subtitle}", "\"" + InputSubtitleFilePath) + "\"";
           }
           if (string.IsNullOrEmpty(OutputFilePath) == false)
           {
