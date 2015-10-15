@@ -628,7 +628,8 @@ namespace MediaPortal.Extensions.MediaServer.DLNA
         {
           if (MediaConverter.RunningTranscodes.ContainsKey(TranscodingParameter.TranscodeId))
           {
-            MediaConverter.RunningTranscodes[TranscodingParameter.TranscodeId].Stop();
+            for (int transcodeNo = 0; transcodeNo < MediaConverter.RunningTranscodes[TranscodingParameter.TranscodeId].Count; transcodeNo++)
+              MediaConverter.RunningTranscodes[TranscodingParameter.TranscodeId][transcodeNo].Stop();
           }
         }
       }
