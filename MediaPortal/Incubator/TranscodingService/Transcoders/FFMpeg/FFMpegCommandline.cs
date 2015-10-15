@@ -754,12 +754,12 @@ namespace MediaPortal.Plugins.Transcoding.Service.Transcoders.FFMpeg
     {
       if (timeStart > 0.0 && (timeStart < mediaDuration || mediaDuration <= 0))
       {
-        data.InputArguments.Add(string.Format("-ss {0:0.0}", timeStart));
+        data.InputArguments.Add(string.Format(CultureInfo.InvariantCulture, "-ss {0:0.0}", timeStart));
         data.OutputArguments.Add("-avoid_negative_ts 1");
       }
       if (timeDuration > 0)
       {
-        data.OutputArguments.Add(string.Format("-t {0:0.0}", timeDuration));
+        data.OutputArguments.Add(string.Format(CultureInfo.InvariantCulture, "-t {0:0.0}", timeDuration));
       }
     }
 
