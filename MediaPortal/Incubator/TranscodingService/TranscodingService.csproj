@@ -70,7 +70,6 @@
     <Compile Include="MediaConverter.cs" />
     <Compile Include="SubtitleAnalyzer.cs" />
     <Compile Include="Transcoders\Base\Checks.cs" />
-    <Compile Include="Transcoders\Base\Metadata\Metadata.cs" />
     <Compile Include="Transcoders\Base\Subtitle.cs" />
     <Compile Include="Transcoders\Base\TranscodeContext.cs" />
     <Compile Include="Transcoders\Base\TranscodeData.cs" />

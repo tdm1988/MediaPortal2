@@ -445,13 +445,10 @@ namespace MediaPortal.Extensions.MediaServer.DLNA
       }
       else
       {
-        MediaConverter converter = new MediaConverter();
-        converter.Logger = Logger;
-
         if (info.IsImage)
         {
           ImageTranscoding image = (ImageTranscoding)TranscodingParameter;
-          TranscodedImageMetadata metadata = converter.GetTranscodedImageMetadata(image);
+          TranscodedImageMetadata metadata = MediaConverter.GetTranscodedImageMetadata(image);
           DlnaMetadata = new MetadataContainer();
           DlnaMetadata.Metadata.Mime = info.Metadata.Mime;
           DlnaMetadata.Metadata.ImageContainerType = metadata.TargetImageCodec;
@@ -468,7 +465,7 @@ namespace MediaPortal.Extensions.MediaServer.DLNA
         else if (info.IsAudio)
         {
           AudioTranscoding audio = (AudioTranscoding)TranscodingParameter;
-          TranscodedAudioMetadata metadata = converter.GetTranscodedAudioMetadata(audio);
+          TranscodedAudioMetadata metadata = MediaConverter.GetTranscodedAudioMetadata(audio);
           DlnaMetadata = new MetadataContainer();
           DlnaMetadata.Metadata.Mime = info.Metadata.Mime;
           DlnaMetadata.Metadata.AudioContainerType = metadata.TargetAudioContainer;
@@ -506,7 +503,7 @@ namespace MediaPortal.Extensions.MediaServer.DLNA
         else if (info.IsVideo)
         {
           VideoTranscoding video = (VideoTranscoding)TranscodingParameter;
-          TranscodedVideoMetadata metadata = converter.GetTranscodedVideoMetadata(video);
+          TranscodedVideoMetadata metadata = MediaConverter.GetTranscodedVideoMetadata(video);
           int selectedAudio = 0;
           for (int stream = 0; stream < info.Audio.Count; stream++)
           {

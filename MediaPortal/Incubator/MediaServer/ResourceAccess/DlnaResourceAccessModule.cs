@@ -68,7 +68,6 @@ namespace MediaPortal.Extensions.MediaServer.ResourceAccess
     private string _product = null;
     private Dictionary<string, Guid> _lastMediaItem = new Dictionary<string, Guid>();
     private Dictionary<string, Dictionary<string, List<TranscodeContext>>> _currentClientTranscodes = new Dictionary<string, Dictionary<string, List<TranscodeContext>>>();
-    private MediaConverter _transcoder = new MediaConverter();
 
     protected enum StreamMode
     {
@@ -94,8 +93,6 @@ namespace MediaPortal.Extensions.MediaServer.ResourceAccess
       _serverOsVersion = WindowsAPI.GetOsVersionString();
       Assembly assembly = Assembly.GetExecutingAssembly();
       _product = "MediaPortal 2 DLNA Server/" + AssemblyName.GetAssemblyName(assembly.Location).Version.ToString(2);
-
-      _transcoder.Logger = Logger;
 
       ClearCache();
     }
@@ -135,7 +132,7 @@ namespace MediaPortal.Extensions.MediaServer.ResourceAccess
     {
       lock (_syncObj)
       {
-        _transcoder.CleanUpTranscodeCache();
+        MediaConverter.CleanUpTranscodeCache();
       }
     }
 
@@ -509,7 +506,7 @@ namespace MediaPortal.Extensions.MediaServer.ResourceAccess
               response.ContentType = subTargetMime;
               if (subUseLocal)
               {
-                using (var subStream = _transcoder.GetReadyFileBuffer(subSource.Source))
+                using (var subStream = MediaConverter.GetReadyFileBuffer(subSource.Source))
                 {
                   Logger.Debug("DlnaResourceAccessModule: Sending subtitle file for {0}", uri.ToString());
                   SendResourceFile(request, response, subStream, false);
@@ -519,7 +516,7 @@ namespace MediaPortal.Extensions.MediaServer.ResourceAccess
               {
                 if (dlnaItem.IsTranscoded)
                 {
-                  using (var subStream = _transcoder.GetSubtitleStream((VideoTranscoding)dlnaItem.TranscodingParameter))
+                  using (var subStream = MediaConverter.GetSubtitleStream((VideoTranscoding)dlnaItem.TranscodingParameter))
                   {
                     Logger.Debug("DlnaResourceAccessModule: Sending transcoded subtitle file for {0}", uri.ToString());
                     SendResourceFile(request, response, subStream, false);
@@ -527,7 +524,7 @@ namespace MediaPortal.Extensions.MediaServer.ResourceAccess
                 }
                 else
                 {
-                  using (var subStream = _transcoder.GetSubtitleStream((VideoTranscoding)dlnaItem.SubtitleTranscodingParameter))
+                  using (var subStream = MediaConverter.GetSubtitleStream((VideoTranscoding)dlnaItem.SubtitleTranscodingParameter))
                   {
                     Logger.Debug("DlnaResourceAccessModule: Sending transcoded subtitle file for {0}", uri.ToString());
                     SendResourceFile(request, response, subStream, false);
@@ -603,12 +600,12 @@ namespace MediaPortal.Extensions.MediaServer.ResourceAccess
             {
               int startIndex = request.Uri.AbsoluteUri.LastIndexOf("/") + 1;
               string fileName = request.Uri.AbsoluteUri.Substring(startIndex);
-              if (Path.GetExtension(_transcoder.HLSSegmentFileTemplate) == Path.GetExtension(fileName))
+              if (Path.GetExtension(MediaConverter.HLSSegmentFileTemplate) == Path.GetExtension(fileName))
               {
                 string segmentFile = Path.Combine(dlnaItem.SegmentDir, fileName);
                 if (File.Exists(segmentFile) == true)
                 {
-                  resourceStream = _transcoder.GetReadyFileBuffer(segmentFile);
+                  resourceStream = MediaConverter.GetReadyFileBuffer(segmentFile);
                 }
                 else
                 {
@@ -629,7 +626,7 @@ namespace MediaPortal.Extensions.MediaServer.ResourceAccess
             }
             if (resourceStream == null && dlnaItem.IsTranscoded == false)
             {
-              resourceStream = _transcoder.GetReadyFileBuffer((ILocalFsResourceAccessor)dlnaItem.DlnaMetadata.Metadata.Source);
+              resourceStream = MediaConverter.GetReadyFileBuffer((ILocalFsResourceAccessor)dlnaItem.DlnaMetadata.Metadata.Source);
             }
 
             IList<Range> ranges = null;
@@ -641,7 +638,7 @@ namespace MediaPortal.Extensions.MediaServer.ResourceAccess
               if (dlnaItem.IsSegmented)
               {
                 //Is this possible?
-                duration = _transcoder.HLSSegmentTimeInSeconds;
+                duration = MediaConverter.HLSSegmentTimeInSeconds;
               }
               ranges = ParseTimeRanges(byteRangesSpecifier, duration);
               if (ranges == null || ranges.Count != 1)
@@ -726,7 +723,8 @@ namespace MediaPortal.Extensions.MediaServer.ResourceAccess
             TranscodeContext context = null;
             if (resourceStream == null)
             {
-              context = _transcoder.GetMediaStream(dlnaItem.TranscodingParameter, timeRange.From, timeRange.Length, true);
+              context = MediaConverter.GetMediaStream(dlnaItem.TranscodingParameter, timeRange.From, timeRange.Length, true);
+              context.InUse = true;
               partialResource = context.Partial;
               dlnaItem.SegmentDir = context.SegmentDir;
               resourceStream = context.TranscodedStream;
@@ -747,8 +745,11 @@ namespace MediaPortal.Extensions.MediaServer.ResourceAccess
                   Logger.Debug("DlnaResourceAccessModule: Ending {0} transcodes for client {1}", _currentClientTranscodes[clientId].Count, clientId);
                   foreach(var transcodeContexts in _currentClientTranscodes[clientId].Values)
                   {
-                    foreach(var transcodeContext in transcodeContexts)
-                      if(transcodeContext.Running) transcodeContext.Stop();
+                    foreach (var transcodeContext in transcodeContexts)
+                    {
+                      if (transcodeContext.Running) transcodeContext.Stop();
+                      transcodeContext.InUse = false;
+                    }
                   }
                   _currentClientTranscodes[clientId].Clear();
                 }
@@ -849,11 +850,7 @@ namespace MediaPortal.Extensions.MediaServer.ResourceAccess
             }
             finally
             {
-              if (partialResource == true)
-              {
-                context.Stop();
-                context.DeleteFiles();
-              }
+              if (context != null) context.InUse = false;
             }
           }
         }

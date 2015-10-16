@@ -34,13 +34,12 @@ using MediaPortal.Common;
 using MediaPortal.Common.Logging;
 using MediaPortal.Common.ResourceAccess;
 using MediaPortal.Plugins.Transcoding.Service.Transcoders.Base;
-using MediaPortal.Plugins.Transcoding.Service.Transcoders.Base.Metadata;
 using MediaPortal.Plugins.Transcoding.Service.Transcoders.FFMpeg.Converters;
 using MediaPortal.Plugins.Transcoding.Service.Transcoders.FFMpeg.Encoders;
 
 namespace MediaPortal.Plugins.Transcoding.Service.Transcoders.FFMpeg
 {
-  internal class FFMpegCommandline : Metadata
+  internal class FFMpegCommandline
   {
     private int _transcoderMaximumThreads;
     private int _transcoderTimeout;
@@ -91,14 +90,57 @@ namespace MediaPortal.Plugins.Transcoding.Service.Transcoders.FFMpeg
     };
 
 
-    internal FFMpegCommandline(MediaConverter mediaConverter)
+    internal FFMpegCommandline(int maxThreads, int commandTimeout, string cachePath, int hlsSegmentDuration, string hlsSegmentTemplate, bool supportHCSubs)
     {
-      _transcoderMaximumThreads = mediaConverter.TranscoderMaximumThreads;
-      _transcoderTimeout = mediaConverter.TranscoderTimeout;
-      _transcoderCachePath = mediaConverter.TranscoderCachePath;
-      _hlsSegmentTimeInSeconds = mediaConverter.HLSSegmentTimeInSeconds;
-      _hlsSegmentFileTemplate = mediaConverter.HLSSegmentFileTemplate;
-      _supportHardcodedSubs = mediaConverter.SupportHardcodedSubs;
+      _transcoderMaximumThreads = maxThreads;
+      _transcoderTimeout = commandTimeout;
+      _transcoderCachePath = cachePath;
+      _hlsSegmentTimeInSeconds = hlsSegmentDuration;
+      _hlsSegmentFileTemplate = hlsSegmentTemplate;
+      _supportHardcodedSubs = supportHCSubs;
+    }
+
+    internal void GetVideoDimensions(VideoTranscoding video, out Size newSize, out Size newContentSize, out float newPixelAspectRatio, out bool pixelARChanged, out bool videoARChanged, out bool videoHeightChanged)
+    {
+      newSize = new Size(video.SourceVideoWidth, video.SourceVideoHeight);
+      newContentSize = new Size(video.SourceVideoWidth, video.SourceVideoHeight);
+      newPixelAspectRatio = video.SourceVideoPixelAspectRatio;
+      pixelARChanged = false;
+      videoARChanged = false;
+      videoHeightChanged = false;
+
+      if (Checks.IsSquarePixelNeeded(video))
+      {
+        newSize.Width = Convert.ToInt32(Math.Round((double)video.SourceVideoWidth * video.SourceVideoPixelAspectRatio));
+        newSize.Height = video.SourceVideoHeight;
+        newContentSize.Width = newSize.Width;
+        newContentSize.Height = newSize.Height;
+        newPixelAspectRatio = 1;
+        pixelARChanged = true;
+      }
+      if (Checks.IsVideoAspectRatioChanged(newSize.Width, newSize.Height, newPixelAspectRatio, video.TargetVideoAspectRatio) == true)
+      {
+        double sourceNewAspectRatio = (double)newSize.Width / (double)newSize.Height * video.SourceVideoAspectRatio;
+        if (sourceNewAspectRatio < video.SourceVideoAspectRatio)
+          newSize.Width = Convert.ToInt32(Math.Round((double)newSize.Height * video.TargetVideoAspectRatio / newPixelAspectRatio));
+        else
+          newSize.Height = Convert.ToInt32(Math.Round((double)newSize.Width * newPixelAspectRatio / video.TargetVideoAspectRatio));
+
+        videoARChanged = true;
+      }
+      if (Checks.IsVideoHeightChangeNeeded(newSize.Height, video.TargetVideoMaxHeight) == true)
+      {
+        double oldWidth = newSize.Width;
+        double oldHeight = newSize.Height;
+        newSize.Width = Convert.ToInt32(Math.Round(newSize.Width * ((double)video.TargetVideoMaxHeight / (double)newSize.Height)));
+        newSize.Height = video.TargetVideoMaxHeight;
+        newContentSize.Width = Convert.ToInt32(Math.Round((double)newContentSize.Width * ((double)newSize.Width / oldWidth)));
+        newContentSize.Height = Convert.ToInt32(Math.Round((double)newContentSize.Height * ((double)newSize.Height / oldHeight)));
+        videoHeightChanged = true;
+      }
+      //Correct widths
+      newSize.Width = ((newSize.Width + 1) / 2) * 2;
+      newContentSize.Width = ((newContentSize.Width + 1) / 2) * 2;
     }
 
     internal void InitTranscodingParameters(IResourceAccessor sourceFile, ref FFMpegTranscodeData data)

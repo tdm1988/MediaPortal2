@@ -22,6 +22,7 @@ namespace MediaPortal.Plugins.Transcoding.Service.Transcoders.Base
     long _lastSize = 0;
     TimeSpan _lastTime = TimeSpan.FromTicks(0);
     object _lastSync = new object();
+    bool _streamInUse = false;
 
     public string TargetFile { get; internal set; }
     public string SegmentDir { get; internal set; }
@@ -29,6 +30,20 @@ namespace MediaPortal.Plugins.Transcoding.Service.Transcoders.Base
     public bool Aborted { get; internal set; }
     public bool Failed { get; internal set; }
     public bool Partial { get; internal set; }
+    public bool InUse 
+    {
+      get { return _streamInUse; }
+      set
+      {
+        if(_streamInUse == true && value == false && Partial == true)
+        {
+          //Delete partial transcodes if no longer used
+          Stop();
+          DeleteFiles();
+        }
+        _streamInUse = value;
+      }
+    }
     public TimeSpan TargetDuration { get; internal set; }
     public TimeSpan CurrentDuration 
     { 
@@ -167,7 +182,7 @@ namespace MediaPortal.Plugins.Transcoding.Service.Transcoders.Base
       Running = false;
     }
 
-    public void DeleteFiles()
+    internal void DeleteFiles()
     {
       string deletePath = TargetFile;
       bool isFolder = false;

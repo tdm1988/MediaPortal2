@@ -42,9 +42,10 @@ namespace MediaPortal.Plugins.Transcoding.Service
 {
   public class TranscodingServicePlugin : IPluginStateTracker
   {
-    public static string TranscoderCachePath { get; private set; }
-    public static long TranscoderMaximumCacheSizeInGB { get; private set; }
-    public static long TranscodeMaximumCacheAgeInDays { get; private set; }
+    public static bool CacheEnabled { get; private set; }
+    public static string CachePath { get; private set; }
+    public static long CacheMaximumSizeInGB { get; private set; }
+    public static long CacheMaximumAgeInDays { get; private set; }
     public static int TranscoderMaximumThreads { get; private set; }
     public static int TranscoderTimeout { get; private set; }
     public static int HLSSegmentTimeInSeconds { get; private set; }
@@ -78,10 +79,11 @@ namespace MediaPortal.Plugins.Transcoding.Service
 
     public TranscodingServicePlugin()
     {
-      TranscoderMaximumCacheSizeInGB = 0; //GB
-      TranscodeMaximumCacheAgeInDays = 30; //Days
-      TranscoderMaximumThreads = 0;
-      TranscoderCachePath = Path.Combine(Path.GetTempPath(), DEFAULT_TRANSCODE_CACHE_FOLDER);
+      CacheEnabled = true;
+      CacheMaximumSizeInGB = 0; //GB
+      CacheMaximumAgeInDays = 30; //Days
+      CachePath = Path.Combine(Path.GetTempPath(), DEFAULT_TRANSCODE_CACHE_FOLDER);
+      TranscoderMaximumThreads = 0; //Auto
       TranscoderTimeout = 5000;
       HLSSegmentTimeInSeconds = 10;
       HLSSegmentFileTemplate = "segment%05d.ts";
@@ -120,21 +122,25 @@ namespace MediaPortal.Plugins.Transcoding.Service
         {
           foreach (XmlNode childNode in node.ChildNodes)
           {
-            if (childNode.Name == "TranscoderCachePath")
+            if (childNode.Name == "CacheEnabled")
             {
-              TranscoderCachePath = childNode.InnerText;
-              if (Directory.Exists(TranscoderCachePath) == false)
+              CacheEnabled = Convert.ToInt32(childNode.InnerText) > 0;
+            }
+            else if (childNode.Name == "CachePath")
+            {
+              CachePath = childNode.InnerText;
+              if (Directory.Exists(CachePath) == false)
               {
-                Directory.CreateDirectory(TranscoderCachePath);
+                Directory.CreateDirectory(CachePath);
               }
             }
-            else if (childNode.Name == "TranscoderMaximumCacheSizeInGB")
+            else if (childNode.Name == "CacheMaximumSizeInGB")
             {
-              TranscoderMaximumCacheSizeInGB = Convert.ToInt64(childNode.InnerText);
+              CacheMaximumSizeInGB = Convert.ToInt64(childNode.InnerText);
             }
-            else if (childNode.Name == "TranscodeMaximumCacheAgeInDays")
+            else if (childNode.Name == "CacheMaximumAgeInDays")
             {
-              TranscodeMaximumCacheAgeInDays = Convert.ToInt64(childNode.InnerText);
+              CacheMaximumAgeInDays = Convert.ToInt64(childNode.InnerText);
             }
             else if (childNode.Name == "TranscoderMaximumThreads")
             {
@@ -205,6 +211,7 @@ namespace MediaPortal.Plugins.Transcoding.Service
           }
         }
       }
+      MediaConverter.LoadSettings();
     }
 
     private void SaveTranscodeSettings()
@@ -239,14 +246,17 @@ namespace MediaPortal.Plugins.Transcoding.Service
       {
         node.RemoveAll();
 
-        XmlElement elem = document.CreateElement("TranscoderCachePath");
-        elem.InnerText = TranscoderCachePath;
+        XmlElement elem = document.CreateElement("CacheEnabled");
+        elem.InnerText = Convert.ToString(CacheEnabled ? 1 : 0);
         node.AppendChild(elem);
-        elem = document.CreateElement("TranscoderMaximumCacheSizeInGB");
-        elem.InnerText = Convert.ToString(TranscoderMaximumCacheSizeInGB);
+        elem = document.CreateElement("CachePath");
+        elem.InnerText = CachePath;
         node.AppendChild(elem);
-        elem = document.CreateElement("TranscodeMaximumCacheAgeInDays");
-        elem.InnerText = Convert.ToString(TranscodeMaximumCacheAgeInDays);
+        elem = document.CreateElement("CacheMaximumSizeInGB");
+        elem.InnerText = Convert.ToString(CacheMaximumSizeInGB);
+        node.AppendChild(elem);
+        elem = document.CreateElement("CacheMaximumAgeInDays");
+        elem.InnerText = Convert.ToString(CacheMaximumAgeInDays);
         node.AppendChild(elem);
         elem = document.CreateElement("TranscoderMaximumThreads");
         elem.InnerText = Convert.ToString(TranscoderMaximumThreads);
