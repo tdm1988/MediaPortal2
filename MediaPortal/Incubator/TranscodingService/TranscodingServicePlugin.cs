@@ -75,14 +75,14 @@ namespace MediaPortal.Plugins.Transcoding.Service
     private static List<VideoCodec> _nvidiaCodecs = new List<VideoCodec>() {VideoCodec.H264, VideoCodec.H265};
 
     private const string SETTINGS_FILE = "MediaPortal.Plugins.Transcoding.Service.Settings.xml";
-    private const string DEFAULT_TRANSCODE_CACHE_FOLDER = "MPTranscodes";
+    public static string DEFAULT_CACHE_PATH = ServiceRegistration.Get<IPathManager>().GetPath(@"<DATA>\TranscodeCache\");
 
     public TranscodingServicePlugin()
     {
       CacheEnabled = true;
       CacheMaximumSizeInGB = 0; //GB
       CacheMaximumAgeInDays = 30; //Days
-      CachePath = Path.Combine(Path.GetTempPath(), DEFAULT_TRANSCODE_CACHE_FOLDER);
+      CachePath = DEFAULT_CACHE_PATH;
       TranscoderMaximumThreads = 0; //Auto
       TranscoderTimeout = 5000;
       HLSSegmentTimeInSeconds = 10;
@@ -101,6 +101,11 @@ namespace MediaPortal.Plugins.Transcoding.Service
       Logger.Info(string.Format("{0} v{1} [{2}] by {3}", meta.Name, meta.PluginVersion, meta.Description, meta.Author));
 
       LoadTranscodeSettings();
+      if (Directory.Exists(CachePath) == false)
+      {
+        Directory.CreateDirectory(CachePath);
+      }
+      MediaConverter.LoadSettings();
     }
 
     private void LoadTranscodeSettings()
@@ -129,10 +134,6 @@ namespace MediaPortal.Plugins.Transcoding.Service
             else if (childNode.Name == "CachePath")
             {
               CachePath = childNode.InnerText;
-              if (Directory.Exists(CachePath) == false)
-              {
-                Directory.CreateDirectory(CachePath);
-              }
             }
             else if (childNode.Name == "CacheMaximumSizeInGB")
             {
@@ -211,7 +212,6 @@ namespace MediaPortal.Plugins.Transcoding.Service
           }
         }
       }
-      MediaConverter.LoadSettings();
     }
 
     private void SaveTranscodeSettings()
@@ -319,6 +319,7 @@ namespace MediaPortal.Plugins.Transcoding.Service
     public void Continue()
     {
       LoadTranscodeSettings();
+      MediaConverter.LoadSettings();
     }
 
     public void Shutdown()
