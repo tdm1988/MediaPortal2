@@ -54,7 +54,7 @@ namespace MediaPortal.Extensions.MediaServer.Objects.MediaLibrary
     public void Initialise()
     {
       DlnaMediaItem dlnaItem = Client.GetDlnaItem(Item);
-      if (dlnaItem.IsSubtitled == true)
+      if (DlnaResourceAccessUtils.IsSoftCodedSubtitleAvailable(dlnaItem, Client) == true)
       {
         string mime = null;
         string type = null;

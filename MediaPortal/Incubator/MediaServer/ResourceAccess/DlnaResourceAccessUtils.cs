@@ -40,6 +40,7 @@ using System.Globalization;
 using MediaPortal.Extensions.MediaServer.Profiles;
 using MediaPortal.Common.MediaManagement;
 using System.IO;
+using MediaPortal.Extensions.MediaServer.DLNA;
 
 namespace MediaPortal.Extensions.MediaServer.ResourceAccess
 {
@@ -88,16 +89,6 @@ namespace MediaPortal.Extensions.MediaServer.ResourceAccess
       return true;
     }
 
-    [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-    private static extern uint GetShortPathName([MarshalAs(UnmanagedType.LPTStr)] string lpszLongPath, [MarshalAs(UnmanagedType.LPTStr)] StringBuilder lpszShortPath, uint cchBuffer);
-
-    public static string GetFileShortName(string longName)
-    {
-      StringBuilder shortNameBuffer = new StringBuilder(256);
-      uint result = GetShortPathName(longName, shortNameBuffer, 256);
-      return shortNameBuffer.ToString();
-    }
-
     private static string GetSubtitleMime(SubtitleCodec codec)
     {
       switch (codec)
@@ -118,7 +109,7 @@ namespace MediaPortal.Extensions.MediaServer.ResourceAccess
       return "text/plain";
     }
 
-    public static bool FindSubtitle(EndPointSettings client, out SubtitleCodec targetCodec, out string targetMime)
+    public static bool UseSoftCodedSubtitle(EndPointSettings client, out SubtitleCodec targetCodec, out string targetMime)
     {
       targetCodec = SubtitleCodec.Unknown;
       targetMime = "text/plain";
@@ -167,13 +158,32 @@ namespace MediaPortal.Extensions.MediaServer.ResourceAccess
       return localIp;
     }
 
+    public static bool IsSoftCodedSubtitleAvailable(DlnaMediaItem dlnaItem, EndPointSettings client)
+    {
+      if (client.Profile.Settings.Subtitles.SubtitleMode != SubtitleSupport.SoftCoded)
+      {
+        return false;
+      }
+      if (dlnaItem.IsTranscoded && dlnaItem.IsVideo)
+      {
+        VideoTranscoding video = (VideoTranscoding)dlnaItem.TranscodingParameter;
+        if (MediaConverter.IsSubtitleAvailable(video)) return true;
+      }
+      else if (dlnaItem.IsVideo)
+      {
+        VideoTranscoding subtitle = (VideoTranscoding)dlnaItem.SubtitleTranscodingParameter;
+        if (MediaConverter.IsSubtitleAvailable(subtitle)) return true;
+      }
+      return false;
+    }
+
     public static string GetSubtitleBaseURL(MediaItem item, EndPointSettings client, out string subMime, out string subExtension)
     {
       SubtitleCodec codec = SubtitleCodec.Unknown;
       subMime = null;
       subExtension = null;
 
-      if (FindSubtitle(client, out codec, out subMime) == false)
+      if (UseSoftCodedSubtitle(client, out codec, out subMime) == true)
       {
         subExtension = "srt";
         string subType = codec.ToString();

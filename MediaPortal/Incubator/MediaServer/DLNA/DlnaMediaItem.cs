@@ -97,9 +97,7 @@ namespace MediaPortal.Extensions.MediaServer.DLNA
       {
         info = DlnaVideoMetadata.ParseMediaItem(item);
       }
-
-      IsSubtitled = false;
-      
+     
       if (MediaServerPlugin.TranscodingAllowed == true)
       {
         if (IsAudio)
@@ -423,7 +421,9 @@ namespace MediaPortal.Extensions.MediaServer.DLNA
       if(TranscodingParameter == null)
       {
         VideoTranscoding subtitle = new VideoTranscoding();
+        subtitle.SourceFile = info.Metadata.Source;
         subtitle.TargetSubtitleSupport = client.Profile.Settings.Subtitles.SubtitleMode;
+        subtitle.SourceSubtitles.AddRange(info.Subtitles);
         if (MediaServerPlugin.HardcodedSubtitlesAllowed == false && client.Profile.Settings.Subtitles.SubtitleMode == SubtitleSupport.HardCoded)
         {
           subtitle.TargetSubtitleSupport = SubtitleSupport.None;
@@ -569,8 +569,6 @@ namespace MediaPortal.Extensions.MediaServer.DLNA
           DlnaMetadata.Video.PixelFormatType = metadata.TargetVideoPixelFormat;
           DlnaMetadata.Video.TimestampType = metadata.TargetVideoTimestamp;
           DlnaMetadata.Video.Width = metadata.TargetVideoMaxWidth;
-
-          IsSubtitled = metadata.TargetSubtitled;
         }
       }
 
@@ -687,7 +685,6 @@ namespace MediaPortal.Extensions.MediaServer.DLNA
         return true;
       }
     }
-    public bool IsSubtitled { get; private set; }
     public BaseTranscoding TranscodingParameter { get; private set; }
     public BaseTranscoding SubtitleTranscodingParameter { get; private set; }
     public bool IsImage { get; private set; }
