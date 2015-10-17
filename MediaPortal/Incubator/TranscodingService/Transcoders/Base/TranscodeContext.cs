@@ -23,6 +23,18 @@ namespace MediaPortal.Plugins.Transcoding.Service.Transcoders.Base
     TimeSpan _lastTime = TimeSpan.FromTicks(0);
     object _lastSync = new object();
     bool _streamInUse = false;
+    bool _useCache = true;
+    ManualResetEvent _completeEvent = new ManualResetEvent(true);
+
+    public TranscodeContext(bool useCache)
+    {
+      _useCache = useCache;
+    }
+
+    internal ManualResetEvent CompleteEvent 
+    {
+      get { return _completeEvent; }
+    }
 
     public string TargetFile { get; internal set; }
     public string SegmentDir { get; internal set; }
@@ -35,9 +47,9 @@ namespace MediaPortal.Plugins.Transcoding.Service.Transcoders.Base
       get { return _streamInUse; }
       set
       {
-        if(_streamInUse == true && value == false && Partial == true)
+        if(_streamInUse == true && value == false && (Partial == true || _useCache == false))
         {
-          //Delete partial transcodes if no longer used
+          //Delete transcodes if no longer used
           Stop();
           DeleteFiles();
         }
@@ -106,7 +118,7 @@ namespace MediaPortal.Plugins.Transcoding.Service.Transcoders.Base
         return _standardOutput.ToString();
       }
     }
-    public bool Running { get; internal set; }
+    public bool Running { get; private set; }
 
     /// <summary>
     /// Returns a Stream to the transcoded file or also to a playlist file in case of HLS.
@@ -192,9 +204,14 @@ namespace MediaPortal.Plugins.Transcoding.Service.Transcoders.Base
         isFolder = true;
       }
 
-      DateTime start = DateTime.Now;
-      while ((DateTime.Now - start).TotalSeconds < 5.0)
+      _completeEvent.WaitOne(5000);
+      DateTime waitStart = DateTime.Now;
+      while (true)
       {
+        if ((DateTime.Now - waitStart).TotalSeconds > 60.0)
+        {
+          break;
+        }
         try
         {
           if (isFolder == false)
@@ -202,6 +219,7 @@ namespace MediaPortal.Plugins.Transcoding.Service.Transcoders.Base
             if (File.Exists(deletePath))
             {
               File.Delete(deletePath);
+              break;
             }
             else
             {
@@ -213,6 +231,7 @@ namespace MediaPortal.Plugins.Transcoding.Service.Transcoders.Base
             if (Directory.Exists(deletePath))
             {
               Directory.Delete(deletePath, true);
+              break;
             }
             else
             {
@@ -221,11 +240,13 @@ namespace MediaPortal.Plugins.Transcoding.Service.Transcoders.Base
           }
         }
         catch { }
+        Thread.Sleep(500);
       }
     }
 
     public void Dispose()
     {
+      InUse = false;
       Stop();
       if (TranscodedStream != null)
         TranscodedStream.Dispose();
