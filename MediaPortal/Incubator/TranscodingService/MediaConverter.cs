@@ -120,8 +120,7 @@ namespace MediaPortal.Plugins.Transcoding.Service
     static MediaConverter()
     {
       _logger = ServiceRegistration.Get<ILogger>();
-      FFMpegLib ffmpegLib = new FFMpegLib();
-      _transcoderBinPath = ffmpegLib.FFMpegBinaryPath;
+      _transcoderBinPath = FFMpegBinary.FFMpegPath;
       string result;
       using (Process process = new Process { StartInfo = new ProcessStartInfo(_transcoderBinPath, "") { UseShellExecute = false, CreateNoWindow = true, RedirectStandardError = true } })
       {

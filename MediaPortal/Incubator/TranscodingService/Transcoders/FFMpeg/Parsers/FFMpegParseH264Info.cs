@@ -131,10 +131,9 @@ namespace MediaPortal.Plugins.Transcoding.Service.Transcoders.FFMpeg.Parsers
     // TODO: Should be in the FFMpegLib
     private static bool TryExecuteBinary(string arguments, out byte[] result, ILocalFsResourceAccessor lfsra, ProcessPriorityClass priorityClass = ProcessPriorityClass.Normal)
     {
-      FFMpegLib ffmpeg = new FFMpegLib();
       using (ServiceRegistration.Get<IImpersonationService>().CheckImpersonationFor(lfsra.CanonicalLocalResourcePath))
       {
-        using (Process process = new Process { StartInfo = new ProcessStartInfo(ffmpeg.FFMpegBinaryPath, arguments) { UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = true } })
+        using (Process process = new Process { StartInfo = new ProcessStartInfo(FFMpegBinary.FFMpegPath, arguments) { UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = true } })
         {
           process.Start();
           process.PriorityClass = priorityClass;
