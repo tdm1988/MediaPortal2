@@ -758,6 +758,10 @@ namespace MediaPortal.Extensions.MediaServer.Profiles
               if (Profiles.ContainsKey(profile.ID))
               {
                 //User profiles can override defaults
+                if(userProfiles == true)
+                {
+                  profile.Name = profile.Name + " [User]";
+                }
                 Profiles[profile.ID] = profile;
               }
               else
