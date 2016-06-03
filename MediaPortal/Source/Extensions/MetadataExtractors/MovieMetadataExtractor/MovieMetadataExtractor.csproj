@@ -53,8 +53,8 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="taglib-sharp, Version=2.0.3.8, Culture=neutral, PublicKeyToken=db62eba44689b5b0, processorArchitecture=x86">
-      <HintPath>..\..\..\..\Packages\MediaPortal.TagLib.2.0.3.8\lib\taglib-sharp.dll</HintPath>
+    <Reference Include="taglib-sharp, Version=2.1.0.1, Culture=neutral, PublicKeyToken=db62eba44689b5b0, processorArchitecture=x86">
+      <HintPath>..\..\..\..\Packages\MediaPortal.TagLib.2.1.0.1\lib\net45\taglib-sharp.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>
@@ -84,10 +84,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Core\MediaPortal.Backend\MediaPortal.Backend.csproj">
-      <Project>{5b27eb95-b829-40f4-b445-0225ca206f85}</Project>
-      <Name>MediaPortal.Backend</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\Core\MediaPortal.Common\MediaPortal.Common.csproj">
       <Project>{ECF060E7-CAA1-4466-851F-F80B857641EA}</Project>
       <Name>MediaPortal.Common</Name>
@@ -106,7 +102,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="build.targets" />
+    <None Include="build.targets">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

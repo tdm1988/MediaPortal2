@@ -13,6 +13,7 @@
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\..\</SolutionDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
@@ -98,6 +99,10 @@
     <ProjectReference Include="..\..\..\Core\MediaPortal.Utilities\MediaPortal.Utilities.csproj">
       <Project>{4fe7b8ae-1330-424a-91a1-c68d7abf9cb8}</Project>
       <Name>MediaPortal.Utilities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OnlineLibraries\OnlineLibraries.csproj">
+      <Project>{dca4d19e-75f4-4a8a-b70a-f3f4291dc62b}</Project>
+      <Name>OnlineLibraries</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -69,3 +69,4 @@
   <Import Project="build.targets" />
   <Import Project="..\..\..\..\Packages\FreeImage.3.15.4\build\FreeImage.targets" Condition="Exists('..\..\..\..\Packages\FreeImage.3.15.4\build\FreeImage.targets')" />
 </Project>
+

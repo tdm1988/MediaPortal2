@@ -38,11 +38,10 @@ using MediaPortal.Common.ResourceAccess;
 using MediaPortal.Common.Services.Logging;
 using MediaPortal.Common.Services.PathManager;
 using MediaPortal.Extensions.MetadataExtractors;
-using MediaPortal.Extensions.OnlineLibraries;
-using MediaPortal.Extensions.OnlineLibraries.Libraries.TvdbLib.Data;
 using MediaPortal.Mock;
 using MediaPortal.Utilities;
 using System.Threading;
+using MediaPortal.Extensions.OnlineLibraries.Matchers;
 
 namespace Test.OnlineLibraries
 {
