@@ -292,7 +292,7 @@ namespace MediaPortal.UiComponents.Trakt.Service
         if (MediaItemAspect.TryGetExternalAttribute(pc.CurrentMediaItem.Aspects, ExternalIdentifierAspect.SOURCE_TVDB, ExternalIdentifierAspect.TYPE_EPISODE, out value))
           series.SeriesID = value;
 
-        if (MediaItemAspect.TryGetAttribute(pc.CurrentMediaItem.Aspects, EpisodeAspect.ATTR_SERIESNAME, out value) && !string.IsNullOrWhiteSpace(value))
+        if (MediaItemAspect.TryGetAttribute(pc.CurrentMediaItem.Aspects, EpisodeAspect.ATTR_SERIES_NAME, out value) && !string.IsNullOrWhiteSpace(value))
           series.Title = value;
 
         if (MediaItemAspect.TryGetAttribute(pc.CurrentMediaItem.Aspects, EpisodeAspect.ATTR_FIRSTAIRED, out dtValue))
@@ -308,8 +308,13 @@ namespace MediaPortal.UiComponents.Trakt.Service
       }
 
       // Fallback duration info
-      if (string.IsNullOrWhiteSpace(scrobbleData.Duration) && MediaItemAspect.TryGetAttribute(pc.CurrentMediaItem.Aspects, VideoAspect.ATTR_DURATION, out lValue) && lValue > 0)
-        scrobbleData.Duration = (lValue / 60).ToString();
+      IList<MultipleMediaItemAspect> videoAspects;
+      if (string.IsNullOrWhiteSpace(scrobbleData.Duration) && MediaItemAspect.TryGetAspects(pc.CurrentMediaItem.Aspects, VideoAspect.Metadata, out videoAspects))
+      {
+        lValue = videoAspects[0].GetAttributeValue<long>(VideoAspect.ATTR_DURATION);
+        if(lValue > 0)
+          scrobbleData.Duration = (lValue / 60).ToString();
+      }
 
       if (string.IsNullOrWhiteSpace(scrobbleData.Title))
         scrobbleData.Title = title;

@@ -260,7 +260,7 @@ namespace MediaPortal.Extensions.OnlineLibraries.Wrappers
           {
             TvMazeId = episodeDetail.Id,
 
-            SeriesMovieDbId = seriesDetail.Id,
+            SeriesTvMazeId = seriesDetail.Id,
             SeriesImdbId = seriesDetail.Externals.ImDbId,
             SeriesTvdbId = seriesDetail.Externals.TvDbId ?? 0,
             SeriesTvRageId = seriesDetail.Externals.TvRageId ?? 0,

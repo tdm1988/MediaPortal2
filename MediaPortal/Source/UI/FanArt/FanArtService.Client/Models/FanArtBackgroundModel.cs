@@ -290,7 +290,7 @@ namespace MediaPortal.Extensions.UserServices.FanArtService.Client.Models
         ItemDescription = null;
         return;
       }
-      SeriesItem episode = SelectedItem as SeriesItem;
+      EpisodeItem episode = SelectedItem as EpisodeItem;
       if (episode != null)
       {
         SimpleTitle = episode.Series;
@@ -315,7 +315,7 @@ namespace MediaPortal.Extensions.UserServices.FanArtService.Client.Models
       if (video != null)
       {
         SimpleTitle = video.SimpleTitle;
-        ItemDescription = video.StoryPlot;
+        ItemDescription = string.Empty;
         return;
       }
       FilterItem filterItem = SelectedItem as FilterItem;

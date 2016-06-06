@@ -70,7 +70,7 @@ namespace MediaPortal.Extensions.OnlineLibraries.Matchers
 
     #region Init
 
-    public SeriesTvDbMatcher() : 
+    public SeriesTvDbMatcher() :
       base(CACHE_PATH, MAX_MEMCACHE_DURATION)
     {
     }
@@ -82,18 +82,18 @@ namespace MediaPortal.Extensions.OnlineLibraries.Matchers
         TvDbWrapper wrapper = new TvDbWrapper();
         // Try to lookup online content in the configured language
         CultureInfo currentCulture = ServiceRegistration.Get<ILocalization>().CurrentCulture;
-        wrapper.SetPreferredLanguage(currentCulture.TwoLetterISOLanguageName);
         if (wrapper.Init(CACHE_PATH))
         {
           _wrapper = wrapper;
-        return true;
+          wrapper.SetPreferredLanguage(currentCulture.TwoLetterISOLanguageName);
+          return true;
+        }
       }
-    }
       catch (Exception ex)
-    {
+      {
         ServiceRegistration.Get<ILogger>().Error("SeriesTvDbMatcher: Error initializing wrapper", ex);
       }
-        return false;
+      return false;
     }
 
     #endregion
@@ -111,7 +111,7 @@ namespace MediaPortal.Extensions.OnlineLibraries.Matchers
     }
 
     protected override bool SetSeriesId(EpisodeInfo episode, string id)
-      {
+    {
       if (!string.IsNullOrEmpty(id))
       {
         episode.SeriesTvdbId = Convert.ToInt32(id);
@@ -145,12 +145,12 @@ namespace MediaPortal.Extensions.OnlineLibraries.Matchers
     }
 
     protected override bool GetPersonId(PersonInfo person, out string id)
-        {
+    {
       id = null;
       if (person.TvdbId > 0)
         id = person.TvdbId.ToString();
       return id != null;
-        }
+    }
 
     #endregion
 
@@ -163,14 +163,14 @@ namespace MediaPortal.Extensions.OnlineLibraries.Matchers
 
       IThreadPool threadPool = ServiceRegistration.Get<IThreadPool>(false);
       if (threadPool != null)
-        {
+      {
         ServiceRegistration.Get<ILogger>().Debug("SeriesTvDbMatcher: Refreshing local cache");
         threadPool.Add(() =>
           {
-          if (Init())
-            ((TvDbWrapper)_wrapper).UpdateCache();
-        });
-          }
+            if (_wrapper != null)
+              ((TvDbWrapper)_wrapper).UpdateCache();
+          });
+      }
       _lastRefresh = DateTime.Now;
     }
 
@@ -193,13 +193,13 @@ namespace MediaPortal.Extensions.OnlineLibraries.Matchers
             {
               fanartFiles.AddRange(Directory.GetFiles(path, "img_graphical_ *.jpg"));
               fanartFiles.AddRange(Directory.GetFiles(path, "img_text_*.jpg"));
-        }
+            }
             else if (type == FanArtTypes.Poster)
-        {
+            {
               fanartFiles.AddRange(Directory.GetFiles(path, "img_posters_*.jpg"));
             }
             else if (type == FanArtTypes.FanArt)
-              {
+            {
               fanartFiles.AddRange(Directory.GetFiles(path, "img_fan-*.jpg"));
             }
           }
@@ -214,33 +214,33 @@ namespace MediaPortal.Extensions.OnlineLibraries.Matchers
           if (Directory.Exists(path))
           {
             if (type == FanArtTypes.Banner)
-      {
+            {
               fanartFiles.AddRange(Directory.GetFiles(path, string.Format("img_seasonswide_{0}-{1}*.jpg", season.SeriesTvdbId, season.SeasonNumber.Value)));
-      }
+            }
             else if (type == FanArtTypes.Poster)
-      {
+            {
               fanartFiles.AddRange(Directory.GetFiles(path, string.Format("img_seasons_{0}-{1}*.jpg", season.SeriesTvdbId, season.SeasonNumber.Value)));
             }
-      }
-    }
+          }
+        }
       }
       else if (scope == FanArtMediaTypes.Episode)
       {
         EpisodeInfo episode = infoObject as EpisodeInfo;
         if (episode != null && episode.TvdbId > 0 && episode.SeriesTvdbId > 0)
-    {
+        {
           string path = Path.Combine(CACHE_PATH, episode.SeriesTvdbId.ToString());
           if (Directory.Exists(path))
-      {
+          {
             if (type == FanArtTypes.Thumbnail)
-        {
+            {
               string file = Path.Combine(path, string.Format("img_episodes_{0}-{1}.jpg", episode.SeriesTvdbId, episode.TvdbId));
               if (File.Exists(file))
                 fanartFiles.Add(file);
             }
           }
+        }
       }
-    }
       else if (scope == FanArtMediaTypes.Actor)
       {
         PersonInfo person = infoObject as PersonInfo;
@@ -248,20 +248,20 @@ namespace MediaPortal.Extensions.OnlineLibraries.Matchers
         {
           string path = Path.Combine(CACHE_PATH, person.TvdbId.ToString());
           if (Directory.Exists(path))
-    {
+          {
             if (type == FanArtTypes.Thumbnail)
-      {
+            {
               if (Directory.Exists(path))
                 fanartFiles.AddRange(Directory.GetFiles(path, string.Format(@"img_actors_{0}.jpg", person.TvdbId), SearchOption.AllDirectories));
             }
           }
-      }
+        }
       }
       return fanartFiles;
     }
 
     protected override int SaveFanArtImages(string id, IEnumerable<TvdbBanner> images, string scope, string type)
-      {
+    {
       if (images == null)
         return 0;
 
@@ -274,10 +274,10 @@ namespace MediaPortal.Extensions.OnlineLibraries.Matchers
         return 0;
 
       return SaveBanners(images, _wrapper.PreferredLanguage);
-      }
+    }
 
     protected override int SaveSeriesEpisodeFanArtImages(string id, int seasonNo, int episodeNo, IEnumerable<TvdbBanner> images, string scope, string type)
-      {
+    {
       if (images == null)
         return 0;
 
@@ -311,7 +311,7 @@ namespace MediaPortal.Extensions.OnlineLibraries.Matchers
       }
       if (idx > 0)
       {
-        ServiceRegistration.Get<ILogger>().Debug( @"SeriesTvDbMatcher Download: Saved {0} banners", idx);
+        ServiceRegistration.Get<ILogger>().Debug(@"SeriesTvDbMatcher Download: Saved {0} banners", idx);
         return idx;
       }
 

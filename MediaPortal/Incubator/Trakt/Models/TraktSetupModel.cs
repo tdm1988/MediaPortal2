@@ -396,7 +396,7 @@ namespace MediaPortal.UiComponents.Trakt.Models
       DateTime dtFirstAired;
       year = 0;
 
-      if (!MediaItemAspect.TryGetAttribute(mediaItem.Aspects, EpisodeAspect.ATTR_SERIESNAME, out series) || string.IsNullOrWhiteSpace(series))
+      if (!MediaItemAspect.TryGetAttribute(mediaItem.Aspects, EpisodeAspect.ATTR_SERIES_NAME, out series) || string.IsNullOrWhiteSpace(series))
         return false;
 
       if (!MediaItemAspect.TryGetAttribute(mediaItem.Aspects, EpisodeAspect.ATTR_FIRSTAIRED, out dtFirstAired))
@@ -408,7 +408,7 @@ namespace MediaPortal.UiComponents.Trakt.Models
 
     private static bool GetSeriesTitle(MediaItem mediaItem, out string series)
     {
-      return MediaItemAspect.TryGetAttribute(mediaItem.Aspects, EpisodeAspect.ATTR_SERIESNAME, out series) && !string.IsNullOrWhiteSpace(series);
+      return MediaItemAspect.TryGetAttribute(mediaItem.Aspects, EpisodeAspect.ATTR_SERIES_NAME, out series) && !string.IsNullOrWhiteSpace(series);
     }
 
     private List<TraktEpisodeSync.Episode> ToSeries(MediaItem mediaItem)

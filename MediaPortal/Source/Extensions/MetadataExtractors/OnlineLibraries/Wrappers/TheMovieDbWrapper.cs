@@ -387,10 +387,13 @@ namespace MediaPortal.Extensions.OnlineLibraries.Wrappers
               nextEpisode = currentSeason.Episodes.Where(e => e.AirDate > DateTime.Now).FirstOrDefault();
             }
           }
-          series.NextEpisodeName = new LanguageText(nextEpisode.Name, false);
-          series.NextEpisodeAirDate = nextEpisode.AirDate;
-          series.NextEpisodeSeasonNumber = nextEpisode.SeasonNumber;
-          series.NextEpisodeNumber = nextEpisode.EpisodeNumber;
+          if (nextEpisode != null)
+          {
+            series.NextEpisodeName = new LanguageText(nextEpisode.Name, false);
+            series.NextEpisodeAirDate = nextEpisode.AirDate;
+            series.NextEpisodeSeasonNumber = nextEpisode.SeasonNumber;
+            series.NextEpisodeNumber = nextEpisode.EpisodeNumber;
+          }
         }
       }
 
