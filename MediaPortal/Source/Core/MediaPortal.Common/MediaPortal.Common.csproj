@@ -59,6 +59,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApplicationCore.cs" />
+    <Compile Include="Configuration\ConfigurationClasses\SingleSelectionListOfT.cs" />
     <Compile Include="Exceptions\LauncherExceptionHandling.cs" />
     <Compile Include="MediaManagement\DefaultItemAspects\SelectionMarkerAspect.cs" />
     <Compile Include="ResourceAccess\IUncachableResource.cs" />
