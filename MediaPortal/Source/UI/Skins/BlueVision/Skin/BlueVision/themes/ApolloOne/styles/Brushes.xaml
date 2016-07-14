@@ -7,7 +7,7 @@
 
   <!-- Default brush used to paint the background of a page/window -->
   <ResourceWrapper x:Key="BackgroundBrush">
-    <ImageBrush ImageSource="Background.jpg" />
+    <ImageBrush ImageSource="background.jpg" />
   </ResourceWrapper>
 
   <!-- Default brush used to paint the background of a dialog -->
