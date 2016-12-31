@@ -21,8 +21,9 @@
           </Grid.ColumnDefinitions>
           <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
           </Grid.RowDefinitions>
-          <!-- Feeds -->
+          <!-- User profile list -->
           <ListView Margin="10" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
               Style="{ThemeResource MenuListViewStyle}"
               ItemsSource="{Binding Path=Users}" >
@@ -31,6 +32,8 @@
                   Parameters="{LateBoundValue BindingValue={Binding}}"/>
             </ListView.Resources>
           </ListView>
+
+          <Label Grid.Row="2" HorizontalAlignment="Left" DataContext="{Binding Source={StaticResource Model}, Path=CurrentUser}" Content="{Binding Path=Name}" Color="{ThemeResource TextColor}"/>
         </Grid>
       </DockPanel>
     </ControlTemplate>

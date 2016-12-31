@@ -23,6 +23,7 @@
 #endregion
 
 using System;
+using System.Linq;
 using System.Windows.Forms;
 using MediaPortal.Common;
 using MediaPortal.Common.General;
@@ -31,6 +32,7 @@ using MediaPortal.Common.UserProfileDataManagement;
 using MediaPortal.UI.Presentation.DataObjects;
 using MediaPortal.UI.ServerCommunication;
 using MediaPortal.UiComponents.SkinBase.General;
+using MediaPortal.UI.Services.UserManagement;
 
 namespace MediaPortal.UiComponents.Login
 {
@@ -50,6 +52,7 @@ namespace MediaPortal.UiComponents.Login
     {
       _currentUser = new WProperty(typeof(UserProfile), null);
       LoadUsers();
+      SetCurrentUser();
     }
 
     protected IUserProfileDataManagement UserProfileManagement
@@ -66,6 +69,9 @@ namespace MediaPortal.UiComponents.Login
     /// </summary>
     private void LoadUsers()
     {
+      if (UserProfileManagement == null)
+        return;
+
       UserProfile u1;
       string profileName = SystemInformation.ComputerName.ToLower();
       if (!UserProfileManagement.GetProfileByName(profileName, out u1))
@@ -86,6 +92,21 @@ namespace MediaPortal.UiComponents.Login
       RefreshUserList();
     }
 
+    private void SetCurrentUser(UserProfile userProfile = null)
+    {
+      IUserManagement userProfileDataManagement = ServiceRegistration.Get<IUserManagement>();
+      if (userProfile == null)
+      {
+        // Init with system default
+        userProfile = userProfileDataManagement.CurrentUser;
+      }
+      else
+      {
+        userProfileDataManagement.CurrentUser = userProfile;
+      }
+      CurrentUser = userProfile;
+    }
+
     /// <summary>
     /// this will turn the _users list into the _usersExposed list
     /// </summary>
@@ -93,14 +114,13 @@ namespace MediaPortal.UiComponents.Login
     {
       // clear the exposed users list
       Users.Clear();
+
+      if (UserProfileManagement == null)
+        return;
       // add users to expose them
       var users = UserProfileManagement.GetProfiles();
-      foreach (UserProfile user in users)
+      foreach (UserProfile user in users.Where(u => u != null))
       {
-        if (user == null)
-        {
-          continue;
-        }
         ListItem item = new ListItem();
         item.SetLabel(Consts.KEY_NAME, user.Name);
 
@@ -121,13 +141,13 @@ namespace MediaPortal.UiComponents.Login
     /// <param name="item"></param>
     public void SelectUser(ListItem item)
     {
-      Guid profileId = (Guid) item.AdditionalProperties[KEY_PROFILE_ID];
+      Guid profileId = (Guid)item.AdditionalProperties[KEY_PROFILE_ID];
 
       UserProfile userProfile;
       if (!UserProfileManagement.GetProfile(profileId, out userProfile))
         return;
 
-      CurrentUser = userProfile;
+      SetCurrentUser(userProfile);
     }
 
     /// <summary>
@@ -144,7 +164,7 @@ namespace MediaPortal.UiComponents.Login
     /// </summary>
     public UserProfile CurrentUser
     {
-      get { return (UserProfile) _currentUser.GetValue(); }
+      get { return (UserProfile)_currentUser.GetValue(); }
       set { _currentUser.SetValue(value); }
     }
 

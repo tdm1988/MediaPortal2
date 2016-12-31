@@ -69,6 +69,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Language\strings_en.xml" />
     <Content Include="plugin.xml" />
     <Content Include="Skin\default\workflow\login-actions.xml" />
   </ItemGroup>
