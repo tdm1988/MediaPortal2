@@ -27,10 +27,8 @@ using System.Linq;
 using System.Windows.Forms;
 using MediaPortal.Common;
 using MediaPortal.Common.General;
-using MediaPortal.Common.Services.ServerCommunication;
 using MediaPortal.Common.UserProfileDataManagement;
 using MediaPortal.UI.Presentation.DataObjects;
-using MediaPortal.UI.ServerCommunication;
 using MediaPortal.UiComponents.SkinBase.General;
 using MediaPortal.UI.Services.UserManagement;
 
@@ -55,30 +53,22 @@ namespace MediaPortal.UiComponents.Login
       SetCurrentUser();
     }
 
-    protected IUserProfileDataManagement UserProfileManagement
-    {
-      get
-      {
-        UPnPClientControlPoint controlPoint = ServiceRegistration.Get<IServerConnectionManager>().ControlPoint;
-        return controlPoint != null ? controlPoint.UserProfileDataManagementService : null;
-      }
-    }
-
     /// <summary>
     /// will load the users from somewhere
     /// </summary>
     private void LoadUsers()
     {
-      if (UserProfileManagement == null)
+      IUserManagement userManagement = ServiceRegistration.Get<IUserManagement>();
+      if (userManagement.UserProfileDataManagement == null)
         return;
 
       UserProfile u1;
       string profileName = SystemInformation.ComputerName.ToLower();
-      if (!UserProfileManagement.GetProfileByName(profileName, out u1))
+      if (!userManagement.UserProfileDataManagement.GetProfileByName(profileName, out u1))
       {
         // add a few dummy users, later this should be more flexible and handled by a login manager / user account control
-        Guid userId1 = UserProfileManagement.CreateProfile(profileName);
-        if (!UserProfileManagement.GetProfile(userId1, out u1))
+        Guid userId1 = userManagement.UserProfileDataManagement.CreateProfile(profileName);
+        if (!userManagement.UserProfileDataManagement.GetProfile(userId1, out u1))
           return;
       }
 
@@ -115,10 +105,11 @@ namespace MediaPortal.UiComponents.Login
       // clear the exposed users list
       Users.Clear();
 
-      if (UserProfileManagement == null)
+      IUserManagement userManagement = ServiceRegistration.Get<IUserManagement>();
+      if (userManagement.UserProfileDataManagement == null)
         return;
       // add users to expose them
-      var users = UserProfileManagement.GetProfiles();
+      var users = userManagement.UserProfileDataManagement.GetProfiles();
       foreach (UserProfile user in users.Where(u => u != null))
       {
         ListItem item = new ListItem();
@@ -142,9 +133,10 @@ namespace MediaPortal.UiComponents.Login
     public void SelectUser(ListItem item)
     {
       Guid profileId = (Guid)item.AdditionalProperties[KEY_PROFILE_ID];
+      IUserManagement userManagement = ServiceRegistration.Get<IUserManagement>();
 
       UserProfile userProfile;
-      if (!UserProfileManagement.GetProfile(profileId, out userProfile))
+      if (userManagement.UserProfileDataManagement == null || !userManagement.UserProfileDataManagement.GetProfile(profileId, out userProfile))
         return;
 
       SetCurrentUser(userProfile);
