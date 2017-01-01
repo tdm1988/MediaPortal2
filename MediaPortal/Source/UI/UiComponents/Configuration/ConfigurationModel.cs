@@ -95,6 +95,7 @@ namespace MediaPortal.UiComponents.Configuration
     protected ConfigurationController _currentConfigController = null;
     protected AbstractProperty _headerTextProperty;
     protected ICollection<AbstractProperty> _trackedVisibleEnabledProperties = new List<AbstractProperty>();
+    private bool _workflowMode; // temporary allows switching between both navigation modes
 
     #endregion
 
@@ -164,7 +165,7 @@ namespace MediaPortal.UiComponents.Configuration
 
     public string HeaderText
     {
-      get { return (string) _headerTextProperty.GetValue(); }
+      get { return (string)_headerTextProperty.GetValue(); }
       set { _headerTextProperty.SetValue(value); }
     }
 
@@ -239,7 +240,7 @@ namespace MediaPortal.UiComponents.Configuration
         return null;
       ConfigurationController result = null;
       // Check if a custom configuration controller is requested
-      ConfigSettingMetadata metadata = (ConfigSettingMetadata) setting.Metadata;
+      ConfigSettingMetadata metadata = (ConfigSettingMetadata)setting.Metadata;
       if (metadata.AdditionalTypes != null && metadata.AdditionalTypes.ContainsKey("CustomConfigController"))
       {
         Type controllerType = metadata.AdditionalTypes["CustomConfigController"];
@@ -309,13 +310,23 @@ namespace MediaPortal.UiComponents.Configuration
       {
         if (childNode.ConfigObj is ConfigSetting)
         {
-          if (IsSettingSupported((ConfigSetting) childNode.ConfigObj))
+          if (IsSettingSupported((ConfigSetting)childNode.ConfigObj))
             result++;
         }
         else if (childNode.ConfigObj is ConfigGroup || childNode.ConfigObj is ConfigSection)
           result += NumSettingsSupported(childNode);
       }
       return result;
+    }
+
+    protected bool TryGetParentLocation(string location, out string parentLocation)
+    {
+      parentLocation = null;
+      if (string.IsNullOrEmpty(location) || location == "/")
+        return false;
+      var parts = location.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+      parentLocation = "/" + string.Join("/", parts.Take(parts.Length - 1).ToArray());
+      return true;
     }
 
     /// <summary>
@@ -330,15 +341,33 @@ namespace MediaPortal.UiComponents.Configuration
     {
       foreach (IConfigurationNode childNode in sectionOrGroupNode.ChildNodes)
       {
+        if (childNode.ConfigObj is ConfigSection)
+        {
+          bool supportedSettings = NumSettingsSupported(childNode) > 0;
+          // Hint (Albert): Instead of skipping, we could disable the transition in case there are no supported
+          // settings contained in it
+          if (!supportedSettings)
+            continue;
+          ConfigSection section = (ConfigSection)childNode.ConfigObj;
+          // Add action for menu
+          IResourceString res = LocalizationHelper.CreateResourceString(section.Metadata.Text);
+          string location = childNode.Location;
+          ListItem item = new ListItem(KEY_NAME, res)
+          {
+            Command = new MethodDelegateCommand(() => PrepareConfigLocation(location))
+          };
+          settingsList.Add(item);
+        }
+
         if (childNode.ConfigObj is ConfigSetting)
         {
-          ConfigSetting setting = (ConfigSetting) childNode.ConfigObj;
+          ConfigSetting setting = (ConfigSetting)childNode.ConfigObj;
           if (!setting.Visible || !IsSettingSupported(setting))
             continue;
           string location = childNode.Location;
           ListItem item = new ListItem(KEY_NAME, setting.SettingMetadata.Text)
           {
-              Command = new MethodDelegateCommand(() => ShowConfigItem(location))
+            Command = new MethodDelegateCommand(() => ShowConfigItem(location))
           };
           item.SetLabel(KEY_HELPTEXT, setting.SettingMetadata.HelpText);
           item.Enabled = setting.Enabled;
@@ -377,10 +406,35 @@ namespace MediaPortal.UiComponents.Configuration
       if (currentNode == null)
         // This is an error case, should not happen
         return;
+
+      if (!_workflowMode)
+      {
+        string parentLocation;
+        if (TryGetParentLocation(currentNode.Location, out parentLocation))
+        {
+          ListItem parentItem = new ListItem(KEY_NAME, "..")
+          {
+            Command = new MethodDelegateCommand(() => PrepareConfigLocation(parentLocation))
+          };
+          _configSettingsList.Add(parentItem);
+        }
+      }
       AddConfigSettings(currentNode, _configSettingsList);
       _configSettingsList.FireChange();
       ConfigBase configObj = currentNode.ConfigObj;
       HeaderText = configObj == null ? RES_CONFIGURATION_NAME : configObj.Metadata.Text;
+    }
+
+    /// <summary>
+    /// Sets up the internal and external states to conform to the specified <paramref name="configLocation"/>.
+    /// </summary>
+    /// <param name="configLocation">New config location</param>
+    protected void PrepareConfigLocation(string configLocation)
+    {
+      _currentConfigController = null;
+      ReleaseAllVisibleEnabledNotifications();
+      _currentLocation = configLocation;
+      UpdateConfigSettingsAndHeader();
     }
 
     /// <summary>
@@ -451,11 +505,12 @@ namespace MediaPortal.UiComponents.Configuration
 
     public void UpdateMenuActions(NavigationContext context, IDictionary<Guid, WorkflowAction> actions)
     {
+      if (!_workflowMode)
+        return;
       IConfigurationManager configurationManager = ServiceRegistration.Get<IConfigurationManager>();
       string configLocation = GetConfigLocation(context);
       WorkflowState mainState;
-      ServiceRegistration.Get<IWorkflowManager>().States.TryGetValue(new Guid(CONFIGURATION_MAIN_STATE_ID_STR),
-          out mainState);
+      ServiceRegistration.Get<IWorkflowManager>().States.TryGetValue(new Guid(CONFIGURATION_MAIN_STATE_ID_STR), out mainState);
       IConfigurationNode currentNode = configurationManager.GetNode(configLocation);
       foreach (IConfigurationNode childNode in currentNode.ChildNodes)
       {
@@ -466,7 +521,7 @@ namespace MediaPortal.UiComponents.Configuration
           // settings contained in it
           if (!supportedSettings)
             continue;
-          ConfigSection section = (ConfigSection) childNode.ConfigObj;
+          ConfigSection section = (ConfigSection)childNode.ConfigObj;
           // Create transient state for new config section
           WorkflowState newState = WorkflowState.CreateTransientState(
               string.Format("Config: '{0}'", childNode.Location), section.SectionMetadata.Text, false, CONFIGURATION_SECTION_SCREEN,
@@ -475,15 +530,15 @@ namespace MediaPortal.UiComponents.Configuration
           IResourceString res = LocalizationHelper.CreateResourceString(section.Metadata.Text);
           WorkflowAction wa = new PushTransientStateNavigationTransition(
               Guid.NewGuid(), context.WorkflowState.Name + "->" + childNode.Location, null,
-              new Guid[] {context.WorkflowState.StateId}, newState, res)
-            {
-                DisplayCategory = ACTIONS_WORKFLOW_CATEGORY,
-                SortOrder = childNode.Sort ?? res.Evaluate(),
-                WorkflowNavigationContextVariables = new Dictionary<string, object>
+              new Guid[] { context.WorkflowState.StateId }, newState, res)
+          {
+            DisplayCategory = ACTIONS_WORKFLOW_CATEGORY,
+            SortOrder = childNode.Sort ?? res.Evaluate(),
+            WorkflowNavigationContextVariables = new Dictionary<string, object>
                 {
                     {CONFIG_LOCATION_KEY, childNode.Location}
                 }
-            };
+          };
           actions.Add(wa.ActionId, wa);
         }
       }
