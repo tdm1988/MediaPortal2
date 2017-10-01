@@ -31,7 +31,7 @@ namespace MediaPortal.UiComponents.Media.Settings.Configuration
     public override void Load()
     {
       base.Load();
-      _lowerLimit = 0;
+      _lowerLimit = 3;
       _upperLimit = 15;
       _type = NumberType.FloatingPoint;
       _step = 1;
