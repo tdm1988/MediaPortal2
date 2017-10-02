@@ -129,20 +129,24 @@ namespace MediaPortal.UiComponents.Media.Models
 
     public void ShowVideoInfo()
     {
-      if (IsOSDVisible)
-        // Pressing the info button twice will bring up the context menu
-        PlayerConfigurationDialogModel.OpenPlayerConfigurationDialog();
       _lastVideoInfoDemand = DateTime.Now;
       Update();
     }
 
     public void CloseVideoInfo()
     {
-      { 
-      //if (IsOSDVisible)
-      //{
-      //  IsOSDVisible = false;
-       // _lastVideoInfoDemand = DateTime.Now;
+      if (IsOSDVisible)
+      {
+        IsOSDVisible = false;
+        Update();
+      }
+    }
+
+    public void OpenPlayerConfigurationDialog()
+    {
+      if (IsOSDVisible)
+      {
+        PlayerConfigurationDialogModel.OpenPlayerConfigurationDialog();
       }
     }
 
