@@ -65,7 +65,7 @@
             </Grid>
             
             <Control Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" x:Name="ProgressPresenter" Margin="20,0,10,-10" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                     Template="{DynamicResource ResourceKey=OSD_Progress_Template}"/>
+                     Template="{DynamicResource ResourceKey=OSD_Progress_Template}" IsVisible="{Binding IsOSDVisible}"/>
           </Grid>
         </ControlTemplate>
       </Setter.Value>
