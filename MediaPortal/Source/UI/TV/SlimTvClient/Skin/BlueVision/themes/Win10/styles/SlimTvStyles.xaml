@@ -86,7 +86,7 @@
                   Command="{Command ZapNextChannel}" Context="{Model Id=8BEC1372-1C76-484c-8A69-C7F3103708EC}"/>
           <Button x:Name="RecordButton" Style="{ThemeResource RecordButtonStyle}" Command="{Command RecordDialog}"
                   Context="{Model Id=8BEC1372-1C76-484c-8A69-C7F3103708EC}" Margin="{ThemeResource PlayerControlButtonMargins}"/>
-          <Button x:Name="SelectMenuButton" Style="{ThemeResource ShowContextMenuButtonStyle}" Margin="{ThemeResource PlayerControlButtonMargins}"
+          <Button x:Name="SelectMenuButton" Style="{ThemeResource SelectContextMenuButtonStyle}" Margin="{ThemeResource PlayerControlButtonMargins}"
                   Command="{Command Source={StaticResource VideoPlayerModel},Path=OpenPlayerConfigurationDialog}"/>
           <Button x:Name="SelectTitleButton" Style="{ThemeResource ShowDvdMenuButtonStyle}" Margin="{ThemeResource PlayerControlButtonMargins}"
                   IsVisible="{Binding Source={StaticResource VideoPlayerModel},Path=PlayerUIContributor.TitlesAvailable}"

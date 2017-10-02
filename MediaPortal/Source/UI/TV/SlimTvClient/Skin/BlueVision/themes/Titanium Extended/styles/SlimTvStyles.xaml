@@ -234,7 +234,7 @@
                     <Button x:Name="SkipForwardButton" Style="{ThemeResource SkipForwardButtonStyle}" IsVisible="{Binding CanSkipForward}"
                             Command="{Command Next}"/>
                     <Image Source="topbar_devider.png" Margin="15,0,15,0"/>
-                    <Button x:Name="SelectMenuButton" Style="{ThemeResource SelectSubtitleButtonStyle}" Margin="0,0,0,0"
+                    <Button x:Name="SelectMenuButton" Style="{ThemeResource SelectContextMenuButtonStyle}" Margin="0,0,0,0"
                             Command="{Command Source={StaticResource VideoPlayerModel},Path=OpenPlayerConfigurationDialog}"/>
                     <Button x:Name="SelectSubtitleButton" Style="{ThemeResource SelectSubtitleButtonStyle}"
                             IsVisible="{Binding Source={StaticResource VideoPlayerModel},Path=PlayerUIContributor.SubtitlesAvailable}"

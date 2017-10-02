@@ -2166,7 +2166,7 @@
     </Setter>
   </Style>
 
-  <Style x:Key="ShowContextMenuButtonStyle" TargetType="{x:Type Button}">
+  <Style x:Key="SelectContextMenuButtonStyle" TargetType="{x:Type Button}">
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="{x:Type Button}">

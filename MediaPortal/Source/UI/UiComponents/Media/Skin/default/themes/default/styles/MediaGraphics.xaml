@@ -28,7 +28,7 @@
           "/>
   </ControlTemplate>
 
-  <ControlTemplate x:Key="ShowContextMenuControlTemplate">
+  <ControlTemplate x:Key="SelectContextMenuControlTemplate">
     <Path x:Name="ShowDvdMenu" Fill="{ThemeResource PlayControlsFillBrush}" Stretch="Uniform" Stroke="{ThemeResource PlayControlsStrokeColor}"
         Width="{ThemeResource OSDControlWidth}" Height="{ThemeResource OSDControlWidth}" Margin="{ThemeResource OSDControlMargin}"
         Data="F1 
