@@ -14,11 +14,11 @@
   <KeyBinding Key="Yellow" Command="{Command PlayerUIContributor.OpenChooseSubtitleDialog}" IsEnabled="{Binding PlayerUIContributor.SubtitlesAvailable}"/>
   <KeyBinding Key="Blue" Command="{Command Source={Service WorkflowManager},Path=NavigatePush,Parameters=A3F53310-4D93-4f93-8B09-D53EE8ACD829}" />
 
-  <KeyBinding Key="Up" Command="{Command Source={StaticResource ExtendedVideoSkip},Path=InstantSkipForward}" IsEnabled="{Binding !IsOSDVisible}"/>
-  <KeyBinding Key="Down" Command="{Command Source={StaticResource ExtendedVideoSkip},Path=InstantSkipBackward}" IsEnabled="{Binding !IsOSDVisible}"/>
+  <KeyBinding Key="Up" Command="{Command Source={StaticResource ExtendedVideoSkip},Path=InstantSkipForward}" IsEnabled="{Binding Source={StaticResource VideoPlayerModel}, Path=!IsOSDVisible}"/>
+  <KeyBinding Key="Down" Command="{Command Source={StaticResource ExtendedVideoSkip},Path=InstantSkipBackward}" IsEnabled="{Binding Source={StaticResource VideoPlayerModel}, Path=!IsOSDVisible}"/>
 
-  <KeyBinding Key="Right" Command="{Command Source={StaticResource ExtendedVideoSkip},Path=SkipStepForward}" IsEnabled="{Binding !IsOSDVisible}"/>
-  <KeyBinding Key="Left" Command="{Command Source={StaticResource ExtendedVideoSkip},Path=SkipStepBackward}" IsEnabled="{Binding !IsOSDVisible}"/>
+  <KeyBinding Key="Right" Command="{Command Source={StaticResource ExtendedVideoSkip},Path=SkipStepForward}" IsEnabled="{Binding Source={StaticResource VideoPlayerModel}, Path=!IsOSDVisible}"/>
+  <KeyBinding Key="Left" Command="{Command Source={StaticResource ExtendedVideoSkip},Path=SkipStepBackward}" IsEnabled="{Binding Source={StaticResource VideoPlayerModel}, Path=!IsOSDVisible}"/>
 
   <KeyBinding Key="Info" Command="{Command Source={StaticResource VideoPlayerModel}, Path=ShowVideoInfo}" IsEnabled="{Binding !IsOSDVisible}"/>
   <!--KeyBinding Key="Info" Command="{Command Source={StaticResource VideoPlayerModel}, Path=CloseOSD}" IsEnabled="{Binding IsOSDVisible}"/-->
