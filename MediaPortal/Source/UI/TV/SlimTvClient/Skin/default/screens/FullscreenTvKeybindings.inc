@@ -6,9 +6,10 @@
   <Grid.Resources>
     <Model x:Key="ExtendedVideoSkip" Id="8573DBD8-A257-426a-9875-9DB155D32D47"/>
     <Model x:Key="ChannelZapModel" Id="1C7DCFFE-E34E-41FD-9104-9AA594E49375"/>
+    <Model x:Key="VideoPlayerModel" Id="4E2301B4-3C17-4a1d-8DE5-2CEA169A0256"/>
   </Grid.Resources>
 
-  <KeyBinding Key="Info" Command="{Command ShowVideoInfo}"/>
+
   <KeyBinding Key="ZoomMode" Command="{Command PlayerUIContributor.ShowZoomModeDialog}"/>
   <KeyBinding Key="Yellow" Command="{Command PlayerUIContributor.OpenChooseSubtitleDialog}" IsEnabled="{Binding PlayerUIContributor.SubtitlesAvailable}"/>
   <KeyBinding Key="Blue" Command="{Command Source={Service WorkflowManager},Path=NavigatePush,Parameters=A3F53310-4D93-4f93-8B09-D53EE8ACD829}" />
@@ -19,7 +20,9 @@
   <KeyBinding Key="Right" Command="{Command Source={StaticResource ExtendedVideoSkip},Path=SkipStepForward}" IsEnabled="{Binding !IsOSDVisible}"/>
   <KeyBinding Key="Left" Command="{Command Source={StaticResource ExtendedVideoSkip},Path=SkipStepBackward}" IsEnabled="{Binding !IsOSDVisible}"/>
 
-  <KeyBinding Key="Escape" Command="{Command CloseOSD}" IsEnabled="{Binding IsOSDVisible}"/>
+  <KeyBinding Key="Info" Command="{Command Source={StaticResource VideoPlayerModel}, Path=ShowVideoInfo}" IsEnabled="{Binding !IsOSDVisible}"/>
+  <KeyBinding Key="Info" Command="{Command Source={StaticResource VideoPlayerModel}, Path=CloseOSD}" IsEnabled="{Binding IsOSDVisible}"/>
+  <KeyBinding Key="Escape" Command="{Command Source={StaticResource VideoPlayerModel}, Path=CloseOSD}" IsEnabled="{Binding IsOSDVisible}"/>
 
   <KeyBinding Key="PageUp" Command="{Command ZapNextChannel}"/>
   <KeyBinding Key="PageDown" Command="{Command ZapPrevChannel}"/>
