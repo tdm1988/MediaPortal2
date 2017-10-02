@@ -136,7 +136,9 @@
                       <Button x:Name="SkipForwardButton" Style="{ThemeResource SkipForwardButtonStyle}" Margin="0" IsVisible="{Binding CanSkipForward}"
                           Command="{Command Next}"/>
                       <Image Source="PlayerControl\DIVIDER.PNG" Height="35" Stretch="Uniform" VerticalAlignment="Center" Margin="3,0,3,0"/>
-                      <Button x:Name="SelectTitleButton" Style="{ThemeResource ShowDvdMenuButtonStyle}" Margin="0"
+                      <Button x:Name="SelectMenuButton" Style="{ThemeResource SelectContextMenuButtonStyle}" Margin="0"
+                          Command="{Command Source={StaticResource VideoPlayerModel},Path=OpenPlayerConfigurationDialog}"/>
+                      <Button x:Name="SelectTitleButton" Style="{ThemeResource SelectChapterButtonStyle}" Margin="0"
                           IsVisible="{Binding Source={StaticResource VideoPlayerModel},Path=PlayerUIContributor.TitlesAvailable}"
                           Command="{Command Source={StaticResource VideoPlayerModel},Path=PlayerUIContributor.OpenChooseTitleDialog}"/>
                       <Button x:Name="SelectSubtitleButton" Style="{ThemeResource SelectSubtitleButtonStyle}" Margin="0"
