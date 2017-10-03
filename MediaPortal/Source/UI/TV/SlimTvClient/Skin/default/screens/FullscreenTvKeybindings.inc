@@ -20,9 +20,9 @@
   <KeyBinding Key="Right" Command="{Command Source={StaticResource ExtendedVideoSkip},Path=SkipStepForward}" IsEnabled="{Binding Source={StaticResource VideoPlayerModel}, Path=!IsOSDVisible}"/>
   <KeyBinding Key="Left" Command="{Command Source={StaticResource ExtendedVideoSkip},Path=SkipStepBackward}" IsEnabled="{Binding Source={StaticResource VideoPlayerModel}, Path=!IsOSDVisible}"/>
 
-  <KeyBinding Key="Info" Command="{Command Source={StaticResource VideoPlayerModel}, Path=ShowVideoInfo}" IsEnabled="{Binding !IsOSDVisible}"/>
-  <KeyBinding Key="Info" Command="{Command Source={StaticResource VideoPlayerModel}, Path=CloseVideoInfo}" IsEnabled="{Binding IsOSDVisible}"/>
+  <KeyBinding Key="Info" Command="{Command Source={StaticResource VideoPlayerModel}, Path=ToggleVideoInfo}" />
   <KeyBinding Key="Escape" Command="{Command Source={StaticResource VideoPlayerModel}, Path=CloseVideoInfo}" IsEnabled="{Binding IsOSDVisible}"/>
+  <KeyBinding Key="Back" Command="{Command Source={StaticResource VideoPlayerModel}, Path=CloseVideoInfo}" IsEnabled="{Binding IsOSDVisible}"/>
 
   <KeyBinding Key="PageUp" Command="{Command ZapNextChannel}"/>
   <KeyBinding Key="PageDown" Command="{Command ZapPrevChannel}"/>

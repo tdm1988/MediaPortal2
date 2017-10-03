@@ -79,7 +79,7 @@ namespace MediaPortal.UiComponents.Media.Models
           _lastVideoInfoDemand = DateTime.MinValue;
         }
       }
-      IsOSDVisible = inputManager.IsMouseUsed || !timeoutElapsed || _inactive;
+  //    IsOSDVisible = inputManager.IsMouseUsed || !timeoutElapsed || _inactive;
       IsPip = pipPlayer != null;
     }
 
@@ -127,19 +127,14 @@ namespace MediaPortal.UiComponents.Media.Models
       set { _isPipProperty.SetValue(value); }
     }
 
-    public void ShowVideoInfo()
+    public void ToggleVideoInfo()
     {
-      _lastVideoInfoDemand = DateTime.Now;
-      Update();
+      IsOSDVisible = !IsOSDVisible;
     }
 
     public void CloseVideoInfo()
     {
-      if (IsOSDVisible)
-      {
-        IsOSDVisible = false;
-        Update();
-      }
+      IsOSDVisible = false;
     }
 
     public void OpenPlayerConfigurationDialog()
