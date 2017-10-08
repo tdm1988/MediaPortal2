@@ -23,15 +23,19 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using MediaPortal.UI.Control.InputManager;
 using MediaPortal.Common;
 using MediaPortal.Common.General;
 using MediaPortal.Common.Logging;
+using MediaPortal.Common.Messaging;
+using MediaPortal.Common.Runtime;
 using MediaPortal.Common.Settings;
 using MediaPortal.UI.Presentation.Players;
 using MediaPortal.UiComponents.Media.General;
 using MediaPortal.UiComponents.Media.Settings;
 using MediaPortal.UiComponents.SkinBase.Models;
+using MediaPortal.UI.Presentation.Workflow;
 
 namespace MediaPortal.UiComponents.Media.Models
 {
@@ -47,6 +51,9 @@ namespace MediaPortal.UiComponents.Media.Models
     public const string MODEL_ID_STR = "4E2301B4-3C17-4a1d-8DE5-2CEA169A0256";
     public static readonly Guid MODEL_ID = new Guid(MODEL_ID_STR);
 
+    private bool _isPlayerConfigOpen;
+    private DateTime _lastVideoInfoDemand = DateTime.MinValue;
+
     protected AbstractProperty _isOSDVisibleProperty;
     protected AbstractProperty _isPipProperty;
 
@@ -54,6 +61,9 @@ namespace MediaPortal.UiComponents.Media.Models
     {
       _isOSDVisibleProperty = new WProperty(typeof(bool), false);
       _isPipProperty = new WProperty(typeof(bool), false);
+      
+      SubscribeToMessages();
+
       // Don't StartTimer here, since that will be done in method EnterModelContext
     }
 
@@ -65,9 +75,49 @@ namespace MediaPortal.UiComponents.Media.Models
       IVideoPlayer pipPlayer = secondaryPlayerContext == null ? null : secondaryPlayerContext.CurrentPlayer as IVideoPlayer;
       IInputManager inputManager = ServiceRegistration.Get<IInputManager>();
 
-      // TODO fix mouse handling 
-   // IsOSDVisible = inputManager.IsMouseUsed && _inactive;      
+      if (!_isPlayerConfigOpen && DateTime.Now - _lastVideoInfoDemand > DateTime.Now.AddSeconds(5) - DateTime.Now)
+      {
+        IsOSDVisible = inputManager.IsMouseUsed;
+      }
       IsPip = pipPlayer != null;
+    }
+
+    private void SubscribeToMessages()
+    {
+      _messageQueue = new AsynchronousMessageQueue(this, new string[]
+      {
+        WorkflowManagerMessaging.CHANNEL,
+        PlayerManagerMessaging.CHANNEL,
+        PlayerContextManagerMessaging.CHANNEL,
+      });
+      _messageQueue.MessageReceived += OnMessageReceived;
+      _messageQueue.Start();
+    }
+
+    private void OnMessageReceived(AsynchronousMessageQueue queue, SystemMessage message)
+    {
+      if (message.ChannelName == WorkflowManagerMessaging.CHANNEL)
+      {
+        if ((WorkflowManagerMessaging.MessageType)message.MessageType == WorkflowManagerMessaging.MessageType.StatePushed)
+        {
+          bool isPlayerConfigDialog = ServiceRegistration.Get<IWorkflowManager>().CurrentNavigationContext.WorkflowState.StateId.ToString().Equals("D0B79345-69DF-4870-B80E-39050434C8B3", StringComparison.OrdinalIgnoreCase);
+          if (isPlayerConfigDialog)
+          {
+            _isPlayerConfigOpen = true;
+            IsOSDVisible = false;
+          }
+        }
+
+        if ((WorkflowManagerMessaging.MessageType)message.MessageType == WorkflowManagerMessaging.MessageType.StatesPopped)
+        {
+          ICollection<Guid> statesRemoved = new List<Guid>(((IDictionary<Guid, NavigationContext>)message.MessageData[WorkflowManagerMessaging.CONTEXTS]).Keys);
+          if (statesRemoved.Contains(new Guid("D0B79345-69DF-4870-B80E-39050434C8B3")))
+          {
+            _isPlayerConfigOpen = false;
+            _lastVideoInfoDemand = DateTime.Now;
+          }
+        }
+      }
     }
 
     protected override Type GetPlayerUIContributorType(IPlayer player, MediaWorkflowStateType stateType)
@@ -118,8 +168,16 @@ namespace MediaPortal.UiComponents.Media.Models
     {
       if (IsOSDVisible)
       {
-        PlayerConfigurationDialogModel.OpenPlayerConfigurationDialog();
-        IsOSDVisible = false;
+        MediaModelSettings settings = ServiceRegistration.Get<ISettingsManager>().Load<MediaModelSettings>();
+        if (settings.OpenPlayerConfigInOsd)
+        {
+          PlayerConfigurationDialogModel.OpenPlayerConfigurationDialog();
+        }
+        else
+        {
+          IsOSDVisible = !IsOSDVisible;
+          _lastVideoInfoDemand = DateTime.Now;
+        }
       }
       else
       {

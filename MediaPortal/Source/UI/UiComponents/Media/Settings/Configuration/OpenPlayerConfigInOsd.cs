@@ -26,25 +26,19 @@ using MediaPortal.Common.Configuration.ConfigurationClasses;
 
 namespace MediaPortal.UiComponents.Media.Settings.Configuration
 {
-  public class VideoOsdTimeout : LimitedNumberSelect
+  public class OpenPlayerConfigInOsd : YesNo
   {
     public override void Load()
     {
-      base.Load();
-      _lowerLimit = 3;
-      _upperLimit = 15;
-      _type = NumberType.FloatingPoint;
-      _step = 1;
-      _value = SettingsManager.Load<MediaModelSettings>().VideoOsdTimeout;
+      _yes = SettingsManager.Load<MediaModelSettings>().OpenPlayerConfigInOsd;
     }
 
     public override void Save()
     {
       base.Save();
       MediaModelSettings settings = SettingsManager.Load<MediaModelSettings>();
-      settings.VideoOsdTimeout = _value;
+      settings.OpenPlayerConfigInOsd = _yes;
       SettingsManager.Save(settings);
     }
-    
   }
 }

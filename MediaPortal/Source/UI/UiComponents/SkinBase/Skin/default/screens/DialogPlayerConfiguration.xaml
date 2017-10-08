@@ -24,8 +24,10 @@
     </InvokeCommand>
     
     <ControlTemplate x:Key="Additional_KeyBindings">
-      <KeyBinding Key="Info" Command="{Command Source={Service ScreenManager}, Path=CloseTopmostDialog}" />
-  <!--<KeyBinding Key="Back" Command="{Command Source={Service ScreenManager}, Path=CloseTopmostDialog}" />  -->
+      <Grid>
+        <KeyBinding Key="Info" Command="{Command Source={Service ScreenManager}, Path=CloseTopmostDialog}" />
+        <KeyBinding Key="Back" Command="{Command Source={Service ScreenManager}, Path=CloseTopmostDialog}" />
+      </Grid>
     </ControlTemplate>
 
   </Include.Resources>
