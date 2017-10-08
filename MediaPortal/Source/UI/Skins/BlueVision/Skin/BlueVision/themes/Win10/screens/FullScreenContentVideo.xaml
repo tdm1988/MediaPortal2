@@ -61,7 +61,7 @@
             AutoVisibility="true"/>
     </DockPanel>
 
-    <KeyBinding Key="Info" Command="{Command ToggleVideoInfo}"/>
+    <KeyBinding Key="Info" Command="{Command ShowVideoInfo}"/>
     <KeyBinding Key="Back" Command="{Command CloseVideoInfo}" IsEnabled="{Binding IsOSDVisible}"/>
     <KeyBinding Key="Escape" Command="{Command CloseVideoInfo}" IsEnabled="{Binding IsOSDVisible}"/>
     <KeyBinding Key="ZoomMode" Command="{Command PlayerUIContributor.ShowZoomModeDialog}"/>

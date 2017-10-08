@@ -47,8 +47,6 @@ namespace MediaPortal.UiComponents.Media.Models
     public const string MODEL_ID_STR = "4E2301B4-3C17-4a1d-8DE5-2CEA169A0256";
     public static readonly Guid MODEL_ID = new Guid(MODEL_ID_STR);
 
-    protected DateTime _lastVideoInfoDemand = DateTime.MinValue;
-
     protected AbstractProperty _isOSDVisibleProperty;
     protected AbstractProperty _isPipProperty;
 
@@ -65,21 +63,10 @@ namespace MediaPortal.UiComponents.Media.Models
       IPlayerContextManager playerContextManager = ServiceRegistration.Get<IPlayerContextManager>();
       IPlayerContext secondaryPlayerContext = playerContextManager.SecondaryPlayerContext;
       IVideoPlayer pipPlayer = secondaryPlayerContext == null ? null : secondaryPlayerContext.CurrentPlayer as IVideoPlayer;
-      MediaModelSettings settings = ServiceRegistration.Get<ISettingsManager>().Load<MediaModelSettings>();
       IInputManager inputManager = ServiceRegistration.Get<IInputManager>();
 
-      bool timeoutElapsed = true;
-      if (_lastVideoInfoDemand != DateTime.MinValue)
-      {
-        // Consider all inputs to keep OSD alive
-        _lastVideoInfoDemand = inputManager.LastInputTime;
-        timeoutElapsed = DateTime.Now - _lastVideoInfoDemand > TimeSpan.FromSeconds(settings.VideoOsdTimeout);
-        if (timeoutElapsed)
-        {
-          _lastVideoInfoDemand = DateTime.MinValue;
-        }
-      }
-  //    IsOSDVisible = inputManager.IsMouseUsed || !timeoutElapsed || _inactive;
+      // TODO fix mouse handling 
+   // IsOSDVisible = inputManager.IsMouseUsed && _inactive;      
       IsPip = pipPlayer != null;
     }
 
@@ -127,9 +114,17 @@ namespace MediaPortal.UiComponents.Media.Models
       set { _isPipProperty.SetValue(value); }
     }
 
-    public void ToggleVideoInfo()
+    public void ShowVideoInfo()
     {
-      IsOSDVisible = !IsOSDVisible;
+      if (IsOSDVisible)
+      {
+        PlayerConfigurationDialogModel.OpenPlayerConfigurationDialog();
+        IsOSDVisible = false;
+      }
+      else
+      {
+        IsOSDVisible = !IsOSDVisible;
+      }
     }
 
     public void CloseVideoInfo()
