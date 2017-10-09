@@ -192,10 +192,7 @@ namespace MediaPortal.UiComponents.Media.Models
 
     public void OpenPlayerConfigurationDialog()
     {
-      if (IsOSDVisible)
-      {
-        PlayerConfigurationDialogModel.OpenPlayerConfigurationDialog();
-      }
+      PlayerConfigurationDialogModel.OpenPlayerConfigurationDialog();
     }
 
     #endregion
