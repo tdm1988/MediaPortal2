@@ -75,7 +75,7 @@ namespace MediaPortal.UiComponents.Media.Models
       IVideoPlayer pipPlayer = secondaryPlayerContext == null ? null : secondaryPlayerContext.CurrentPlayer as IVideoPlayer;
       IInputManager inputManager = ServiceRegistration.Get<IInputManager>();
 
-      if (!_isPlayerConfigOpen && DateTime.Now - _lastVideoInfoDemand > DateTime.Now.AddSeconds(5) - DateTime.Now)
+      if (!_isPlayerConfigOpen && DateTime.Now - _lastVideoInfoDemand > DateTime.Now.AddSeconds(5) - DateTime.Now && !IsOSDVisible)
       {
         IsOSDVisible = inputManager.IsMouseUsed;
       }
