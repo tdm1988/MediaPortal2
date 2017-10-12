@@ -44,7 +44,7 @@
               <Grid.RenderTransform>
                 <TranslateTransform Y="250"/>
               </Grid.RenderTransform>
-              
+
               <Grid.Resources>
                 <Storyboard x:Key="InfoSlideInStoryboard" FillBehavior="HoldEnd">
                   <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" FillBehavior="HoldEnd" Storyboard.TargetName="InfoControlPanel" Storyboard.TargetProperty="RenderTransform.Y">
