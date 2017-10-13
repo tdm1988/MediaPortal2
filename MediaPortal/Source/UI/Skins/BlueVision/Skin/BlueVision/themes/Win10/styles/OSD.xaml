@@ -111,20 +111,20 @@
                 <RowDefinition Height="30"/>
               </Grid.RowDefinitions>
               <Grid.RenderTransform>
-                <TranslateTransform Y="-120"/>
+                <TranslateTransform Y="-130"/>
               </Grid.RenderTransform>
               
               <Grid.Resources>
                 <Storyboard x:Key="SlideInStoryboard" FillBehavior="HoldEnd">
                   <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" FillBehavior="HoldEnd" Storyboard.TargetName="PlayerControlPanel" Storyboard.TargetProperty="RenderTransform.Y">
-                    <SplineDoubleKeyFrame KeyTime="00:00:00" Value="-120"/>
+                    <SplineDoubleKeyFrame KeyTime="00:00:00" Value="-130"/>
                     <SplineDoubleKeyFrame KeyTime="00:00:00.35" Value="0"/>
                   </DoubleAnimationUsingKeyFrames>
                 </Storyboard>
                 <Storyboard x:Key="SlideOutStoryboard" FillBehavior="HoldEnd">
                   <DoubleAnimationUsingKeyFrames BeginTime="00:00:00" FillBehavior="HoldEnd" Storyboard.TargetName="PlayerControlPanel" Storyboard.TargetProperty="RenderTransform.Y">
                     <SplineDoubleKeyFrame KeyTime="00:00:00" Value="0"/>
-                    <SplineDoubleKeyFrame KeyTime="00:00:00.35" Value="-120"/>
+                    <SplineDoubleKeyFrame KeyTime="00:00:00.35" Value="-130"/>
                   </DoubleAnimationUsingKeyFrames>
                 </Storyboard>
               </Grid.Resources>
