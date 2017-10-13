@@ -45,7 +45,7 @@
     </DockPanel>
 
     <mp_special_controls:PlayerControl x:Name="PrimaryOSD"  Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="0"
-            Style="{ThemeResource PrimaryImageOSDStyle}" Margin="0,0,-40,0"
+            Style="{ThemeResource PrimaryImageOSDStyle}" Margin="0,0,0,0"
             VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
     
     <KeyBinding Key="Info" Command="{Command ShowVideoInfo}"/>

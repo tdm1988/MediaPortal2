@@ -2091,7 +2091,7 @@
   </ControlTemplate>
 
   <ControlTemplate x:Key="GenericImageOSDControlsControl">
-    <DockPanel x:Name="PlayControlsPanel" VerticalAlignment="Top" HorizontalAlignment="Stretch" LastChildFill="True" Margin="0,0,50,0">
+    <DockPanel x:Name="PlayControlsPanel" VerticalAlignment="Top" HorizontalAlignment="Stretch" LastChildFill="True" Margin="0,0,0,0">
 
       <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Context="{Service Window}" HorizontalAlignment="Left">
         <Button x:Name="PowerButton" Style="{ThemeResource PowerButtonStyle}" Margin="0,-2,5,0" Height="72"
