@@ -53,6 +53,7 @@ namespace MediaPortal.UiComponents.Media.Models
 
     private bool _isPlayerConfigOpen;
     private DateTime _lastVideoInfoDemand = DateTime.MinValue;
+    private bool _isOsdOpenOnDemand;
 
     protected AbstractProperty _isOSDVisibleProperty;
     protected AbstractProperty _isPipProperty;
@@ -75,10 +76,14 @@ namespace MediaPortal.UiComponents.Media.Models
       IVideoPlayer pipPlayer = secondaryPlayerContext == null ? null : secondaryPlayerContext.CurrentPlayer as IVideoPlayer;
       IInputManager inputManager = ServiceRegistration.Get<IInputManager>();
 
-      if (!_isPlayerConfigOpen && DateTime.Now - _lastVideoInfoDemand > DateTime.Now.AddSeconds(5) - DateTime.Now && !IsOSDVisible)
+      if (!_isOsdOpenOnDemand && !_isPlayerConfigOpen)
       {
-        IsOSDVisible = inputManager.IsMouseUsed;
+        if (DateTime.Now - _lastVideoInfoDemand > DateTime.Now.AddSeconds(5) - DateTime.Now)
+        {
+          IsOSDVisible = inputManager.IsMouseUsed;
+        }
       }
+
       IsPip = pipPlayer != null;
     }
 
@@ -115,6 +120,7 @@ namespace MediaPortal.UiComponents.Media.Models
           {
             _isPlayerConfigOpen = false;
             _lastVideoInfoDemand = DateTime.Now;
+            _isOsdOpenOnDemand = false;
           }
         }
       }
@@ -183,11 +189,14 @@ namespace MediaPortal.UiComponents.Media.Models
       {
         IsOSDVisible = !IsOSDVisible;
       }
+      _isOsdOpenOnDemand = IsOSDVisible;
     }
 
     public void CloseVideoInfo()
     {
       IsOSDVisible = false;
+      _lastVideoInfoDemand = DateTime.Now;
+      _isOsdOpenOnDemand = false;
     }
 
     public void OpenPlayerConfigurationDialog()
