@@ -10,7 +10,7 @@
     xmlns:aspect="clr-namespace:MediaPortal.Common.MediaManagement.DefaultItemAspects;assembly=MediaPortal.Common"
     xmlns:fanart="clr-namespace:MediaPortal.Extensions.UserServices.FanArtService.Client;assembly=FanArtService.Client"
     xmlns:wmc_converters="clr-namespace:MediaPortal.UiComponents.WMCSkin.Converters;assembly=WMCSkin"
-    DependsOnStyleResources="OSD,OSDAudio,FullScreenContentConsts,MediaButtons,MediaColors,MediaConsts,Consts,Colors,Buttons,OtherControls,OtherControlsOverrides"
+    DependsOnStyleResources="OSD,FullScreenContentConsts,MediaButtons,MediaColors,MediaConsts,Consts,Colors,Buttons,OtherControls,OtherControlsOverrides"
     >
 
   <Model x:Key="FanArtBackgroundModel" Id="8F42C8E9-E8A3-475C-A50A-99E1E644DC91"/>
@@ -170,6 +170,7 @@
         <ControlTemplate TargetType="{x:Type mp_special_controls:PlayerControl}">
           <ControlTemplate.Resources>
             <Model x:Key="AudioPlayerModel" Id="D8998340-DA2D-42be-A29B-6D7A72AEA2DC"/>
+       
           </ControlTemplate.Resources>
 
           <Control Style="{ThemeResource OSDAudioContainer}" DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}"
