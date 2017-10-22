@@ -263,11 +263,9 @@
         <mp_special_controls:PlayerControl x:Name="PrimaryOSD" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="250,150,0,0"
             Style="{ThemeResource PrimaryAudioOSDStyle}" VerticalAlignment="Bottom" HorizontalAlignment="Right"/>
 
-        <Grid Context="{Model Id=4E2301B4-3C17-4a1d-8DE5-2CEA169A0256}">
-          <KeyBinding Key="Info" Command="{Command ShowVideoInfo}"/>
-          <KeyBinding Key="Back" Command="{Command CloseVideoInfo}" IsEnabled="{Binding IsOSDVisible}"/>
-          <KeyBinding Key="Escape" Command="{Command CloseVideoInfo}" IsEnabled="{Binding IsOSDVisible}"/>
-        </Grid>
+        <KeyBinding Key="Info" Command="{Command ToggleAudioInfo}"/>
+        <KeyBinding Key="Back" Command="{Command CloseAudioInfo}" IsEnabled="{Binding IsOSDVisible}"/>
+        <KeyBinding Key="Escape" Command="{Command CloseAudioInfo}" IsEnabled="{Binding IsOSDVisible}"/>
         
       </Grid>
     </mp_special_controls:PlayerControl.TemplateControl>

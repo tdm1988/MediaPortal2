@@ -52,9 +52,10 @@
         </VisualBrush.Visual>
       </VisualBrush>
     </Grid.Background>
-
+    
     <!--Playerstate overlay-->
-    <Grid Grid.ColumnSpan="3" Grid.RowSpan="4" HorizontalAlignment="Center" VerticalAlignment="Center">
+    <Grid Grid.ColumnSpan="3" Grid.RowSpan="4" HorizontalAlignment="Center" VerticalAlignment="Center"
+          DataContext="{Binding ElementName=PrimaryOSD}">
       <Image Width="250" Stretch="Uniform" Opacity="0.7" VerticalAlignment="Center" HorizontalAlignment="Center">
         <Image.Source>
           <MultiBinding Converter="{StaticResource ExpressionMultiValueConverter}" ConverterParameter="{}{0} ? {3} : ({1} ? {4} : ({2} ? {5} : {6}))">
@@ -71,7 +72,7 @@
       <Label Content="{Binding SeekHint}" FontSize="50" FontFamily="DefaultBold" Opacity="0.7" Margin="0,0,0,5"
              Color="Black" VerticalAlignment="Center" HorizontalAlignment="Center"/>
     </Grid>
-
+    
     <Control Grid.RowSpan="3" Grid.ColumnSpan="3">
       <Control.Background>
         <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
@@ -83,7 +84,7 @@
       </Control.Background>
     </Control>
 
-    <Grid Grid.Row="2" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+    <Grid Grid.Row="2" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  DataContext="{Binding ElementName=PrimaryOSD}">
       <Grid.RowDefinitions>
         <RowDefinition Height="*"/>
       </Grid.RowDefinitions>
@@ -256,14 +257,14 @@
                                         HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,-260,0,0"
                                         x:Name="SpectrumAnalyzer" Style="{ThemeResource SpectrumAnalyzerStyle}"/>
 
-    <!-- player control -->
-    <mp_special_controls:PlayerControl x:Name="PrimaryOSD"  Grid.Column="0"  Grid.Row="0" IsVisible="{Binding IsPlayerControlVisible}"
+    
+    <mp_special_controls:PlayerControl x:Name="PrimaryOSD"  Grid.ColumnSpan="3" Grid.Row="0"
             Style="{ThemeResource PrimaryAudioOSDStyle}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
 
     
-    <KeyBinding Key="Info" Command="{Command TogglePlayerControl}"/>
-    <KeyBinding Key="Back" Command="{Command ClosePlayerControl}" IsEnabled="{Binding IsPlayerControlVisible}"/>
-    <KeyBinding Key="Escape" Command="{Command ClosePlayerControl}" IsEnabled="{Binding IsPlayerControlVisible}"/>
+    <KeyBinding Key="Info" Command="{Command ToggleAudioInfo}"/>
+    <KeyBinding Key="Back" Command="{Command CloseAudioInfo}" IsEnabled="{Binding IsOSDVisible}"/>
+    <KeyBinding Key="Escape" Command="{Command CloseAudioInfo}" IsEnabled="{Binding IsOSDVisible}"/>
 
   </Grid>
 </Screen>

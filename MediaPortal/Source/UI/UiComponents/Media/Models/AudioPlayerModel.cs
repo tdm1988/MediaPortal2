@@ -40,15 +40,15 @@ namespace MediaPortal.UiComponents.Media.Models
     public const string MODEL_ID_STR = "D8998340-DA2D-42be-A29B-6D7A72AEA2DC";
     public static readonly Guid MODEL_ID = new Guid(MODEL_ID_STR);
     protected AbstractProperty _mediaItemProperty;
-    protected AbstractProperty _isPlayerControlVisibleProperty;
+    protected AbstractProperty _isOSDVisibleProperty;
     protected MediaItem _currentMediaItem;
-    private bool _isPlayerCtrlOpenOnDemand;
-    private DateTime _lastPlayerCtrlDemand = DateTime.MinValue;
+    private bool _isOsdOpenOnDemand;
+    private DateTime _lastAudioInfoDemand = DateTime.MinValue;
 
     public AudioPlayerModel() : base(Consts.WF_STATE_ID_CURRENTLY_PLAYING_AUDIO, Consts.WF_STATE_ID_FULLSCREEN_AUDIO)
     {
       _mediaItemProperty = new SProperty(typeof(MediaItem), null);
-      _isPlayerControlVisibleProperty = new WProperty(typeof(bool), false);
+      _isOSDVisibleProperty = new WProperty(typeof(bool), false);
     }
 
     protected override Type GetPlayerUIContributorType(IPlayer player, MediaWorkflowStateType stateType)
@@ -73,31 +73,30 @@ namespace MediaPortal.UiComponents.Media.Models
       _currentMediaItem = playerContext == null ? null : playerContext.CurrentMediaItem;
       IInputManager inputManager = ServiceRegistration.Get<IInputManager>();
 
-      if (!_isPlayerCtrlOpenOnDemand)
+      if (!_isOsdOpenOnDemand)
       {
-        if (DateTime.Now - _lastPlayerCtrlDemand > DateTime.Now.AddSeconds(5) - DateTime.Now)
+        if (DateTime.Now - _lastAudioInfoDemand > DateTime.Now.AddSeconds(5) - DateTime.Now)
         {
-          IsPlayerControlVisible = inputManager.IsMouseUsed;
+          IsOSDVisible = inputManager.IsMouseUsed;
         }
       }
-
       MediaItem = _currentMediaItem;
     }
 
     #region Members to be accessed from the GUI
 
-    public void TogglePlayerControl()
+    public void ToggleAudioInfo()
     {
-      IsPlayerControlVisible = !IsPlayerControlVisible;
-      _isPlayerCtrlOpenOnDemand = IsPlayerControlVisible;
-      _lastPlayerCtrlDemand = DateTime.Now;
+      IsOSDVisible = !IsOSDVisible;
+      _isOsdOpenOnDemand = IsOSDVisible;
+      _lastAudioInfoDemand = DateTime.Now;
     }
 
-    public void ClosePlayerControl()
+    public void CloseAudioInfo()
     {
-      IsPlayerControlVisible = false;
-      _lastPlayerCtrlDemand = DateTime.Now;
-      _isPlayerCtrlOpenOnDemand = false;
+      IsOSDVisible = false;
+      _lastAudioInfoDemand = DateTime.Now;
+      _isOsdOpenOnDemand = false;
     }
 
     public AbstractProperty MediaItemProperty
@@ -111,15 +110,15 @@ namespace MediaPortal.UiComponents.Media.Models
       internal set { _mediaItemProperty.SetValue(value); }
     }
 
-    public AbstractProperty IsPlayerControlVisibleProperty
+    public AbstractProperty IsOSDVisibleProperty
     {
-      get { return _isPlayerControlVisibleProperty; }
+      get { return _isOSDVisibleProperty; }
     }
 
-    public bool IsPlayerControlVisible
+    public bool IsOSDVisible
     {
-      get { return (bool)_isPlayerControlVisibleProperty.GetValue(); }
-      set { _isPlayerControlVisibleProperty.SetValue(value); }
+      get { return (bool)_isOSDVisibleProperty.GetValue(); }
+      set { _isOSDVisibleProperty.SetValue(value); }
     }
 
     #endregion
