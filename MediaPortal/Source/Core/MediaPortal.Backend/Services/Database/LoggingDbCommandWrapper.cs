@@ -41,7 +41,7 @@ namespace MediaPortal.Backend.Services.Database
     #region Private variables
 
     private static readonly FileLogger sqlDebugLog = FileLogger.CreateFileLogger(
-        ServiceRegistration.Get<IPathManager>().GetPath(@"<LOG>\SQLDebug.log"), Common.Logging.LogLevel.Debug, false, true);
+      ServiceRegistration.Get<IPathManager>().GetPath(@"<LOG>\SQLDebug.log"), Common.Logging.LogLevel.Debug, false, true);
     private readonly IDbCommand _command = null;
 
     #endregion
@@ -117,37 +117,29 @@ namespace MediaPortal.Backend.Services.Database
 
     public int ExecuteNonQuery()
     {
-      var sw = System.Diagnostics.Stopwatch.StartNew();
-      var result = _command.ExecuteNonQuery();
-      sw.Stop();
-      DumpCommand(true, sw.Elapsed.TotalMilliseconds);
+      int result = 0;
+      ExecuteWithTimer(() => result = _command.ExecuteNonQuery());
       return result;
     }
 
     public IDataReader ExecuteReader(CommandBehavior behavior)
     {
-      var sw = System.Diagnostics.Stopwatch.StartNew();
-      var result = _command.ExecuteReader(behavior);
-      sw.Stop();
-      DumpCommand(true, sw.Elapsed.TotalMilliseconds);
+      IDataReader result = null;
+      ExecuteWithTimer(() => result = _command.ExecuteReader(behavior));
       return result;
     }
 
     public IDataReader ExecuteReader()
     {
-      var sw = System.Diagnostics.Stopwatch.StartNew();
-      var result = _command.ExecuteReader();
-      sw.Stop();
-      DumpCommand(true, sw.Elapsed.TotalMilliseconds);
+      IDataReader result = null;
+      ExecuteWithTimer(() => result = _command.ExecuteReader());
       return result;
     }
 
     public object ExecuteScalar()
     {
-      var sw = System.Diagnostics.Stopwatch.StartNew();
-      var result =  _command.ExecuteScalar();
-      sw.Stop();
-      DumpCommand(true, sw.Elapsed.TotalMilliseconds);
+      object result = null;
+      ExecuteWithTimer(() => result = _command.ExecuteScalar());
       return result;
     }
 
@@ -192,6 +184,18 @@ namespace MediaPortal.Backend.Services.Database
     public void Dispose()
     {
       _command.Dispose();
+    }
+
+    #endregion
+
+    #region Private members
+
+    private void ExecuteWithTimer(Action action)
+    {
+      var sw = System.Diagnostics.Stopwatch.StartNew();
+      action();
+      sw.Stop();
+      DumpCommand(true, sw.Elapsed.TotalMilliseconds);
     }
 
     #endregion
