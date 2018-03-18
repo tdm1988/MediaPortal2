@@ -72,6 +72,7 @@
     <Compile Include="Services\ClientCommunication\UPnPServerControllerServiceImpl.cs" />
     <Compile Include="Services\ClientCommunication\UPnPServerControlPoint.cs" />
     <Compile Include="Services\ClientCommunication\UPnPClientControllerServiceProxy.cs" />
+    <Compile Include="Services\Database\JsonCommandWrapper.cs" />
     <Compile Include="Services\Database\LoggingDbCommandWrapper.cs" />
     <Compile Include="Services\Database\SqlScriptPreprocessor.cs" />
     <Compile Include="Services\MediaLibrary\BindVar.cs" />
@@ -128,6 +129,11 @@
       <Name>UPnP</Name>
       <Private>True</Private>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>10.0.3</Version>
+    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

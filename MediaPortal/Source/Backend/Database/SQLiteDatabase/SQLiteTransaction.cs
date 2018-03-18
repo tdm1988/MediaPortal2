@@ -109,7 +109,13 @@ namespace MediaPortal.Database.SQLite
       IDbCommand result = _connection.CreateCommand();
 
       if (_settings.EnableDebugLogging)
+      {
+#if JSON_LOG
+        result = new LoggingDbCommandWrapper(result, true);
+#else
         result = new LoggingDbCommandWrapper(result);
+#endif
+      }
 
       result.Transaction = _transaction;
       return result;

@@ -42,15 +42,24 @@ namespace MediaPortal.Backend.Services.Database
 
     private static readonly FileLogger sqlDebugLog = FileLogger.CreateFileLogger(
       ServiceRegistration.Get<IPathManager>().GetPath(@"<LOG>\SQLDebug.log"), Common.Logging.LogLevel.Debug, false, true);
+    private static readonly FileLogger sqlReplayLog = FileLogger.CreateFileLogger(
+      ServiceRegistration.Get<IPathManager>().GetPath(@"<LOG>\SQLReplay.log"), Common.Logging.LogLevel.Debug, false, true);
     private readonly IDbCommand _command = null;
+    private readonly bool _replayMode = false;
 
     #endregion
 
     #region Constructor
 
     public LoggingDbCommandWrapper(IDbCommand command)
+      : this(command, false)
+    {
+    }
+
+    public LoggingDbCommandWrapper(IDbCommand command, bool replayMode)
     {
       _command = command;
+      _replayMode = replayMode;
     }
 
     #endregion
@@ -64,6 +73,15 @@ namespace MediaPortal.Backend.Services.Database
 
     protected void DumpCommand(bool includeParameters, double timeSpanMs)
     {
+      if (_replayMode)
+      {
+        var wrapper = new JsonCommandWrapper();
+        wrapper.FromCommand(_command);
+        var serialized = wrapper.Serialize();
+        sqlReplayLog.Debug(StringUtils.EscapeCurlyBraces(serialized));
+        return;
+      }
+
       StringBuilder sbLogText = new StringBuilder();
       sbLogText.Append("\r\n-------------------------------------------------------");
       sbLogText.Append(SqlUtils.FormatSQL(_command.CommandText));
