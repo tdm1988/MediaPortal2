@@ -40,17 +40,13 @@ namespace MediaPortal.Plugins.SlimTv.Client.Models
   /// </summary>
   public class ChannelZapModel : IDisposable
   {
-    protected int _skipStepIndex = 0;
-    protected int _skipStepDirection = 1;
-    protected bool _skipStepValid = true;
-    protected List<int> _skipSteps = new List<int>();
     protected DelayedEvent _zapTimer;
     protected AbstractProperty _channelNumberOrIndexProperty;
     private const string CHANNEL_ZAP_SUPERLAYER_SCREEN_NAME = "ChannelZapOSD";
 
     public const string MODEL_ID_STR = "1C7DCFFE-E34E-41FD-9104-9AA594E49375";
 
-    public Guid ModelId
+    virtual public Guid ModelId
     {
       get { return new Guid(MODEL_ID_STR); }
     }
@@ -66,12 +62,37 @@ namespace MediaPortal.Plugins.SlimTv.Client.Models
         _zapTimer.Dispose();
     }
 
-    #region GUI Properties
+    protected virtual void ZapChannel(int number)
+    {
+      IWorkflowManager workflowManager = ServiceRegistration.Get<IWorkflowManager>();
+      SlimTvClientModel model = workflowManager.GetModel(SlimTvClientModel.MODEL_ID) as SlimTvClientModel;
+      if (model == null)
+        return;
+      SlimTvClientSettings settings = ServiceRegistration.Get<ISettingsManager>().Load<SlimTvClientSettings>();
+      // Special case "0", we use it for "zap back" to tune previous watched channel
+      if (number == 0)
+      {
+        _ = model.ZapBack();
+        return;
+      }
 
-    /// <summary>
-    /// Contains the user inputs of numbers which are either treated as channel index or absolute (logical) channel number.
-    /// </summary>
-    public string ChannelNumberOrIndex
+      if (settings.ZapByChannelIndex)
+      {
+        // Channel index starts by 0, user enters 1 based numbers
+        number--;
+        _ = model.TuneByIndex(number);
+      } else
+      {
+        _ = model.TuneByChannelNumber(number);
+      }
+    }
+
+  #region GUI Properties
+
+  /// <summary>
+  /// Contains the user inputs of numbers which are either treated as channel index or absolute (logical) channel number.
+  /// </summary>
+  public string ChannelNumberOrIndex
     {
       get { return (string) _channelNumberOrIndexProperty.GetValue(); }
       internal set { _channelNumberOrIndexProperty.SetValue(value); }
@@ -94,13 +115,7 @@ namespace MediaPortal.Plugins.SlimTv.Client.Models
 
     #endregion
 
-    #region Skip Step handling
-
-    protected IPlayerContext GetPlayerContext()
-    {
-      IPlayerContextManager playerContextManager = ServiceRegistration.Get<IPlayerContextManager>();
-      return playerContextManager.GetPlayerContext(PlayerChoice.CurrentPlayer);
-    }
+    #region Timer handling
 
     private void ReSetZapTimer()
     {
@@ -146,29 +161,7 @@ namespace MediaPortal.Plugins.SlimTv.Client.Models
 
       ClearZapTimer();
 
-      IWorkflowManager workflowManager = ServiceRegistration.Get<IWorkflowManager>();
-      SlimTvClientModel model = workflowManager.GetModel(SlimTvClientModel.MODEL_ID) as SlimTvClientModel;
-      if (model == null)
-        return;
-
-      // Special case "0", we use it for "zap back" to tune previous watched channel
-      if (number == 0)
-      {
-        _ = model.ZapBack();
-        return;
-      }
-
-      SlimTvClientSettings settings = ServiceRegistration.Get<ISettingsManager>().Load<SlimTvClientSettings>();
-      if (settings.ZapByChannelIndex)
-      {
-        // Channel index starts by 0, user enters 1 based numbers
-        number--;
-        _ = model.TuneByIndex(number);
-      }
-      else
-      {
-        _ = model.TuneByChannelNumber(number);
-      }
+      ZapChannel(number);
     }
 
     #endregion

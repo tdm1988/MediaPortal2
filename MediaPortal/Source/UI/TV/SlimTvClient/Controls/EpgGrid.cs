@@ -209,11 +209,31 @@ namespace MediaPortal.Plugins.SlimTv.Client.Controls
             OnGroupChanged();
             break;
           case SlimTvClientMessaging.MessageType.ProgramsChanged:
+            if (message.MessageData.TryGetValue("MoveCursor", out object difference) && difference is TimeSpan)
+            {
+              // Find where focus is now
+              int row;
+              ProgramListItem prog;
+              FrameworkElement header;
+              GetFocusedRowAndStartTime(out prog, out header, out row);
+              // Convert hours to a TimeSpan
+              if (prog != null)
+              {
+                _lastFocusedRow = row;
+                SetFocusTime(prog.Program.StartTime + (TimeSpan)difference);
+              }
+            }
             OnProgramsChanged();
             break;
           case SlimTvClientMessaging.MessageType.ProgramStatusChanged:
             IProgram program = (IProgram)message.MessageData[SlimTvClientMessaging.KEY_PROGRAM];
             UpdateProgramStatus(program);
+            break;
+          case SlimTvClientMessaging.MessageType.GoToChannelIndex:
+            if (message.MessageData.TryGetValue("Channel", out object channel) && channel is int)
+            {
+              SkipToChannelIndex((int)channel);
+            }
             break;
         }
       }
@@ -803,16 +823,18 @@ namespace MediaPortal.Plugins.SlimTv.Client.Controls
         e.Handled = true;
       else if (e.Key == Key.ChannelUp && OnPageUp())
         e.Handled = true;
-      else if (e.Key == Key.Fwd && OnScrollHours(_visibleHours))
+#if false
+      else if (e.Key == Key.Fwd && OnScrollForward1Screen())
         e.Handled = true;
-      else if (e.Key == Key.Rew && OnScrollHours(-_visibleHours))
+      else if (e.Key == Key.Rew && OnScrollBackward1Screen())
         e.Handled = true;
-      else if (e.Key == Key.Next && OnScrollHours(12))
+      else if (e.Key == Key.Next && OnScrollForward12Hours())
         e.Handled = true;
-      else if (e.Key == Key.Previous && OnScrollHours(-12))
+      else if (e.Key == Key.Previous && OnScrollBackward12Hours())
         e.Handled = true;
       else if(e.Key.RawCode >= '0' && e.Key.RawCode <= '9' && OnNumericKey((char)e.Key.RawCode))
         e.Handled = true;
+#endif
     }
 
     protected override void OnMouseWheel(MouseWheelEventArgs e)
@@ -990,25 +1012,39 @@ namespace MediaPortal.Plugins.SlimTv.Client.Controls
       return true;
     }
 
-    private bool OnScrollHours(double hours)
+    private bool OnScrollForward1Screen()
     {
       var model = SlimTvMultiChannelGuideModel;
       if (model == null)
         return false;
-      // Find where focus is now
-      int row;
-      ProgramListItem program;
-      FrameworkElement header;
-      GetFocusedRowAndStartTime(out program, out header, out row);
-      // Convert hours to a TimeSpan
-      TimeSpan t = TimeSpan.FromHours(hours);
-      // Scroll the model
-      model.Scroll(t);
-      if (program != null)
-      {
-        _lastFocusedRow = row;
-        SetFocusTime(program.Program.StartTime + t);
-      }
+      model.ScrollForward1Screen();
+      return true;
+    }
+
+    private bool OnScrollBackward1Screen()
+    {
+      var model = SlimTvMultiChannelGuideModel;
+      if (model == null)
+        return false;
+      model.ScrollBackward1Screen();
+      return true;
+    }
+
+    private bool OnScrollForward12Hours()
+    {
+      var model = SlimTvMultiChannelGuideModel;
+      if (model == null)
+        return false;
+      model.ScrollForward12Hours();
+      return true;
+    }
+
+    private bool OnScrollBackward12Hours()
+    {
+      var model = SlimTvMultiChannelGuideModel;
+      if (model == null)
+        return false;
+      model.ScrollBackward12Hours();
       return true;
     }
 
@@ -1025,17 +1061,11 @@ namespace MediaPortal.Plugins.SlimTv.Client.Controls
 
     private bool SkipToChannel(int channel)
     {
-      int row;
-      ProgramListItem program;
-      FrameworkElement header;
-      if (!GetFocusedRowAndStartTime(out program, out header, out row))
-        return false;
-
       int channelIndex = -1;
       int cIndex = 0;
       foreach (ChannelProgramListItem ch in ChannelsPrograms)
       {
-        if(ch.Channel.ChannelNumber == channel)
+        if (ch.Channel.ChannelNumber == channel)
         {
           channelIndex = cIndex;
           break;
@@ -1044,6 +1074,18 @@ namespace MediaPortal.Plugins.SlimTv.Client.Controls
       }
       if (channelIndex < 0)
         return false;
+      SkipToChannelIndex(channelIndex);
+      return true;
+    }
+
+    private void SkipToChannelIndex(int channelIndex)
+    {
+      int row;
+      ProgramListItem program;
+      FrameworkElement header;
+      if (!GetFocusedRowAndStartTime(out program, out header, out row))
+        return;
+
       row = channelIndex - _channelViewOffset;
       if (program != null)
         SetFocusTime(program.Program.StartTime);
@@ -1080,7 +1122,6 @@ namespace MediaPortal.Plugins.SlimTv.Client.Controls
           _focusTime = DateTime.MinValue;
         }
       }
-      return true;
     }
 
     private bool ScrollVertical(int scrollDirection)
