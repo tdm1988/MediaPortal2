@@ -190,20 +190,20 @@ namespace MediaPortal.Plugins.SlimTv.Client.Models
       _ = UpdateProgramsAfterScroll(difference);
     }
 
-    public async Task GoToChannelIndex(int number)
+    public void GoToChannelIndex(int number)
     {
       if(number >= 0 && number < ChannelList.Count)
         SlimTvClientMessaging.SendSlimTvClientMessage(SlimTvClientMessaging.MessageType.GoToChannelIndex, "Channel", number);
     }
 
-    public async Task GoToChannelNumber(int channel)
+    public void GoToChannelNumber(int channel)
     {
       int cIndex = 0;
       foreach (ChannelProgramListItem ch in ChannelList)
       {
         if (ch.Channel.ChannelNumber == channel)
         {
-          await GoToChannelIndex(cIndex);
+          GoToChannelIndex(cIndex);
           return;
         }
         cIndex++;

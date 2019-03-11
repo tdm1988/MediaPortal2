@@ -57,10 +57,10 @@ namespace MediaPortal.Plugins.SlimTv.Client.Models
       {
         // Channel index starts by 0, user enters 1 based numbers
         number--;
-        _ = guide.GoToChannelIndex(number);
+        guide.GoToChannelIndex(number);
       } else
       {
-        _ = guide.GoToChannelNumber(number);
+        guide.GoToChannelNumber(number);
       }
     }
   }
