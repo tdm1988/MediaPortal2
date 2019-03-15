@@ -62,50 +62,6 @@ namespace MediaPortal.Plugins.SlimTv.Client.Models
         _zapTimer.Dispose();
     }
 
-    protected void ZapChannel(int number)
-    {
-#if DEBUG_FOCUS
-      ServiceRegistration.Get<MediaPortal.Common.Logging.ILogger>().Debug("EPG: ChannelZapModel goto {0}", number);
-#endif
-      SlimTvClientSettings settings = ServiceRegistration.Get<ISettingsManager>().Load<SlimTvClientSettings>();
-      IWorkflowManager workflowManager = ServiceRegistration.Get<IWorkflowManager>();
-      if (workflowManager.CurrentNavigationContext.WorkflowModelId == SlimTvMultiChannelGuideModel.MODEL_ID)
-      {
-        SlimTvMultiChannelGuideModel guide = workflowManager.GetModel(SlimTvMultiChannelGuideModel.MODEL_ID) as SlimTvMultiChannelGuideModel;
-        if (guide == null)
-          return;
-        if (settings.ZapByChannelIndex)
-        {
-          // Channel index starts by 0, user enters 1 based numbers
-          number--;
-          guide.GoToChannelIndex(number);
-        } else
-        {
-          guide.GoToChannelNumber(number);
-        }
-        return;
-      }
-      SlimTvClientModel model = workflowManager.GetModel(SlimTvClientModel.MODEL_ID) as SlimTvClientModel;
-      if (model == null)
-        return;
-      // Special case "0", we use it for "zap back" to tune previous watched channel
-      if (number == 0)
-      {
-        _ = model.ZapBack();
-        return;
-      }
-
-      if (settings.ZapByChannelIndex)
-      {
-        // Channel index starts by 0, user enters 1 based numbers
-        number--;
-        _ = model.TuneByIndex(number);
-      } else
-      {
-        _ = model.TuneByChannelNumber(number);
-      }
-    }
-
   #region GUI Properties
 
   /// <summary>
@@ -180,7 +136,48 @@ namespace MediaPortal.Plugins.SlimTv.Client.Models
 
       ClearZapTimer();
 
-      ZapChannel(number);
+#if DEBUG_FOCUS
+      ServiceRegistration.Get<MediaPortal.Common.Logging.ILogger>().Debug("EPG: ChannelZapModel goto {0}", number);
+#endif
+      SlimTvClientSettings settings = ServiceRegistration.Get<ISettingsManager>().Load<SlimTvClientSettings>();
+      IWorkflowManager workflowManager = ServiceRegistration.Get<IWorkflowManager>();
+      if (workflowManager.CurrentNavigationContext.WorkflowModelId == SlimTvMultiChannelGuideModel.MODEL_ID)
+      {
+        SlimTvMultiChannelGuideModel guide = workflowManager.GetModel(SlimTvMultiChannelGuideModel.MODEL_ID) as SlimTvMultiChannelGuideModel;
+        if (guide == null)
+          return;
+        if (settings.ZapByChannelIndex)
+        {
+          // Channel index starts by 0, user enters 1 based numbers
+          number--;
+          guide.GoToChannelIndex(number);
+        } else
+        {
+          guide.GoToChannelNumber(number);
+        }
+        return;
+      }
+      SlimTvClientModel model = workflowManager.GetModel(SlimTvClientModel.MODEL_ID) as SlimTvClientModel;
+      if (model == null)
+        return;
+
+      // Special case "0", we use it for "zap back" to tune previous watched channel
+      if (number == 0)
+      {
+        _ = model.ZapBack();
+        return;
+      }
+
+      if (settings.ZapByChannelIndex)
+      {
+        // Channel index starts by 0, user enters 1 based numbers
+        number--;
+        _ = model.TuneByIndex(number);
+      }
+      else
+      {
+        _ = model.TuneByChannelNumber(number);
+      }
     }
 
     #endregion
