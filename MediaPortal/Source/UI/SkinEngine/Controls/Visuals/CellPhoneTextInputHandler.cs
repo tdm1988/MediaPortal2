@@ -37,8 +37,8 @@ namespace MediaPortal.UI.SkinEngine.Controls.Visuals
 
     public static int CURSOR_ADVANCE_TIMESPAN_MS = 1000;
 
-    public static IList<char> ADDITIONAL_CHARS = new List<char>
-      {'.', ',', '\'', '?',
+    public static IList<char> ONE_AND_ADDITIONAL_CHARS = new List<char>
+      {'1', '.', ',', '\'', '?',
        '!', '\"', '-', '(',
        ')', '@', '/', ':',
        '_', ';', '+', '&',
@@ -51,7 +51,7 @@ namespace MediaPortal.UI.SkinEngine.Controls.Visuals
 
     public static IDictionary<char, IList<char>> CELLPHONE_LAYOUT_LOWER = new Dictionary<char, IList<char>>
       {
-          {'1', new List<char>{'1'}},
+          {'1', ONE_AND_ADDITIONAL_CHARS},
           {'2', new List<char>{'2', 'a', 'b', 'c'}},
           {'3', new List<char>{'3', 'd', 'e', 'f'}},
           {'4', new List<char>{'4', 'g', 'h', 'i'}},
@@ -60,15 +60,14 @@ namespace MediaPortal.UI.SkinEngine.Controls.Visuals
           {'7', new List<char>{'7', 'p', 'q', 'r', 's'}},
           {'8', new List<char>{'8', 't', 'u', 'v'}},
           {'9', new List<char>{'9', 'w', 'x', 'y', 'z'}},
-          {'0', new List<char>{'0', ' '}},
-          {'*', ADDITIONAL_CHARS}
+          {'0', new List<char>{'0', ' '}}
       };
 
     public const string LOWER_LAYOUT_NAME = "abc";
 
     public static IDictionary<char, IList<char>> CELLPHONE_LAYOUT_UPPER = new Dictionary<char, IList<char>>
       {
-          {'1', new List<char>{'1'}},
+          {'1', ONE_AND_ADDITIONAL_CHARS},
           {'2', new List<char>{'2', 'A', 'B', 'C'}},
           {'3', new List<char>{'3', 'D', 'E', 'F'}},
           {'4', new List<char>{'4', 'G', 'H', 'I'}},
@@ -77,8 +76,7 @@ namespace MediaPortal.UI.SkinEngine.Controls.Visuals
           {'7', new List<char>{'7', 'P', 'Q', 'R', 'S'}},
           {'8', new List<char>{'8', 'T', 'U', 'V'}},
           {'9', new List<char>{'9', 'W', 'X', 'Y', 'Z'}},
-          {'0', new List<char>{'0', ' '}},
-          {'*', ADDITIONAL_CHARS}
+          {'0', new List<char>{'0', ' '}}
       };
 
     public const string UPPER_LAYOUT_NAME = "ABC";
@@ -158,10 +156,12 @@ namespace MediaPortal.UI.SkinEngine.Controls.Visuals
       if (key == Key.None)
         return;
 
-      if (key.IsPrintableKey)
+      if (key.IsPrintableKey && key.RawCode.Value == '*')
+        key = Key.BackSpace;
+      else if (key.IsPrintableKey)
       {
         char character = key.RawCode.Value;
-        if (char.IsNumber(character) || character == '*')
+        if (char.IsNumber(character))
         {
           if (_currentCharChoice == character)
           {
