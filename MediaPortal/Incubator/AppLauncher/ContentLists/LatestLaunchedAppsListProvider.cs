@@ -29,6 +29,7 @@ using System.Threading.Tasks;
 using MediaPortal.UI.ContentLists;
 using MediaPortal.Plugins.AppLauncher.General;
 using MediaPortal.Plugins.AppLauncher.Models;
+using System;
 
 namespace MediaPortal.Plugins.AppLauncher.ContentLists
 {
@@ -36,11 +37,11 @@ namespace MediaPortal.Plugins.AppLauncher.ContentLists
   {
     public override Task<bool> UpdateItemsAsync(int maxItems, UpdateReason updateReason)
     {
-      if (!AppLauncherHomeModel.AnyAppWasLaunched(nameof(LatestLaunchedAppsListProvider)))
+      if (!updateReason.HasFlag(UpdateReason.Forced))
         return Task.FromResult(false);
 
-      var apps = Helper.LoadApps();
-      IEnumerable<ListItem> listItems = apps.AppsList.OrderByDescending(a => a.LastUsed).Select(a => CreateAppItem(a));
+      var apps = Helper.LoadApps(false);
+      IEnumerable<ListItem> listItems = apps.AppsList.Where(a => a.LastUsed > default(DateTime)).OrderByDescending(a => a.LastUsed).Select(a => CreateAppItem(a));
       _allItems.Clear();
       foreach (var item in listItems.Take(maxItems))
         _allItems.Add(item);

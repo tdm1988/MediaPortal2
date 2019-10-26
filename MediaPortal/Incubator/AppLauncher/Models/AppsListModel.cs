@@ -39,6 +39,10 @@ namespace MediaPortal.Plugins.AppLauncher.Models
 
     #endregion
 
+    protected override bool ServerConnectionRequired => false;
+
+    protected override bool UpdateRequired => AppLauncherHomeModel.AnyAppWasChangedToggle;
+
     public AppsListModel() : base("/Content/AppsListProviders")
     {
     }
