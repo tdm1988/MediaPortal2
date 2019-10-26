@@ -71,6 +71,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActionType.cs" />
+    <Compile Include="PackageStateToVisibilityConverter.cs" />
     <Compile Include="BootstrapperWrapper\BootstrapperApplicationWrapper.cs" />
     <Compile Include="ChainPackages\Dokan.cs" />
     <Compile Include="ChainPackages\IPackageChecker.cs" />
@@ -250,6 +251,10 @@
     <Resource Include="Resources\InstallTypes\repair.png" />
     <Resource Include="Resources\InstallTypes\uninstall.png" />
     <Resource Include="Resources\InstallTypes\update.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\absent.png" />
+    <Resource Include="Resources\present.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
