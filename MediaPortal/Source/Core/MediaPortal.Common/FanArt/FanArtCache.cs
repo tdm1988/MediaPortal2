@@ -159,11 +159,12 @@ namespace MediaPortal.Common.FanArt
       if (Directory.Exists(path))
       {
         int maxCount = GetMaxFanArtCount(fanArtType);
-        fanartFiles.AddRange(Directory.GetFiles(path, "*.jpg"));
-        if (fanartFiles.Count < maxCount)
-          fanartFiles.AddRange(Directory.GetFiles(path, "*.png"));
-        if (fanartFiles.Count < maxCount)
-          fanartFiles.AddRange(Directory.GetFiles(path, "*.tbn"));
+        foreach (var extension in LocalFanartHelper.EXTENSIONS)
+        {
+          fanartFiles.AddRange(Directory.GetFiles(path, $"*{extension}"));
+          if (fanartFiles.Count >= maxCount)
+            break;
+        }
       }
       return fanartFiles;
     }
