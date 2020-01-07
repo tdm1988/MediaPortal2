@@ -73,6 +73,7 @@ namespace MediaPortal.Extensions.MetadataExtractors.SeriesMetadataExtractor
     protected AsynchronousMessageQueue _messageQueue;
     protected int _importerCount;
     protected SettingsChangeWatcher<SeriesMetadataExtractorSettings> _settingWatcher;
+    protected string _category;
 
     #endregion
 
@@ -85,6 +86,8 @@ namespace MediaPortal.Extensions.MetadataExtractors.SeriesMetadataExtractor
       if (!mediaAccessor.MediaCategories.TryGetValue(MEDIA_CATEGORY_NAME_SERIES, out seriesCategory))
         seriesCategory = mediaAccessor.RegisterMediaCategory(MEDIA_CATEGORY_NAME_SERIES, new List<MediaCategory> { DefaultMediaCategories.Video });
       MEDIA_CATEGORIES.Add(seriesCategory);
+      OnlineMatcherService.RegisterDefaultSeriesMatchers(MEDIA_CATEGORY_NAME_SERIES);
+      OnlineMatcherService.RegisterDefaultSeriesSubtitleMatchers(MEDIA_CATEGORY_NAME_SERIES);
 
       // All non-default media item aspects must be registered
       IMediaItemAspectTypeRegistration miatr = ServiceRegistration.Get<IMediaItemAspectTypeRegistration>();
@@ -98,6 +101,7 @@ namespace MediaPortal.Extensions.MetadataExtractors.SeriesMetadataExtractor
 
     public SeriesMetadataExtractor()
     {
+      _category = MEDIA_CATEGORY_NAME_SERIES;
       _metadata = new MetadataExtractorMetadata(METADATAEXTRACTOR_ID, "Series metadata extractor", MetadataExtractorPriority.External, true,
           MEDIA_CATEGORIES, new MediaItemAspectMetadata[]
               {
@@ -137,6 +141,9 @@ namespace MediaPortal.Extensions.MetadataExtractors.SeriesMetadataExtractor
               if (ServiceRegistration.Get<IMediaAccessor>().LocalFanArtHandlers.TryGetValue(SeriesFanArtHandler.FANARTHANDLER_ID, out fanartHandler))
                 fanartHandler.ClearCache();
             }
+            break;
+          case ImporterWorkerMessaging.MessageType.ImportCompleted:
+            Interlocked.Decrement(ref _importerCount);
             break;
         }
       }
@@ -260,13 +267,13 @@ namespace MediaPortal.Extensions.MetadataExtractors.SeriesMetadataExtractor
       if (SkipOnlineSearches && !SkipFanArtDownload)
       {
         EpisodeInfo tempInfo = episodeInfo.Clone();
-        await OnlineMatcherService.Instance.FindAndUpdateEpisodeAsync(tempInfo).ConfigureAwait(false);
+        await OnlineMatcherService.Instance.FindAndUpdateEpisodeAsync(tempInfo, _category).ConfigureAwait(false);
         episodeInfo.CopyIdsFrom(tempInfo);
         episodeInfo.HasChanged = tempInfo.HasChanged;
       }
       else if (!SkipOnlineSearches)
       {
-        await OnlineMatcherService.Instance.FindAndUpdateEpisodeAsync(episodeInfo).ConfigureAwait(false);
+        await OnlineMatcherService.Instance.FindAndUpdateEpisodeAsync(episodeInfo, _category).ConfigureAwait(false);
       }
 
       if (episodeInfo.EpisodeName.IsEmpty)
@@ -302,7 +309,7 @@ namespace MediaPortal.Extensions.MetadataExtractors.SeriesMetadataExtractor
       get { return _metadata; }
     }
 
-    public async Task<bool> TryExtractMetadataAsync(IResourceAccessor mediaItemAccessor, IDictionary<Guid, IList<MediaItemAspect>> extractedAspectData, bool forceQuickMode)
+    public virtual async Task<bool> TryExtractMetadataAsync(IResourceAccessor mediaItemAccessor, IDictionary<Guid, IList<MediaItemAspect>> extractedAspectData, bool forceQuickMode)
     {
       try
       {
@@ -343,7 +350,7 @@ namespace MediaPortal.Extensions.MetadataExtractors.SeriesMetadataExtractor
     {
       try
       {
-        if (!(searchCategories?.Contains(MEDIA_CATEGORY_NAME_SERIES) ?? true))
+        if (!(searchCategories?.Contains(_category) ?? true))
           return null;
 
         string searchData = null;
@@ -439,7 +446,7 @@ namespace MediaPortal.Extensions.MetadataExtractors.SeriesMetadataExtractor
         if (episodeSearchinfo != null)
         {
           List<int> epNos = new List<int>(episodeSearchinfo.EpisodeNumbers.OrderBy(e => e));
-          var matches = await OnlineMatcherService.Instance.FindMatchingEpisodesAsync(episodeSearchinfo).ConfigureAwait(false);
+          var matches = await OnlineMatcherService.Instance.FindMatchingEpisodesAsync(episodeSearchinfo, _category).ConfigureAwait(false);
           ServiceRegistration.Get<ILogger>().Debug("SeriesMetadataExtractor: Episode search returned {0} matches", matches.Count());
           if (epNos.Count > 1)
           {
@@ -508,6 +515,8 @@ namespace MediaPortal.Extensions.MetadataExtractors.SeriesMetadataExtractor
               result.ExternalIds.Add("imdb.com", match.ImdbId);
             if (match.MovieDbId > 0)
               result.ExternalIds.Add("themoviedb.org", match.MovieDbId.ToString());
+            foreach (var customId in match.CustomIds)
+              result.ExternalIds.Add(customId.Key, customId.Value);
 
             //Assign aspects and remove unwanted aspects
             match.SetMetadata(result.AspectData, true);
@@ -519,7 +528,7 @@ namespace MediaPortal.Extensions.MetadataExtractors.SeriesMetadataExtractor
         }
         else if (seriesSearchinfo != null)
         {
-          var matches = await OnlineMatcherService.Instance.FindMatchingSeriesAsync(seriesSearchinfo).ConfigureAwait(false);
+          var matches = await OnlineMatcherService.Instance.FindMatchingSeriesAsync(seriesSearchinfo, _category).ConfigureAwait(false);
           ServiceRegistration.Get<ILogger>().Debug("SeriesMetadataExtractor: Series search returned {0} matches", matches.Count());
           foreach (var match in matches)
           {
@@ -539,6 +548,8 @@ namespace MediaPortal.Extensions.MetadataExtractors.SeriesMetadataExtractor
               result.ExternalIds.Add("imdb.com", match.ImdbId);
             if (match.MovieDbId > 0)
               result.ExternalIds.Add("themoviedb.org", match.MovieDbId.ToString());
+            foreach (var customId in match.CustomIds)
+              result.ExternalIds.Add(customId.Key, customId.Value);
 
             //Assign aspects and remove unwanted aspects
             match.SetMetadata(result.AspectData, true);
@@ -583,7 +594,7 @@ namespace MediaPortal.Extensions.MetadataExtractors.SeriesMetadataExtractor
         {
           EpisodeInfo info = new EpisodeInfo();
           info.FromMetadata(matchedAspectData);
-          await OnlineMatcherService.Instance.FindAndUpdateEpisodeAsync(info).ConfigureAwait(false);
+          await OnlineMatcherService.Instance.FindAndUpdateEpisodeAsync(info, _category).ConfigureAwait(false);
           info.SetMetadata(matchedAspectData, true);
           CleanReimportAspects(matchedAspectData);
           return true;
@@ -592,7 +603,7 @@ namespace MediaPortal.Extensions.MetadataExtractors.SeriesMetadataExtractor
         {
           SeriesInfo info = new SeriesInfo();
           info.FromMetadata(matchedAspectData);
-          await OnlineMatcherService.Instance.UpdateSeriesAsync(info, false).ConfigureAwait(false);
+          await OnlineMatcherService.Instance.UpdateSeriesAsync(info, false, _category).ConfigureAwait(false);
           info.SetMetadata(matchedAspectData, true);
           CleanReimportAspects(matchedAspectData);
           return true;

@@ -67,7 +67,9 @@ namespace MediaPortal.Extensions.MetadataExtractors.AudioMetadataExtractor
     /// </summary>
     public static Guid METADATAEXTRACTOR_ID = new Guid(METADATAEXTRACTOR_ID_STR);
 
+    public static readonly string MEDIA_CATEGORY_NAME_ADUIO = DefaultMediaCategories.Audio.CategoryName;
     public const double MINIMUM_HOUR_AGE_BEFORE_UPDATE = 0.5;
+    public const string PICARD_ARTISTS_TAG = "ARTISTS";
 
     #endregion
 
@@ -84,6 +86,7 @@ namespace MediaPortal.Extensions.MetadataExtractors.AudioMetadataExtractor
     protected SettingsChangeWatcher<AudioMetadataExtractorSettings> _settingWatcher;
     protected AsynchronousMessageQueue _messageQueue;
     protected int _importerCount;
+    protected string _category;
 
     /// <summary>
     /// Audio file accessor class needed for our tag library implementation. This class maps
@@ -132,6 +135,7 @@ namespace MediaPortal.Extensions.MetadataExtractors.AudioMetadataExtractor
     static AudioMetadataExtractor()
     {
       MEDIA_CATEGORIES.Add(DefaultMediaCategories.Audio);
+      OnlineMatcherService.RegisterDefaultAudioMatchers(MEDIA_CATEGORY_NAME_ADUIO);
 
       // All non-default media item aspects must be registered
       IMediaItemAspectTypeRegistration miatr = ServiceRegistration.Get<IMediaItemAspectTypeRegistration>();
@@ -179,6 +183,7 @@ namespace MediaPortal.Extensions.MetadataExtractors.AudioMetadataExtractor
 
     public AudioMetadataExtractor()
     {
+      _category = MEDIA_CATEGORY_NAME_ADUIO;
       _metadata = new MetadataExtractorMetadata(METADATAEXTRACTOR_ID, "Audio metadata extractor", MetadataExtractorPriority.Core, false,
           MEDIA_CATEGORIES, new[]
               {
@@ -219,6 +224,9 @@ namespace MediaPortal.Extensions.MetadataExtractors.AudioMetadataExtractor
               if (ServiceRegistration.Get<IMediaAccessor>().LocalFanArtHandlers.TryGetValue(AudioFanArtHandler.FANARTHANDLER_ID, out fanartHandler))
                 fanartHandler.ClearCache();
             }
+            break;
+          case ImporterWorkerMessaging.MessageType.ImportCompleted:
+            Interlocked.Decrement(ref _importerCount);
             break;
         }
       }
@@ -480,28 +488,69 @@ namespace MediaPortal.Extensions.MetadataExtractors.AudioMetadataExtractor
       if (tag == null)
         return false;
       using (tag)
-        return TryUpdateArtists(tag, persons, false);
+        return TryUpdateArtists(tag, persons, forAlbum);
     }
 
     protected static bool TryUpdateArtists(File tag, IList<PersonInfo> persons, bool albumArtists)
     {
       IEnumerable<string> artists = albumArtists ? tag.Tag.AlbumArtists : tag.Tag.Performers;
+      if (!albumArtists)
+      {
+        var customArtists = GetCustomId3v2FrameValue(tag, PICARD_ARTISTS_TAG);
+        if (!string.IsNullOrEmpty(customArtists))
+          artists = customArtists.Split(ADDITIONAL_SEPARATOR);
+      }
       if (!artists.Any())
         return false;
       artists = (tag.TagTypes & TagTypes.Id3v2) != 0 ?
         PatchID3v23Enumeration(artists) : artists;
       artists = ApplyAdditionalSeparator(artists);
-      if (artists.Count() != 1)
+      var atistList = artists.ToList();
+      if (atistList.Count == 0)
         return false;
+
       string musicBrainzId = tag.Tag.MusicBrainzArtistId;
       if (string.IsNullOrEmpty(musicBrainzId))
         return false;
-      string artist = artists.First();
-      PersonInfo person = persons.FirstOrDefault(p => p.Name == artist);
-      if (person == null)
-        return false;
-      person.MusicBrainzId = musicBrainzId;
-      return true;
+      //Multiple ids can be contained in this tag
+      string[] musicBrainzIds = musicBrainzId.Split(ADDITIONAL_SEPARATOR);
+
+      bool success = false;
+      for (int i = 0; i < musicBrainzIds.Length; i++)
+      {
+        string id = musicBrainzIds[i].Trim();
+        if (string.IsNullOrEmpty(id))
+          continue;
+        if (atistList.Count > i)
+        {
+          PersonInfo person = persons.FirstOrDefault(p => p.Name == atistList[i]);
+          if (person == null)
+            continue;
+          person.MusicBrainzId = id;
+          success = true;
+        }
+      }
+      return success;
+    }
+
+    protected static string GetCustomId3v2FrameValue(File tag, string frameDescription)
+    {
+      if((tag.TagTypes & TagTypes.Id3v2) != 0)
+      {
+        var id3v2tag = tag.GetTag(TagTypes.Id3v2, false) as TagLib.Id3v2.Tag;
+        if (id3v2tag != null)
+        {
+          foreach (TagLib.Id3v2.Frame frame in id3v2tag.GetFrames())
+          {
+            var frameId = frame.FrameId.ToString();
+            if (frameId == "TXXX" && (frame as TagLib.Id3v2.UserTextInformationFrame).Description.ToUpperInvariant() == frameDescription.ToUpperInvariant())
+            {
+              return string.Join(ADDITIONAL_SEPARATOR.ToString(), (frame as TagLib.Id3v2.UserTextInformationFrame).Text);
+            }
+          }
+        }
+      }
+      return null;
     }
 
     #endregion
@@ -556,14 +605,23 @@ namespace MediaPortal.Extensions.MetadataExtractors.AudioMetadataExtractor
               if (!isReimport) //Don't assign metadata for reimports because they might be the cause of the wrong import
               {
                 IEnumerable<string> artists;
-                if (tag.Tag.Performers.Length > 0)
+                var customArtists = GetCustomId3v2FrameValue(tag, PICARD_ARTISTS_TAG);
+                if (!string.IsNullOrEmpty(customArtists))
+                {
+                  artists = customArtists.Split(ADDITIONAL_SEPARATOR);
+                  if ((tag.TagTypes & TagTypes.Id3v2) != 0)
+                    artists = PatchID3v23Enumeration(artists);
+                }
+                else if (tag.Tag.Performers.Length > 0)
                 {
                   artists = tag.Tag.Performers;
                   if ((tag.TagTypes & TagTypes.Id3v2) != 0)
                     artists = PatchID3v23Enumeration(artists);
                 }
                 else
+                {
                   artists = artist == null ? null : new string[] { artist.Trim() };
+                }
                 if (tag.Tag.Track != 0)
                   trackNo = tag.Tag.Track;
 
@@ -792,13 +850,13 @@ namespace MediaPortal.Extensions.MetadataExtractors.AudioMetadataExtractor
           if (SkipOnlineSearches && !SkipFanArtDownload)
           {
             TrackInfo tempInfo = trackInfo.Clone();
-            await OnlineMatcherService.Instance.FindAndUpdateTrackAsync(tempInfo).ConfigureAwait(false);
+            await OnlineMatcherService.Instance.FindAndUpdateTrackAsync(tempInfo, _category).ConfigureAwait(false);
             trackInfo.CopyIdsFrom(tempInfo);
             trackInfo.HasChanged = tempInfo.HasChanged;
           }
           else if (!SkipOnlineSearches)
           {
-            await OnlineMatcherService.Instance.FindAndUpdateTrackAsync(trackInfo).ConfigureAwait(false);
+            await OnlineMatcherService.Instance.FindAndUpdateTrackAsync(trackInfo, _category).ConfigureAwait(false);
           }
         }
 
@@ -994,7 +1052,7 @@ namespace MediaPortal.Extensions.MetadataExtractors.AudioMetadataExtractor
         //Perform online search
         if (trackSearchinfo != null)
         {
-          var matches = await OnlineMatcherService.Instance.FindMatchingTracksAsync(trackSearchinfo).ConfigureAwait(false);
+          var matches = await OnlineMatcherService.Instance.FindMatchingTracksAsync(trackSearchinfo, _category).ConfigureAwait(false);
           ServiceRegistration.Get<ILogger>().Debug("AudioMetadataExtractor: Audio search returned {0} matches", matches.Count());
           foreach (var match in matches)
           {
@@ -1023,7 +1081,7 @@ namespace MediaPortal.Extensions.MetadataExtractors.AudioMetadataExtractor
         }
         else if (albumSearchinfo != null)
         {
-          var matches = await OnlineMatcherService.Instance.FindMatchingAlbumsAsync(albumSearchinfo).ConfigureAwait(false);
+          var matches = await OnlineMatcherService.Instance.FindMatchingAlbumsAsync(albumSearchinfo, _category).ConfigureAwait(false);
           ServiceRegistration.Get<ILogger>().Debug("AudioMetadataExtractor: Album search returned {0} matches", matches.Count());
           foreach (var match in matches)
           {
@@ -1066,7 +1124,7 @@ namespace MediaPortal.Extensions.MetadataExtractors.AudioMetadataExtractor
         {
           TrackInfo info = new TrackInfo();
           info.FromMetadata(matchedAspectData);
-          await OnlineMatcherService.Instance.FindAndUpdateTrackAsync(info).ConfigureAwait(false);
+          await OnlineMatcherService.Instance.FindAndUpdateTrackAsync(info, _category).ConfigureAwait(false);
           info.SetMetadata(matchedAspectData, true);
           CleanReimportAspects(matchedAspectData);
           return true;
@@ -1075,7 +1133,7 @@ namespace MediaPortal.Extensions.MetadataExtractors.AudioMetadataExtractor
         {
           AlbumInfo info = new AlbumInfo();
           info.FromMetadata(matchedAspectData);
-          await OnlineMatcherService.Instance.UpdateAlbumAsync(info, false).ConfigureAwait(false);
+          await OnlineMatcherService.Instance.UpdateAlbumAsync(info, false, _category).ConfigureAwait(false);
           info.SetMetadata(matchedAspectData, true);
           CleanReimportAspects(matchedAspectData);
           return true;

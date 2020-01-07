@@ -65,6 +65,8 @@
     <Model Id="F1DBEDCB-CB95-4CF5-8787-07390869DE44" Name="SwitchBrowseLocalMLContributorModel" ClassName="MediaPortal.UiComponents.Media.Actions.SwitchBrowseLocalMLAction"/>
     <Model Id="56B6B935-8972-48C2-811A-BF150A1F8F09" Name="SwitchBrowseModeContributorModel" ClassName="MediaPortal.UiComponents.Media.Actions.SwitchBrowseModeAction"/>
 
+    <Model Id="5D67150A-3B09-43C1-8618-FFE3C763AFD1" Name="EjectOpticalDiscContributorModel" ClassName="MediaPortal.UiComponents.Media.Actions.EjectOpticalDiscAction"/>
+
     <Model Id="8573DBD8-A257-426a-9875-9DB155D32D47" Name="ExtendedVideoSkip" ClassName="MediaPortal.UiComponents.Media.Models.ExtendedVideoSkip" />
 
     <Model Id="E1752E49-67FE-4D94-8544-1134CC3DCD87" Name="LatestMediaModelContributorModel" ClassName="MediaPortal.UiComponents.Media.Actions.LatestMediaAction" />
@@ -256,6 +258,7 @@
     <MediaItemActionBuilder Id="{6B6F3A76-B631-45C9-936B-1BEE51664A21}" Caption="[Media.SubtitleSearch]" Sort="C.2" ClassName="MediaPortal.UiComponents.Media.MediaItemActions.SearchForSubtitles"/>
     <MediaItemActionBuilder Id="{8B92989B-B57F-43C9-ACE2-C1E4866122E7}" Caption="[Media.Refresh]" Sort="C.3" ClassName="MediaPortal.UiComponents.Media.MediaItemActions.RefreshMediaItem"/>
     <MediaItemActionBuilder Id="{3185CBDB-0EF8-4E22-AE3E-2D79FA52F63A}" Caption="[Media.Reimport]" Sort="C.4" ClassName="MediaPortal.UiComponents.Media.MediaItemActions.ReimportMediaItem"/>
+    <MediaItemActionBuilder Id="{0F58BD42-A1CD-4103-9482-A64F017049BF}" Caption="[Media.Eject]" Sort="C.5" ClassName="MediaPortal.UiComponents.Media.MediaItemActions.EjectMediaItem"/>
     <MediaItemActionBuilder Id="{37417344-B43E-486F-A2C5-DFF9E8C1C8E1}" Caption="[Media.DeleteFromStorage]" Sort="D.2" ClassName="MediaPortal.UiComponents.Media.MediaItemActions.DeleteFromStorage" RestrictionGroup="Media.DeleteMediaItem" />
   </Register>
 

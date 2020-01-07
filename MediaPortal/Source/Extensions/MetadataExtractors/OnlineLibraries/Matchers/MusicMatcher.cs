@@ -60,12 +60,13 @@ namespace MediaPortal.Extensions.OnlineLibraries.Matchers
 
     #region Init
 
-    public MusicMatcher(string cachePath, TimeSpan maxCacheDuration, bool cacheRefreshable)
+    public MusicMatcher(string name, string cachePath, TimeSpan maxCacheDuration, bool cacheRefreshable)
     {
       _cachePath = cachePath;
       _matchesSettingsFile = Path.Combine(cachePath, "MusicMatches.xml");
       _maxCacheDuration = maxCacheDuration;
       _id = GetType().Name;
+      _name = name;
       _cacheRefreshable = cacheRefreshable;
 
       _artistMatcher = new SimpleNameMatcher(Path.Combine(cachePath, "ArtistMatches.xml"));
@@ -127,10 +128,27 @@ namespace MediaPortal.Extensions.OnlineLibraries.Matchers
 
     public abstract Task<bool> InitWrapperAsync(bool useHttps);
 
+    public override bool Equals(object obj)
+    {
+      if (obj is MusicMatcher<TImg, TLang> m)
+        return Id.Equals(m.Id);
+      return false;
+    }
+
+    public override int GetHashCode()
+    {
+      return Id.GetHashCode();
+    }
+
+    public override string ToString()
+    {
+      return Name;
+    }
+
     #endregion
 
     #region Constants
-    
+
     private TimeSpan CACHE_CHECK_INTERVAL = TimeSpan.FromMinutes(60);
 
     protected override string MatchesSettingsFile

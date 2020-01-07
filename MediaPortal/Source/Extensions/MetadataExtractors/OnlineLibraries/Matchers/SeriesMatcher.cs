@@ -61,12 +61,13 @@ namespace MediaPortal.Extensions.OnlineLibraries.Matchers
 
     #region Init
 
-    public SeriesMatcher(string cachePath, TimeSpan maxCacheDuration, bool cacheRefreshable)
+    public SeriesMatcher(string name, string cachePath, TimeSpan maxCacheDuration, bool cacheRefreshable)
     {
       _cachePath = cachePath;
       _matchesSettingsFile = Path.Combine(cachePath, "SeriesMatches.xml");
       _maxCacheDuration = maxCacheDuration;
       _id = GetType().Name;
+      _name = name;
       _cacheRefreshable = cacheRefreshable;
 
       _actorMatcher = new SimpleNameMatcher(Path.Combine(cachePath, "ActorMatches.xml"));
@@ -129,6 +130,23 @@ namespace MediaPortal.Extensions.OnlineLibraries.Matchers
     }
 
     public abstract Task<bool> InitWrapperAsync(bool useHttps);
+
+    public override bool Equals(object obj)
+    {
+      if (obj is SeriesMatcher<TImg, TLang> m)
+        return Id.Equals(m.Id);
+      return false;
+    }
+
+    public override int GetHashCode()
+    {
+      return Id.GetHashCode();
+    }
+
+    public override string ToString()
+    {
+      return Name;
+    }
 
     #endregion
 

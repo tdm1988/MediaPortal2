@@ -176,6 +176,8 @@
                   <StackPanel x:Name="PlayControlsPanel_Back" DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Stretch" Height="90">
                     <Button x:Name="SelectContextMenuButton" Style="{ThemeResource SelectContextMenuButtonStyle}" Margin="{ThemeResource PlayerControlButtonMargins}"
                             Command="{Command Source={StaticResource VideoPlayerModel},Path=OpenPlayerConfigurationDialog}"/>
+                    <Button x:Name="PlayingInfoButton" Style="{ThemeResource PlayerInfoButtonStyle}" Margin="{ThemeResource PlayerControlButtonMargins}"
+                            Command="{Command Source={Service WorkflowManager},Path=NavigatePush,Parameters=5764A810-F298-4a20-BF84-F03D16F775B1}"/>
                     <Button x:Name="SelectTitleButton" Style="{ThemeResource ShowDvdMenuButtonStyle}" Margin="{ThemeResource PlayerControlButtonMargins}"
                             IsVisible="{Binding Source={StaticResource VideoPlayerModel},Path=PlayerUIContributor.TitlesAvailable}"
                             Command="{Command Source={StaticResource VideoPlayerModel},Path=PlayerUIContributor.OpenChooseTitleDialog}"/>
@@ -268,6 +270,8 @@
                   </Grid.RowDefinitions>
 
                   <StackPanel x:Name="PlayControlsPanel" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <Button x:Name="PlayingInfoButton" Style="{ThemeResource PlayerInfoButtonStyle}" Margin="{ThemeResource PlayerControlButtonMargins}"
+                            Command="{Command Source={Service WorkflowManager},Path=NavigatePush,Parameters=4596B758-CE2B-4e31-9CB9-6C30215831ED}"/>
                     <Button x:Name="StopButton" Style="{ThemeResource StopButtonStyle}" Margin="0" IsVisible="{Binding CanStop}"
                             Command="{Command Stop}"/>
                     <Button x:Name="SkipBackButton" Style="{ThemeResource SkipBackButtonStyle}" Margin="0" IsVisible="{Binding CanSkipBack}"
@@ -392,6 +396,8 @@
                             Command="{Command SeekForward}"/>
                     <Button x:Name="SkipForwardButton" Style="{ThemeResource SkipForwardButtonStyle}" Margin="{ThemeResource PlayerControlButtonMargins}" IsVisible="{Binding CanSkipForward}"
                             Command="{Command Next}"/>
+                    <Button x:Name="EjectDisc" Style="{ThemeResource EjectDiscButtonStyle}" Margin="{ThemeResource PlayerControlButtonMargins}"
+                            Command="{Command Source={Service WorkflowManager},Path=TryExecuteAction,Parameters=9EE2C4A6-70FD-4947-9418-A40012925DA6}"/>
                   </StackPanel>
 
                   <StackPanel x:Name="PlayControlsPanel_Back" DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Stretch" Height="90">
@@ -2459,22 +2465,23 @@
       </Grid.RowDefinitions>
 
       <Grid Name="PosterGrid" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Panel.ZIndex="1"
-            MaxHeight="{StaticResource VIDEO_COVER_HEIGHT}" Width="{StaticResource VIDEO_COVER_WIDTH}">
+            MaxHeight="{StaticResource VIDEO_COVER_HEIGHT}" Width="{StaticResource VIDEO_COVER_WIDTH}" Background="Black">
         <Image x:Name="thumb" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Uniform"
                Source="{Binding MediaItem}"/>
-        <Image Source="video.png" Stretch="Uniform" IsVisible="{Binding ElementName=thumb, Path=!HasImage}"/>
+        <Image Source="video.png" HorizontalAlignment="Left" VerticalAlignment="Top" Height="70" Width="70" Margin="-5,-5,0,100"
+               Stretch="Uniform" IsVisible="{Binding ElementName=thumb, Path=!HasImage}"/>
       </Grid>
 
       <Image Source="Thumbnail_small.png" Grid.Row="1" Stretch="Fill" Panel.ZIndex="0" Margin="-8"
              HorizontalAlignment="Center" VerticalAlignment="Center">
         <Image.Height>
           <MultiBinding Converter="{StaticResource ExpressionMultiValueConverter}" ConverterParameter="{}{0}+15">
-            <Binding Source="{Binding ElementName=thumb, Path=ActualHeight}"/>
+            <Binding Source="{Binding ElementName=PosterGrid, Path=ActualHeight}"/>
           </MultiBinding>
         </Image.Height>
         <Image.Width>
           <MultiBinding Converter="{StaticResource ExpressionMultiValueConverter}" ConverterParameter="{}{0}+15">
-            <Binding Source="{Binding ElementName=thumb, Path=ActualWidth}"/>
+            <Binding Source="{Binding ElementName=PosterGrid, Path=ActualWidth}"/>
           </MultiBinding>
         </Image.Width>
       </Image>
@@ -2704,6 +2711,13 @@
       <Label x:Name="ItemLabel" Grid.Row="0" Grid.Column="1" Content="{Binding SimpleTitle}" Margin="0,0,10,0" FontFamily="SegoeUIBold"
              FontSize="{ThemeResource SmallFontSize}" Color="{ThemeResource MediaItemUnwatchedColor}">
       </Label>
+      
+      <Image x:Name="AlbumCoverSmall" Stretch="Uniform" Source="{Binding MediaItem}" Margin="10,2,0,2"
+             Width="{StaticResource MEDIA_THUMB_WIDTH_S}" Height="{StaticResource MEDIA_THUMB_HEIGHT_S}">
+        <Image.IsVisible>
+          <Binding Source="{StaticResource ViewModeModel}" Path="LayoutSize" Converter="{StaticResource ExpressionValueConverter}" ConverterParameter="{}{0} == {LayoutSize}.{Small}"/>
+        </Image.IsVisible>
+      </Image>
       <Image x:Name="ItemTypeSmall" Stretch="Uniform" Margin="10,2,0,2"
              Width="{StaticResource MEDIA_THUMB_WIDTH_S}" Height="{StaticResource MEDIA_THUMB_HEIGHT_S}">
         <Image.Source>
@@ -2711,7 +2725,17 @@
                                     fanart:MaxWidth="{StaticResource FANART_POSTER_WIDTH}" fanart:MaxHeight="{StaticResource FANART_POSTER_HEIGHT}"/>
         </Image.Source>
         <Image.IsVisible>
-          <Binding Source="{StaticResource ViewModeModel}" Path="LayoutSize" Converter="{StaticResource ExpressionValueConverter}" ConverterParameter="{}{0} == {LayoutSize}.{Small}"/>
+          <MultiBinding Converter="{StaticResource ExpressionMultiValueConverter}" ConverterParameter="{}{0} &amp;&amp; {1}">
+            <Binding Source="{StaticResource ViewModeModel}" Path="LayoutSize" Converter="{StaticResource ExpressionValueConverter}" ConverterParameter="{}{0} == {LayoutSize}.{Small}"/>
+            <Binding ElementName="AlbumCoverSmall" Path="!HasImage" />
+          </MultiBinding>
+        </Image.IsVisible>
+      </Image>
+
+      <Image x:Name="AlbumCoverMedium" Stretch="Uniform" Source="{Binding MediaItem}" Margin="-20,2,-10,2"
+             Width="{StaticResource MEDIA_THUMB_WIDTH_M}" Height="{StaticResource MEDIA_THUMB_HEIGHT_M}">
+        <Image.IsVisible>
+          <Binding Source="{StaticResource ViewModeModel}" Path="LayoutSize" Converter="{StaticResource ExpressionValueConverter}" ConverterParameter="{}{0} == {LayoutSize}.{Medium}"/>
         </Image.IsVisible>
       </Image>
       <Image x:Name="ItemTypeMedium" Stretch="Uniform" Margin="-20,2,-10,2"
@@ -2721,20 +2745,33 @@
                                     fanart:MaxWidth="{StaticResource FANART_POSTER_WIDTH}" fanart:MaxHeight="{StaticResource FANART_POSTER_HEIGHT}"/>
         </Image.Source>
         <Image.IsVisible>
-          <Binding Source="{StaticResource ViewModeModel}" Path="LayoutSize" Converter="{StaticResource ExpressionValueConverter}" ConverterParameter="{}{0} == {LayoutSize}.{Medium}"/>
+          <MultiBinding Converter="{StaticResource ExpressionMultiValueConverter}" ConverterParameter="{}{0} &amp;&amp; {1}">
+            <Binding Source="{StaticResource ViewModeModel}" Path="LayoutSize" Converter="{StaticResource ExpressionValueConverter}" ConverterParameter="{}{0} == {LayoutSize}.{Medium}"/>
+            <Binding ElementName="AlbumCoverMedium" Path="!HasImage" />
+          </MultiBinding>
         </Image.IsVisible>
       </Image>
-      <Image x:Name="ItemTypeLarge" Stretch="Uniform" Margin="-40,2,-30,2"
+
+      <Image x:Name="AlbumCoverLarge" Stretch="Uniform" Source="{Binding MediaItem}" Margin="-40,2,-30,12"
+             Width="{StaticResource MEDIA_THUMB_WIDTH_L}" Height="{StaticResource MEDIA_THUMB_HEIGHT_L}">
+        <Image.IsVisible>
+          <Binding Source="{StaticResource ViewModeModel}" Path="LayoutSize" Converter="{StaticResource ExpressionValueConverter}" ConverterParameter="{}{0} == {LayoutSize}.{Large}"/>
+        </Image.IsVisible>
+      </Image>
+      <Image x:Name="ItemTypeLarge" Stretch="Uniform" Margin="-40,2,-30,12"
              Width="{StaticResource MEDIA_THUMB_WIDTH_L}" Height="{StaticResource MEDIA_THUMB_HEIGHT_L}">
         <Image.Source>
           <fanart:FanArtImageSource fanart:FanArtMediaType="Album" fanart:FanArtType="Poster" fanart:FanArtName="{Binding MediaItem.MediaItemId}"
                                     fanart:MaxWidth="{StaticResource FANART_POSTER_WIDTH}" fanart:MaxHeight="{StaticResource FANART_POSTER_HEIGHT}"/>
         </Image.Source>
         <Image.IsVisible>
-          <Binding Source="{StaticResource ViewModeModel}" Path="LayoutSize" Converter="{StaticResource ExpressionValueConverter}" ConverterParameter="{}{0} == {LayoutSize}.{Large}"/>
+          <MultiBinding Converter="{StaticResource ExpressionMultiValueConverter}" ConverterParameter="{}{0} &amp;&amp; {1}">
+            <Binding Source="{StaticResource ViewModeModel}" Path="LayoutSize" Converter="{StaticResource ExpressionValueConverter}" ConverterParameter="{}{0} == {LayoutSize}.{Large}"/>
+            <Binding ElementName="AlbumCoverLarge" Path="!HasImage" />
+          </MultiBinding>
         </Image.IsVisible>
       </Image>
-      <Label x:Name="NumberLabel" Grid.Row="0" Grid.Column="2" Content="{Binding Tracks}" Margin="0,0,10,0" FontFamily="SegoeUIBold"
+      <Label x:Name="NumberLabel" Grid.Row="0" Grid.Column="2" Content="{Binding Tracks}" Margin="20,0,10,0" FontFamily="SegoeUIBold"
              Color="{ThemeResource MediaItemUnwatchedColor}" FontSize="{ThemeResource SmallFontSize}"/>
     </Grid>
   </ControlTemplate>
@@ -2742,7 +2779,8 @@
   <ControlTemplate x:Key="GridViewAlbumItemTemplate">
     <Grid x:Name="PosterGrid" Width="{StaticResource AUDIO_GRID_WIDTH}" Height="{StaticResource AUDIO_GRID_HEIGHT}">
       <Image Stretch="Fill" Source="square_small.png" Margin="-5"/>
-      <Image x:Name="poster" Stretch="Fill" Margin="3">
+      <Image x:Name="AlbumCover" Stretch="Fill" Margin="3" Source="{Binding MediaItem}"/>
+      <Image x:Name="poster" Stretch="Fill" Margin="3" IsVisible="{Binding ElementName=AlbumCover, Path=!HasImage}">
         <Image.Source>
           <fanart:FanArtImageSource fanart:FanArtMediaType="Album" fanart:FanArtType="Poster" fanart:FanArtName="{Binding MediaItem.MediaItemId}"
                                     fanart:MaxWidth="{StaticResource AUDIO_GRID_WIDTH}" fanart:MaxHeight="{StaticResource AUDIO_GRID_HEIGHT}"/>
@@ -2750,13 +2788,26 @@
       </Image>
 
       <!-- Fallback Content, if no poster existing -->
-      <Image Source="audio.png" HorizontalAlignment="Left" VerticalAlignment="Top" Height="70" Width="70" Stretch="Uniform" Margin="-5"
-             IsVisible="{Binding ElementName=poster, Path=!HasImage}"/>
-      <Label IsVisible="{Binding ElementName=poster, Path=!HasImage}" TextTrimming="CharacterEllipsis"
+      <Image Source="audio.png" HorizontalAlignment="Left" VerticalAlignment="Top" Height="70" Width="70" Stretch="Uniform" Margin="-5">
+        <Image.IsVisible>
+          <MultiBinding Converter="{StaticResource ExpressionMultiValueConverter}" ConverterParameter="{}{0} &amp;&amp; {1}">
+            <Binding ElementName="poster" Path="!HasImage" />
+            <Binding ElementName="AlbumCover" Path="!HasImage" />
+          </MultiBinding>
+        </Image.IsVisible>
+      </Image>
+      <Label TextTrimming="CharacterEllipsis"
              FontSize="{ThemeResource SmallFontSize}" Color="{ThemeResource TextColor}" Wrap="True" Margin="15,50,10,10"
-             Content="{Binding SimpleTitle}" VerticalAlignment="Center" HorizontalAlignment="Stretch" />
+             Content="{Binding SimpleTitle}" VerticalAlignment="Center" HorizontalAlignment="Stretch">
+        <Label.IsVisible>
+          <MultiBinding Converter="{StaticResource ExpressionMultiValueConverter}" ConverterParameter="{}{0} &amp;&amp; {1}">
+            <Binding ElementName="poster" Path="!HasImage" />
+            <Binding ElementName="AlbumCover" Path="!HasImage" />
+          </MultiBinding>
+        </Label.IsVisible>
+      </Label>
 
-      <!-- watched indicator -->
+        <!-- watched indicator -->
       <Control HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0" Template="{StaticResource Cover_WatchedFlag_Template}" 
                  IsVisible="{Binding Source={StaticResource SkinSettingsModel}, Path=[Nereus].EnableGridWatchedFlags}"/>
     </Grid>
@@ -2774,14 +2825,20 @@
       </Grid.RowDefinitions>
 
       <Image Grid.Row="1" Source="Square_large.png" Stretch="Fill" Margin="-6"/>
-      <Image x:Name="thumbnail" Grid.Row="1" Stretch="Fill">
+      <Image x:Name="AlbumCover" Grid.Row="1" Stretch="Fill" Source="{Binding MediaItem}"/>
+      <Image x:Name="thumbnail" Grid.Row="1" Stretch="Fill" IsVisible="{Binding ElementName=AlbumCover, Path=!HasImage}">
         <Image.Source>
           <fanart:FanArtImageSource fanart:FanArtMediaType="Album" fanart:FanArtType="Poster" fanart:FanArtName="{Binding MediaItem.MediaItemId}"
                     fanart:MaxWidth="{StaticResource FANART_POSTER_WIDTH}" fanart:MaxHeight="{StaticResource FANART_POSTER_HEIGHT}"/>
         </Image.Source>
       </Image>
-      <Border Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" BorderThickness="0"
-              IsVisible="{Binding ElementName=thumbnail, Path=!HasImage}">
+      <Border Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" BorderThickness="0">
+        <Border.IsVisible>
+          <MultiBinding Converter="{StaticResource ExpressionMultiValueConverter}" ConverterParameter="{}{0} &amp;&amp; {1}">
+            <Binding ElementName="thumbnail" Path="!HasImage" />
+            <Binding ElementName="AlbumCover" Path="!HasImage" />
+          </MultiBinding>
+        </Border.IsVisible>
         <Border.Background>
           <MultiBinding Converter="{StaticResource ExpressionMultiValueConverter}" ConverterParameter="{}{0} ? {1} : {2}">
             <Binding RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType={x:Type Button}}" Path="!HasFocus"/>
@@ -2790,8 +2847,15 @@
           </MultiBinding>
         </Border.Background>
       </Border>
-      <Image Grid.Row="1" Source="audio.png" Stretch="Uniform" IsVisible="{Binding ElementName=thumbnail, Path=!HasImage}"/>
-      
+      <Image Grid.Row="1" Source="audio.png" Stretch="Uniform">
+        <Image.IsVisible>
+          <MultiBinding Converter="{StaticResource ExpressionMultiValueConverter}" ConverterParameter="{}{0} &amp;&amp; {1}">
+            <Binding ElementName="thumbnail" Path="!HasImage" />
+            <Binding ElementName="AlbumCover" Path="!HasImage" />
+          </MultiBinding>
+        </Image.IsVisible>
+      </Image>
+
       <Border IsVisible="{Binding RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type Button}},Path=HasFocus}"
               BorderThickness="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
               CornerRadius="{ThemeResource ButtonControlRadiusX}" Grid.Row="1" Margin="0"
@@ -2899,7 +2963,7 @@
 
       <Grid Name="PosterGrid" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Panel.ZIndex="1"
             MaxHeight="{StaticResource VIDEO_COVER_HEIGHT}" Width="{StaticResource VIDEO_COVER_WIDTH}">
-        <Image x:Name="thumb" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="UniformToFill"
+        <Image x:Name="thumb" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Uniform"
                Source="{Binding MediaItem}"/>
         <Image Source="video.png" Stretch="Uniform" IsVisible="{Binding ElementName=thumb, Path=!HasImage}"/>
       </Grid>
@@ -2955,7 +3019,7 @@
       <Image Stretch="Fill" Source="square_small.png" Margin="-5"/>
 
       <!-- Thumbnail available-->
-      <Image x:Name="thumbnail" Stretch="Fill" Margin="3">
+      <Image x:Name="thumbnail" Stretch="UniformToFill" Margin="3">
         <Image.Source>
           <fanart:FanArtImageSource fanart:FanArtMediaType="Undefined" fanart:FanArtType="Thumbnail" fanart:FanArtName="{Binding MediaItem.MediaItemId}"
                                     fanart:MaxWidth="{StaticResource AUDIO_GRID_WIDTH}" fanart:MaxHeight="{StaticResource AUDIO_GRID_HEIGHT}"/>
@@ -2964,7 +3028,7 @@
       <Border VerticalAlignment="Bottom" HorizontalAlignment="Stretch" BorderThickness="0" Background="Black" Opacity="0.5" 
               Height="45" Margin="3" IsVisible="{Binding ElementName=thumbnail, Path=HasImage}"/>
       <Label x:Name="ItemLabel" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalAlignment="Bottom" Margin="5,5,5,8" 
-             Color="{ThemeResource TextColor}" Height="45" VerticalContentAlignment="Center" FontSize="{ThemeResource SmallFontSize}" 
+             Color="{ThemeResource TextColor}" Height="45" VerticalContentAlignment="Center" FontSize="{ThemeResource SmallerFontSize}" FontFamily="SegoeUIBold"
              IsVisible="{Binding ElementName=thumbnail, Path=HasImage}" Content="{Binding Path=SimpleTitle}">
         <Label.Scroll>
           <MultiBinding Converter="{StaticResource ExpressionMultiValueConverter}" ConverterParameter="{}{0} ? {1} : {2}">
@@ -2973,6 +3037,13 @@
             <Binding Source="None"/>
           </MultiBinding>
         </Label.Scroll>
+        <Label.Opacity>
+          <MultiBinding Converter="{StaticResource ExpressionMultiValueConverter}" ConverterParameter="{}{0} ? {1} : {2}">
+            <Binding RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType={x:Type Button}}" Path="HasFocus"/>
+            <Binding Source="1"/>
+            <Binding Source="0.5"/>
+          </MultiBinding>
+        </Label.Opacity>
       </Label>
 
       <!-- Thumbnail not available-->
@@ -3065,7 +3136,7 @@
       </Grid.RowDefinitions>
 
       <Image Grid.Row="1" Source="Square_large.png" Stretch="Fill" Margin="-6"/>
-      <Image x:Name="thumbnail" Grid.Row="1" Stretch="Fill">
+      <Image x:Name="thumbnail" Grid.Row="1" Stretch="UniformToFill">
         <Image.Source>
           <fanart:FanArtImageSource fanart:FanArtMediaType="Undefined" fanart:FanArtType="Thumbnail" fanart:FanArtName="{Binding MediaItem.MediaItemId}"
                     fanart:MaxWidth="{StaticResource AUDIO_COVER_WIDTH}" fanart:MaxHeight="{StaticResource AUDIO_COVER_HEIGHT}"/>
@@ -3129,7 +3200,7 @@
       <Border VerticalAlignment="Bottom" HorizontalAlignment="Stretch" BorderThickness="0" Background="Black" Opacity="0.5" 
               Height="45" Margin="3" IsVisible="{Binding ElementName=thumbnail, Path=HasImage}"/>
       <Label x:Name="ItemLabel" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalAlignment="Bottom" Margin="5,5,5,8" 
-             Color="{ThemeResource TextColor}" Height="45" VerticalContentAlignment="Center" FontSize="{ThemeResource SmallFontSize}" 
+             Color="{ThemeResource TextColor}" Height="45" VerticalContentAlignment="Center" FontSize="{ThemeResource SmallerFontSize}" FontFamily="SegoeUIBold"
              IsVisible="{Binding ElementName=thumbnail, Path=HasImage}" Content="{Binding Path=SimpleTitle}">
         <Label.Scroll>
           <MultiBinding Converter="{StaticResource ExpressionMultiValueConverter}" ConverterParameter="{}{0} ? {1} : {2}">
@@ -3138,6 +3209,13 @@
             <Binding Source="None"/>
           </MultiBinding>
         </Label.Scroll>
+        <Label.Opacity>
+          <MultiBinding Converter="{StaticResource ExpressionMultiValueConverter}" ConverterParameter="{}{0} ? {1} : {2}">
+            <Binding RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType={x:Type Button}}" Path="HasFocus"/>
+            <Binding Source="1"/>
+            <Binding Source="0.5"/>
+          </MultiBinding>
+        </Label.Opacity>
       </Label>
 
       <!-- Thumbnail not available-->
@@ -3299,7 +3377,7 @@
       <Border VerticalAlignment="Bottom" HorizontalAlignment="Stretch" BorderThickness="0" Background="Black" Opacity="0.5" 
               Height="45" Margin="3" IsVisible="{Binding ElementName=thumbnail, Path=HasImage}"/>
       <Label x:Name="ItemLabel" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalAlignment="Bottom" Margin="5,5,5,8" 
-             Color="{ThemeResource TextColor}" Height="45" VerticalContentAlignment="Center" FontSize="{ThemeResource SmallFontSize}" 
+             Color="{ThemeResource TextColor}" Height="45" VerticalContentAlignment="Center" FontSize="{ThemeResource SmallerFontSize}" FontFamily="SegoeUIBold"
              IsVisible="{Binding ElementName=thumbnail, Path=HasImage}" Content="{Binding Path=SimpleTitle}">
         <Label.Scroll>
           <MultiBinding Converter="{StaticResource ExpressionMultiValueConverter}" ConverterParameter="{}{0} ? {1} : {2}">
@@ -3308,6 +3386,13 @@
             <Binding Source="None"/>
           </MultiBinding>
         </Label.Scroll>
+        <Label.Opacity>
+          <MultiBinding Converter="{StaticResource ExpressionMultiValueConverter}" ConverterParameter="{}{0} ? {1} : {2}">
+            <Binding RelativeSource="{RelativeSource Mode=FindAncestor,AncestorType={x:Type Button}}" Path="HasFocus"/>
+            <Binding Source="1"/>
+            <Binding Source="0.5"/>
+          </MultiBinding>
+        </Label.Opacity>
       </Label>
 
       <!-- Thumbnail not available-->
