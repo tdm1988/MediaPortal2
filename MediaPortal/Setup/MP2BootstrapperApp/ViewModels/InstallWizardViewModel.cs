@@ -57,6 +57,7 @@ namespace MP2BootstrapperApp.ViewModels
     private string _buttonNextContent;
     private string _buttonBackContent;
     private string _buttonCancelContent;
+    private string _errorCode;
     private InstallState _state;
     private int _progress;
     private int _cacheProgress;
@@ -119,6 +120,12 @@ namespace MP2BootstrapperApp.ViewModels
     {
       get { return _buttonCancelContent; }
       set { SetProperty(ref _buttonCancelContent, value); }
+    }
+    
+    public string ErrorCode
+    {
+      get { return _errorCode; }
+      set { SetProperty(ref _errorCode, value); }
     }
 
     public ICommand CancelCommand { get; }
@@ -255,6 +262,7 @@ namespace MP2BootstrapperApp.ViewModels
     {
       _wizard.Step = new InstallFinishStep(this, _dispatcher);
       _bootstrapperApplicationModel.FinalResult = e.Status;
+      ErrorCode = "Error code: 0x" + e.Status.ToString("x8");
     }
 
     protected void PlanPackageBegin(object sender, PlanPackageBeginEventArgs planPackageBeginEventArgs)
