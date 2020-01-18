@@ -26,7 +26,7 @@ namespace MP2BootstrapperApp.ViewModels
 {
   public class InstallExistTypePageViewModel : InstallWizardPageViewModelBase
   {
-    private ActionType _actionType = ActionType.Update;
+    private EActionType _actionType = EActionType.Install;
 
     public InstallExistTypePageViewModel(InstallWizardViewModel viewModel)
     {
@@ -34,12 +34,6 @@ namespace MP2BootstrapperApp.ViewModels
       viewModel.ButtonNextContent = "Next";
       viewModel.ButtonBackContent = "Back";
       viewModel.ButtonCancelContent = "Abort";
-    }
-
-    public ActionType ActionType
-    {
-      get { return _actionType; }
-      set { SetProperty(ref _actionType, value); }
     }
   }
 }

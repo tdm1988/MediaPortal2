@@ -35,11 +35,5 @@ namespace MP2BootstrapperApp.ViewModels
       viewModel.ButtonBackContent = "Back";
       viewModel.ButtonCancelContent = "Abort";
     }
-
-    public InstallType InstallType
-    {
-      get { return _installType; }
-      set { SetProperty(ref _installType, value); }
-    }
   }
 }

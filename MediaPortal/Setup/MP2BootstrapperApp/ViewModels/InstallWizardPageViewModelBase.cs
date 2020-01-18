@@ -22,18 +22,19 @@
 
 #endregion
 
-using Prism.Mvvm;
+
+using MP2BootstrapperApp.Nav;
 
 namespace MP2BootstrapperApp.ViewModels
 {
-  public abstract class InstallWizardPageViewModelBase : BindableBase
+  public abstract class InstallWizardPageViewModelBase : ViewModelBase
   {
     private bool _isCurrentPage;
 
     public bool IsCurrentPage
     {
       get { return _isCurrentPage; }
-      set { SetProperty(ref _isCurrentPage, value); }
+      set { Set(ref _isCurrentPage, value); }
     }
   }
 }

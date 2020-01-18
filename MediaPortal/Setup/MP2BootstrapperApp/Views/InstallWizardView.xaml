@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:view="clr-namespace:MP2BootstrapperApp.Views"
         xmlns:viewModels="clr-namespace:MP2BootstrapperApp.ViewModels"
+        xmlns:uc="clr-namespace:MP2BootstrapperApp.Views"
         mc:Ignorable="d"
         Title="Mediaportal" Height="600" Width="1000" ResizeMode="NoResize" WindowStyle="None"
         WindowStartupLocation="CenterScreen" UseLayoutRounding="False" AllowsTransparency="True"
@@ -21,47 +22,7 @@
     </Window.Background>
     <Window.Resources>
 
-        <DataTemplate DataType="{x:Type viewModels:InstallWelcomePageViewModel}">
-            <view:InstallWelcomePageView />
-        </DataTemplate>
-
-        <DataTemplate DataType="{x:Type viewModels:InstallExistTypePageViewModel}">
-            <view:InstallExistTypePageView />
-        </DataTemplate>
-
-        <DataTemplate DataType="{x:Type viewModels:InstallNewTypePageViewModel}">
-            <view:InstallNewTypePageView />
-        </DataTemplate>
-
-        <DataTemplate DataType="{x:Type viewModels:InstallOverviewPageViewModel}">
-            <view:InstallOverviewPageView />
-        </DataTemplate>
-
-        <DataTemplate DataType="{x:Type viewModels:InstallFinishPageViewModel}">
-            <view:InstallFinishPageView />
-        </DataTemplate>
-
-        <DataTemplate DataType="{x:Type viewModels:UpdatePageViewModel}">
-            <view:UpdatePageView />
-        </DataTemplate>
-
-        <DataTemplate DataType="{x:Type viewModels:ModifyPageViewModel}">
-            <view:ModifyPageView />
-        </DataTemplate>
-
-        <DataTemplate DataType="{x:Type viewModels:RepairPageViewModel}">
-            <view:RepairPageView />
-        </DataTemplate>
-
-        <DataTemplate DataType="{x:Type viewModels:UninstallPageViewModel}">
-            <view:UninstallView />
-        </DataTemplate>
-
-        <DataTemplate DataType="{x:Type viewModels:InstallationInProgressPageViewModel}">
-            <view:InstallationInProgressPageView />
-        </DataTemplate>
-
-    <!-- Our style for the ToggleButton -->
+      <!-- Our style for the ToggleButton -->
         <Style x:Key="ToggleButtonWindowClose" TargetType="{x:Type ToggleButton}">
             <!-- Here you can set the initial properties for the control -->
             <Setter Property="Background" Value="Transparent" />
@@ -189,8 +150,9 @@
                     Style="{StaticResource ToggleButtonWindowClose}" BorderBrush="White" Foreground="White" Visibility="Hidden" />
             <Rectangle Fill="{StaticResource Banner}" HorizontalAlignment="Left" Height="120" VerticalAlignment="Top" Width="753" Margin="22,18,0,0"/>
         </Grid>
-
-        <HeaderedContentControl Grid.Column="0" Grid.Row="1" HeaderTemplate="{StaticResource HeaderTemplate}" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="10,40" Content="{Binding Path=CurrentPage}" Header="{Binding Path=Header}" FontSize="26" Foreground="White" HorizontalContentAlignment="Stretch" Width="900"/>
+     
+     <!-- <uc:InstallExistTypePageView Grid.Column="0" Grid.Row="1" Visibility="{Binding }"/> -->
+     <ContentPresenter Content="{Binding Content}" Grid.Column="0" Grid.Row="1" />
 
     <Grid Grid.Column="0" Grid.Row="2" Height="45" Background="#66FFFFFF">
       <Grid.ColumnDefinitions>
@@ -200,13 +162,11 @@
         <ColumnDefinition Width="*" />
       </Grid.ColumnDefinitions>
 
-      <Button Grid.Row="0" Grid.Column="0" x:Name="Abort" IsEnabled="True" Command="{Binding Path=CancelCommand}" Content="{Binding Path=ButtonCancelContent}"
-              HorizontalAlignment="Left" HorizontalContentAlignment="Center" VerticalAlignment="Center" FontSize="22" Margin="50,0,0,0"/>
+
       <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding ErrorCode}" />
-      <Button Grid.Row="0" Grid.Column="2" x:Name="Back" IsEnabled="True" Command="{Binding Path=BackCommand}" Content="{Binding Path=ButtonBackContent}"
-              HorizontalAlignment="Right" HorizontalContentAlignment="Center" VerticalAlignment="Center" FontSize="22" Margin="0,0,0,0"/>
+
       <Button Grid.Row="0" Grid.Column="3" x:Name="Next" IsEnabled="True" Command="{Binding Path=NextCommand}" Content="{Binding Path=ButtonNextContent}"
-              HorizontalAlignment="Right" HorizontalContentAlignment="Center" VerticalAlignment="Center" FontSize="22" Margin="0,0,50,0"/>
+              CommandParameter="2" HorizontalAlignment="Right" HorizontalContentAlignment="Center" VerticalAlignment="Center" FontSize="22" Margin="0,0,50,0"/>
     </Grid>
 
     <ProgressBar Grid.Column="0" Grid.Row="3" HorizontalAlignment="Left" Height="5"  VerticalAlignment="Bottom" 

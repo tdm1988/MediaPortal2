@@ -34,13 +34,11 @@ using Microsoft.Tools.WindowsInstallerXml.Bootstrapper;
 using MP2BootstrapperApp.BootstrapperWrapper;
 using MP2BootstrapperApp.ChainPackages;
 using MP2BootstrapperApp.Models;
-using MP2BootstrapperApp.WizardSteps;
-using Prism.Commands;
-using Prism.Mvvm;
+using MP2BootstrapperApp.Nav;
 
 namespace MP2BootstrapperApp.ViewModels
 {
-  public class InstallWizardViewModel : BindableBase
+  public class InstallWizardViewModel : ViewModelBase
   {
     public enum InstallState
     {
@@ -52,8 +50,8 @@ namespace MP2BootstrapperApp.ViewModels
     }
 
     private readonly IBootstrapperApplicationModel _bootstrapperApplicationModel;
-    private InstallWizardPageViewModelBase _currentPage;
     private string _header;
+    private bool _canExec;
     private string _buttonNextContent;
     private string _buttonBackContent;
     private string _buttonCancelContent;
@@ -63,9 +61,36 @@ namespace MP2BootstrapperApp.ViewModels
     private int _cacheProgress;
     private int _executeProgress;
     private readonly PackageContext _packageContext;
-    private readonly Wizard _wizard;
     private readonly IDispatcher _dispatcher;
+    
+    private InstallType _installType;
+    private EActionType _actionType;
 
+    private IPage content;
+    
+    public IPage Content
+    {
+      get { return content; }
+      set { Set(ref content, value); }
+    }
+
+  /*  public RelayCommand<int> NavigateCommand
+    {
+      get { return new RelayCommand<int>(Navigate, CanExecute); }
+    } */
+
+    private bool CanExecute(int page)
+    {
+      IPage newPage = pages[page].Value;
+      return newPage.CanExecute;
+    }
+
+    private readonly Dictionary<int, Lazy<IPage>> pages = new Dictionary<int, Lazy<IPage>>
+    {
+      [1] = new Lazy<IPage>(() => new OverviewViewModel()),
+      [2] = new Lazy<IPage>(() => new Page2ViewModel())
+    };
+    
     public InstallWizardViewModel(IBootstrapperApplicationModel model, IDispatcher dispatcher)
     {
       _bootstrapperApplicationModel = model;
@@ -73,90 +98,152 @@ namespace MP2BootstrapperApp.ViewModels
       State = InstallState.Initializing;
       _packageContext = new PackageContext();
 
+      Content = new OverviewViewModel();
       WireUpEventHandlers();
       ComputeBundlePackages();
 
-      IStep welcomeStep = new InstallWelcomeStep(this);
-      _wizard = new Wizard(welcomeStep, model);
-
-      NextCommand = new DelegateCommand(() => _wizard.GoNext(), () => _wizard.CanGoNext());
-      BackCommand = new DelegateCommand(() => _wizard.GoBack(), () => _wizard.CanGoBack());
-      CancelCommand = new DelegateCommand(() => CancelInstall(), () => State != InstallState.Canceled);
-      CurrentPage = new InstallWelcomePageViewModel(this);
+      NextCommand = new RelayCommand<int>(Navigate);
+      //  NextCommand = new DelegateCommand(Next, () => true);  
+  //    BackCommand = new DelegateCommand(Back, () => true);
+    //  CancelCommand = new DelegateCommand(Cancel, () => State != InstallState.Canceled);
+      ButtonNextContent = "next";
+      ButtonBackContent = "back";
+      ButtonCancelContent = "cancel";
+      Navigate(1);
     }
 
+    private void Navigate(int page)
+    {
+      Content = pages[page].Value;
+      switch (page)
+      {
+        case 1:
+          doSomethingForOne();
+          break;
+        case 2:
+          doSomethingForOne();
+          break;
+      }
+    }
+
+    private void doSomethingForOne()
+    {
+      
+    }
+
+    private void Next()
+    {
+      switch (ActionType)
+      {
+        case EActionType.Install:
+          Install();
+          break;
+        case EActionType.Update:
+          Update();
+          break;
+        case EActionType.Modify:
+          break;
+        case EActionType.Repair:
+          break;
+        case EActionType.Uninstall:
+          break;
+        default:
+          throw new ArgumentOutOfRangeException();
+      }
+    }
+    
+    private void Install()
+    {
+      switch (InstallType)
+      {
+        case InstallType.ClientServer:
+          InstallClientAndServer();
+          break;
+        case InstallType.Client:
+          break;
+        case InstallType.Server:
+          break;
+        case InstallType.Custom:
+          break;
+        default:
+          throw new ArgumentOutOfRangeException();
+      }
+    }
+    
+    private void Update()
+    {
+      //update installation
+    }
+
+
+    private void InstallClientAndServer()
+    {
+      foreach (BundlePackage package in BundlePackages)
+      {
+        if (package.CurrentInstallState != PackageState.Present)
+        {
+          package.RequestedInstallState = RequestState.Present;
+        }
+      }
+      _bootstrapperApplicationModel.PlanAction(LaunchAction.Install);
+    }
+    
     public InstallState State
     {
       get { return _state; }
-      set
-      {
-        if (_state != value)
-        {
-          SetProperty(ref _state, value);
-          Refresh();
-        }
-      }
+      private set { Set(ref _state, value); }
     }
 
     public string Header
     {
       get { return _header; }
-      set { SetProperty(ref _header, value); }
+      set { Set(ref _header, value); }
+    }
+    
+    public bool CanExec
+    {
+      get { return _canExec; }
+      set { Set(ref _canExec, value); }
     }
 
     public string ButtonNextContent
     {
       get { return _buttonNextContent; }
-      set { SetProperty(ref _buttonNextContent, value); }
+      set { Set(ref _buttonNextContent, value); }
     }
 
     public string ButtonBackContent
     {
       get { return _buttonBackContent; }
-      set { SetProperty(ref _buttonBackContent, value); }
+      set { Set(ref _buttonBackContent, value); }
     }
 
     public string ButtonCancelContent
     {
       get { return _buttonCancelContent; }
-      set { SetProperty(ref _buttonCancelContent, value); }
+      set { Set(ref _buttonCancelContent, value); }
     }
     
     public string ErrorCode
     {
       get { return _errorCode; }
-      set { SetProperty(ref _errorCode, value); }
+      set { Set(ref _errorCode, value); }
     }
 
     public ICommand CancelCommand { get; }
-    public ICommand NextCommand { get; }
+    public ICommand NextCommand { get; set; }
     public ICommand BackCommand { get; }
 
-    public InstallWizardPageViewModelBase CurrentPage
+    public InstallType InstallType
     {
-      get { return _currentPage; }
-      set
-      {
-        if (value == _currentPage)
-        {
-          return;
-        }
-
-        if (_currentPage != null)
-        {
-          _currentPage.IsCurrentPage = false;
-        }
-         
-        _currentPage = value;
-
-        if (_currentPage != null)
-        {
-          _currentPage.IsCurrentPage = true;
-        }
-
-        RaisePropertyChanged();
-        Refresh();
-      }
+      get { return _installType; }
+      set { Set(ref _installType, value); }
+    }
+    
+    public EActionType ActionType
+    {
+      get { return _actionType; }
+      set { Set(ref _actionType, value); }
     }
     
     public ReadOnlyCollection<BundlePackage> BundlePackages { get; private set; }
@@ -164,14 +251,10 @@ namespace MP2BootstrapperApp.ViewModels
     public int Progress
     {
       get { return _progress; }
-      set
-      {
-        _progress = value;
-        RaisePropertyChanged();
-      }
+      set { Set(ref _progress, value); }
     }
 
-    private void CancelInstall()
+    private void Cancel()
     {
       if (State == InstallState.Applaying)
       {
@@ -183,7 +266,7 @@ namespace MP2BootstrapperApp.ViewModels
       }
     }
 
-    protected void DetectedPackageComplete(object sender, DetectPackageCompleteEventArgs detectPackageCompleteEventArgs)
+    private void DetectedPackageComplete(object sender, DetectPackageCompleteEventArgs detectPackageCompleteEventArgs)
     {
       UpdatePackageCurrentState(detectPackageCompleteEventArgs);
     }
@@ -224,10 +307,10 @@ namespace MP2BootstrapperApp.ViewModels
 
     private void DetectRelatedBundle(object sender, DetectRelatedBundleEventArgs e)
     {
-      _wizard.Step = new InstallExistInstallStep(this);
+      //CurrentPage = new InstallExistTypePageViewModel(this);
     }
 
-    protected void PlanComplete(object sender, PlanCompleteEventArgs e)
+    private void PlanComplete(object sender, PlanCompleteEventArgs e)
     {
       if (State == InstallState.Canceled)
       {
@@ -237,12 +320,12 @@ namespace MP2BootstrapperApp.ViewModels
       _bootstrapperApplicationModel.ApplyAction();
     }
 
-    protected void ApplyBegin(object sender, ApplyBeginEventArgs e)
+    private void ApplyBegin(object sender, ApplyBeginEventArgs e)
     {
       State = InstallState.Applaying;
     }
 
-    protected void ExecutePackageBegin(object sender, ExecutePackageBeginEventArgs e)
+    private void ExecutePackageBegin(object sender, ExecutePackageBeginEventArgs e)
     {
       if (State == InstallState.Canceled)
       {
@@ -250,7 +333,7 @@ namespace MP2BootstrapperApp.ViewModels
       }
     }
 
-    protected void ExecutePackageComplete(object sender, ExecutePackageCompleteEventArgs e)
+    private void ExecutePackageComplete(object sender, ExecutePackageCompleteEventArgs e)
     {
       if (State == InstallState.Canceled)
       {
@@ -258,14 +341,14 @@ namespace MP2BootstrapperApp.ViewModels
       }
     }
 
-    protected void ApplyComplete(object sender, ApplyCompleteEventArgs e)
+    private void ApplyComplete(object sender, ApplyCompleteEventArgs e)
     {
-      _wizard.Step = new InstallFinishStep(this, _dispatcher);
+
       _bootstrapperApplicationModel.FinalResult = e.Status;
       ErrorCode = "Error code: 0x" + e.Status.ToString("x8");
     }
 
-    protected void PlanPackageBegin(object sender, PlanPackageBeginEventArgs planPackageBeginEventArgs)
+    private void PlanPackageBegin(object sender, PlanPackageBeginEventArgs planPackageBeginEventArgs)
     {
       UpdatePackageRequestState(planPackageBeginEventArgs);
     }
@@ -284,14 +367,7 @@ namespace MP2BootstrapperApp.ViewModels
 
     private void ResolveSource(object sender, ResolveSourceEventArgs e)
     {
-      if (!string.IsNullOrEmpty(e.DownloadSource))
-      {
-        e.Result = Result.Download;
-      }
-      else
-      {
-        e.Result = Result.Ok;
-      }
+      e.Result = !string.IsNullOrEmpty(e.DownloadSource) ? Result.Download : Result.Ok;
     }
 
     private void CacheAcquireProgress(object sender, CacheAcquireProgressEventArgs e)
@@ -304,16 +380,6 @@ namespace MP2BootstrapperApp.ViewModels
     {
       _executeProgress = e.OverallPercentage;
       Progress = (_cacheProgress + _executeProgress) / 2;
-    }
-
-    private void Refresh()
-    {
-      _dispatcher.Invoke(() =>
-      {
-        ((DelegateCommand) NextCommand).RaiseCanExecuteChanged();
-        ((DelegateCommand) BackCommand).RaiseCanExecuteChanged();
-        ((DelegateCommand) CancelCommand).RaiseCanExecuteChanged();
-      });
     }
 
     private void WireUpEventHandlers()
