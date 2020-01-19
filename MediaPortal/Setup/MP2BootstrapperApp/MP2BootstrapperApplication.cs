@@ -46,6 +46,7 @@ namespace MP2BootstrapperApp
     private IDispatcher _dispatcher;
     private IBootstrapperApplicationModel _model;
     private Wizard _wizard;
+    private InstallWizardViewModel _viewModel;
 
     protected override void Run()
     {
@@ -55,10 +56,15 @@ namespace MP2BootstrapperApp
 
       _model = new BootstrapperApplicationModel(this);
       
-      InstallWizardViewModel viewModel = new InstallWizardViewModel(_model, _dispatcher);
-      InstallWizardView view = new InstallWizardView(viewModel);
 
-      _wizard = new Wizard(viewModel);
+      _viewModel = new InstallWizardViewModel(_model, _dispatcher);
+      InstallWizardView view = new InstallWizardView(_viewModel);
+      _wizard = new Wizard(_viewModel);
+      _viewModel.NextCommand = new RelayCommand<int>(i => _wizard.ChangeState());
+      _wizard.Start();
+
+      WireUpEventHandlers();
+      ComputeBundlePackages();
       _model.SetWindowHandle(view);
 
       Engine.Detect();
@@ -85,7 +91,7 @@ namespace MP2BootstrapperApp
     
     private void DetectRelatedBundle2(object sender, DetectRelatedBundleEventArgs e)
     {
-      _wizard.GoToOverview();
+      _wizard.ChangeState();
       //CurrentPage = new InstallExistTypePageViewModel(this);
     }
     

@@ -2,12 +2,12 @@ using MP2BootstrapperApp.ViewModels;
 
 namespace MP2BootstrapperApp.Nav
 {
-  public class WelcomePage : IState
+  public class FinishPage : IState
   {
     public void Enter(Wizard wizard, InstallWizardViewModel viewModel)
     {
-      viewModel.Content = new OverviewViewModel();
-      wizard.NextState = new OverviewPage();
+      viewModel.Content = new Page2ViewModel();
+      wizard.NextState = new WelcomePage();
     }
   }
 }

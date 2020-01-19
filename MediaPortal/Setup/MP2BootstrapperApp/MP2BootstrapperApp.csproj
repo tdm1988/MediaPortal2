@@ -65,6 +65,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EActionType.cs" />
+    <Compile Include="Nav\FinishPage.cs" />
     <Compile Include="Nav\IState.cs" />
     <Compile Include="Nav\MainViewModel.cs" />
     <Compile Include="Nav\ObservableBase.cs" />

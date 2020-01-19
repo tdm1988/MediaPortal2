@@ -62,6 +62,7 @@ namespace MP2BootstrapperApp.ViewModels
     private int _executeProgress;
     private readonly PackageContext _packageContext;
     private readonly IDispatcher _dispatcher;
+    private Wizard _wizard;
     
     private InstallType _installType;
     private EActionType _actionType;
@@ -93,16 +94,17 @@ namespace MP2BootstrapperApp.ViewModels
     
     public InstallWizardViewModel(IBootstrapperApplicationModel model, IDispatcher dispatcher)
     {
+
       _bootstrapperApplicationModel = model;
       _dispatcher = dispatcher;
       State = InstallState.Initializing;
       _packageContext = new PackageContext();
 
       Content = new OverviewViewModel();
-      WireUpEventHandlers();
-      ComputeBundlePackages();
+    //  WireUpEventHandlers();
+    //  ComputeBundlePackages();
 
-      NextCommand = new RelayCommand<int>(Navigate);
+     // NextCommand = new RelayCommand<int>(i => _wizard.ChangeState(this));
       //  NextCommand = new DelegateCommand(Next, () => true);  
   //    BackCommand = new DelegateCommand(Back, () => true);
     //  CancelCommand = new DelegateCommand(Cancel, () => State != InstallState.Canceled);
