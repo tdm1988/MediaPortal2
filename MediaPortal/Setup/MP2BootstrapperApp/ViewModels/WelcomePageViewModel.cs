@@ -22,16 +22,30 @@
 
 #endregion
 
+using MP2BootstrapperApp.Commands;
+using MP2BootstrapperApp.Models;
+using MP2BootstrapperApp.WizardSteps;
+
 namespace MP2BootstrapperApp.ViewModels
 {
-  public class InstallFinishPageViewModel : InstallWizardPageViewModelBase
+  public class WelcomePageViewModel : PageViewModelBase
   {
-    public InstallFinishPageViewModel(InstallWizardViewModel viewModel)
+    private static string buttonNextContent = "next";
+    private static string header = "finish";
+    private readonly Package _model;
+
+    public WelcomePageViewModel(Wizard wizard, Package model) : base(header, buttonNextContent)
     {
-      viewModel.Header = "Enjoy your Mediaportal 2 experience";
-      viewModel.ButtonNextContent = "Finish";
-      viewModel.ButtonBackContent = "Back";
-      viewModel.ButtonCancelContent = "Abort";
+      NextCommand = new RelayCommand(o  =>
+      {
+        wizard.NextStep = new FinishStep();
+        wizard.ChangeStep();
+      });
+      BackCommand = new RelayCommand(i =>
+      {
+        wizard.NextStep = new WelcomeStep();
+        wizard.ChangeStep();
+      });
     }
   }
 }

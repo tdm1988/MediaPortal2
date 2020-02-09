@@ -1,9 +1,7 @@
-namespace MP2BootstrapperApp.Nav
+namespace MP2BootstrapperApp.ViewModels
 {
   public interface IPage
   {
-    string Title { get; }
     
-    bool CanExecute { get; }
   }
 }

@@ -34,7 +34,6 @@ using Microsoft.Tools.WindowsInstallerXml.Bootstrapper;
 using MP2BootstrapperApp.BootstrapperWrapper;
 using MP2BootstrapperApp.ChainPackages;
 using MP2BootstrapperApp.Models;
-using MP2BootstrapperApp.Nav;
 
 namespace MP2BootstrapperApp.ViewModels
 {
@@ -62,8 +61,7 @@ namespace MP2BootstrapperApp.ViewModels
     private int _executeProgress;
     private readonly PackageContext _packageContext;
     private readonly IDispatcher _dispatcher;
-    private Wizard _wizard;
-    
+
     private InstallType _installType;
     private EActionType _actionType;
 
@@ -80,17 +78,11 @@ namespace MP2BootstrapperApp.ViewModels
       get { return new RelayCommand<int>(Navigate, CanExecute); }
     } */
 
-    private bool CanExecute(int page)
-    {
-      IPage newPage = pages[page].Value;
-      return newPage.CanExecute;
-    }
-
-    private readonly Dictionary<int, Lazy<IPage>> pages = new Dictionary<int, Lazy<IPage>>
+   /* private readonly Dictionary<int, Lazy<IPage>> pages = new Dictionary<int, Lazy<IPage>>
     {
       [1] = new Lazy<IPage>(() => new OverviewViewModel()),
       [2] = new Lazy<IPage>(() => new Page2ViewModel())
-    };
+    }; */
     
     public InstallWizardViewModel(IBootstrapperApplicationModel model, IDispatcher dispatcher)
     {
@@ -100,7 +92,7 @@ namespace MP2BootstrapperApp.ViewModels
       State = InstallState.Initializing;
       _packageContext = new PackageContext();
 
-      Content = new OverviewViewModel();
+    //  Content = new OverviewViewModel();
     //  WireUpEventHandlers();
     //  ComputeBundlePackages();
 
@@ -116,7 +108,7 @@ namespace MP2BootstrapperApp.ViewModels
 
     private void Navigate(int page)
     {
-      Content = pages[page].Value;
+      //Content = pages[page].Value;
       switch (page)
       {
         case 1:
@@ -233,8 +225,6 @@ namespace MP2BootstrapperApp.ViewModels
     }
 
     public ICommand CancelCommand { get; }
-    public ICommand NextCommand { get; set; }
-    public ICommand BackCommand { get; }
 
     public InstallType InstallType
     {
@@ -248,7 +238,7 @@ namespace MP2BootstrapperApp.ViewModels
       set { Set(ref _actionType, value); }
     }
     
-    public ReadOnlyCollection<BundlePackage> BundlePackages { get; private set; }
+    public IList<BundlePackage> BundlePackages { get; set; }
 
     public int Progress
     {
@@ -399,41 +389,41 @@ namespace MP2BootstrapperApp.ViewModels
       _bootstrapperApplicationModel.BootstrapperApplication.WrapperExecuteProgress += ExecuteProgress;
     }
 
-    private void ComputeBundlePackages()
-    {
-      IEnumerable<BundlePackage> packages = new List<BundlePackage>();
-
-      XNamespace manifestNamespace = "http://schemas.microsoft.com/wix/2010/BootstrapperApplicationData";
-
-      string manifestPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-      if (manifestPath != null)
-      {
-        const string bootstrapperApplicationData = "BootstrapperApplicationData";
-        const string xmlExtension = ".xml";
-        string bootstrapperDataFilePath = Path.Combine(manifestPath, bootstrapperApplicationData + xmlExtension);
-        XElement bundleManifestData;
-
-        using (StreamReader reader = new StreamReader(bootstrapperDataFilePath))
-        {
-          string xml = reader.ReadToEnd();
-          XDocument xDoc = XDocument.Parse(xml);
-          bundleManifestData = xDoc.Element(manifestNamespace + bootstrapperApplicationData);
-        }
-
-        const string wixMbaPrereqInfo = "WixMbaPrereqInformation";
-        IList<BootstrapperAppPrereqPackage> mbaPrereqPackages = bundleManifestData?.Descendants(manifestNamespace + wixMbaPrereqInfo)
-          .Select(x => new BootstrapperAppPrereqPackage(x))
-          .ToList();
-
-        const string wixPackageProperties = "WixPackageProperties";
-        packages = bundleManifestData?.Descendants(manifestNamespace + wixPackageProperties)
-          .Select(x => new BundlePackage(x))
-          .Where(pkg => mbaPrereqPackages.All(preReq => preReq.PackageId != pkg.GetId()));
-      }
-
-      BundlePackages = packages != null
-        ? new ReadOnlyCollection<BundlePackage>(packages.ToList())
-        : new ReadOnlyCollection<BundlePackage>(new List<BundlePackage>());
-    }
+    // private void ComputeBundlePackages()
+    // {
+    //   IEnumerable<BundlePackage> packages = new List<BundlePackage>();
+    //
+    //   XNamespace manifestNamespace = "http://schemas.microsoft.com/wix/2010/BootstrapperApplicationData";
+    //
+    //   string manifestPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+    //   if (manifestPath != null)
+    //   {
+    //     const string bootstrapperApplicationData = "BootstrapperApplicationData";
+    //     const string xmlExtension = ".xml";
+    //     string bootstrapperDataFilePath = Path.Combine(manifestPath, bootstrapperApplicationData + xmlExtension);
+    //     XElement bundleManifestData;
+    //
+    //     using (StreamReader reader = new StreamReader(bootstrapperDataFilePath))
+    //     {
+    //       string xml = reader.ReadToEnd();
+    //       XDocument xDoc = XDocument.Parse(xml);
+    //       bundleManifestData = xDoc.Element(manifestNamespace + bootstrapperApplicationData);
+    //     }
+    //
+    //     const string wixMbaPrereqInfo = "WixMbaPrereqInformation";
+    //     IList<BootstrapperAppPrereqPackage> mbaPrereqPackages = bundleManifestData?.Descendants(manifestNamespace + wixMbaPrereqInfo)
+    //       .Select(x => new BootstrapperAppPrereqPackage(x))
+    //       .ToList();
+    //
+    //     const string wixPackageProperties = "WixPackageProperties";
+    //     packages = bundleManifestData?.Descendants(manifestNamespace + wixPackageProperties)
+    //       .Select(x => new BundlePackage(x))
+    //       .Where(pkg => mbaPrereqPackages.All(preReq => preReq.PackageId != pkg.GetId()));
+    //   }
+    //
+    //   BundlePackages = packages != null
+    //     ? new ReadOnlyCollection<BundlePackage>(packages.ToList())
+    //     : new ReadOnlyCollection<BundlePackage>(new List<BundlePackage>());
+    // }
   }
 }

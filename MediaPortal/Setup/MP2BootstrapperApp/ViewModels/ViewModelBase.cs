@@ -1,7 +1,4 @@
-using System.ComponentModel;
-using System.Windows;
-
-namespace MP2BootstrapperApp.Nav
+namespace MP2BootstrapperApp.ViewModels
 {
   public abstract class ViewModelBase : ObservableBase
   {

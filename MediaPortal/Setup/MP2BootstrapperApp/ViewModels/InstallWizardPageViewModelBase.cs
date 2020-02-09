@@ -22,9 +22,6 @@
 
 #endregion
 
-
-using MP2BootstrapperApp.Nav;
-
 namespace MP2BootstrapperApp.ViewModels
 {
   public abstract class InstallWizardPageViewModelBase : ViewModelBase

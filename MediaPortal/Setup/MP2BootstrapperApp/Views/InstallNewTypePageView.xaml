@@ -69,7 +69,7 @@
 
     <StackPanel Orientation="Vertical" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center">
       <RadioButton Name="Radio1" GroupName="InstallTypes" Style="{StaticResource InstallerButton}" Content="..\resources\InstallTypes\full_install.png"
-                   IsChecked="{Binding Path=InstallType, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static conv:InstallType.ClientServer}}"
+                  Command="{Binding InstallType2}" IsChecked="{Binding Path=InstallType, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static conv:InstallType.ClientServer}}"
                    HorizontalAlignment="Center" HorizontalContentAlignment="Center" VerticalAlignment="Top"/>
       <Label FontSize="22" Foreground=" White" HorizontalContentAlignment="Center" Content="Client and Server"
              Opacity="{Binding Opacity, ElementName=Radio1, Mode=Default}"/>

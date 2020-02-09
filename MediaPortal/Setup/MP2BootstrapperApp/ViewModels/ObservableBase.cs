@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace MP2BootstrapperApp.Nav
+namespace MP2BootstrapperApp.ViewModels
 {
   public abstract class ObservableBase : INotifyPropertyChanged
   {

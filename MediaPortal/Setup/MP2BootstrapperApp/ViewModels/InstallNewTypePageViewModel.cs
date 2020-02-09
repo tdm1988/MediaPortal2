@@ -22,6 +22,8 @@
 
 #endregion
 
+using System.Windows.Input;
+
 namespace MP2BootstrapperApp.ViewModels
 {
   public class InstallNewTypePageViewModel : InstallWizardPageViewModelBase
@@ -34,6 +36,19 @@ namespace MP2BootstrapperApp.ViewModels
       viewModel.ButtonNextContent = "Next";
       viewModel.ButtonBackContent = "Back";
       viewModel.ButtonCancelContent = "Abort";
+    }
+    
+    public InstallType InstallType
+    {
+      get { return _installType; }
+      set { Set(ref _installType, value); }
+    }
+
+    private ICommand _cm;
+    public ICommand InstallType2
+    {
+      get { return _cm; }
+      set { Set(ref _cm, value); }
     }
   }
 }

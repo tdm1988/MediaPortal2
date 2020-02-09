@@ -32,7 +32,7 @@ using System.Xml.Linq;
 using Microsoft.Tools.WindowsInstallerXml.Bootstrapper;
 using MP2BootstrapperApp.BootstrapperWrapper;
 using MP2BootstrapperApp.Models;
-using MP2BootstrapperApp.Nav;
+using MP2BootstrapperApp.WizardSteps;
 using MP2BootstrapperApp.ViewModels;
 using MP2BootstrapperApp.Views;
 
@@ -45,6 +45,7 @@ namespace MP2BootstrapperApp
   {
     private IDispatcher _dispatcher;
     private IBootstrapperApplicationModel _model;
+    private Package _package;
     private Wizard _wizard;
     private InstallWizardViewModel _viewModel;
 
@@ -55,16 +56,15 @@ namespace MP2BootstrapperApp
       MessageBox.Show("dd");
 
       _model = new BootstrapperApplicationModel(this);
-      
-
+      _package = new Package();
       _viewModel = new InstallWizardViewModel(_model, _dispatcher);
       InstallWizardView view = new InstallWizardView(_viewModel);
-      _wizard = new Wizard(_viewModel);
-      _viewModel.NextCommand = new RelayCommand<int>(i => _wizard.ChangeState());
+      
+      _wizard = new Wizard(_viewModel, _package);
       _wizard.Start();
 
       WireUpEventHandlers();
-      ComputeBundlePackages();
+      
       _model.SetWindowHandle(view);
 
       Engine.Detect();
@@ -91,11 +91,11 @@ namespace MP2BootstrapperApp
     
     private void DetectRelatedBundle2(object sender, DetectRelatedBundleEventArgs e)
     {
-      _wizard.ChangeState();
-      //CurrentPage = new InstallExistTypePageViewModel(this);
+      _wizard.NextStep = new ProductExistsStep();
+      _wizard.ChangeStep();
     }
     
-    private List<BundlePackage> ComputeBundlePackages()
+    private IList<BundlePackage> ComputeBundlePackages()
     {
       IEnumerable<BundlePackage> packages = new List<BundlePackage>();
 

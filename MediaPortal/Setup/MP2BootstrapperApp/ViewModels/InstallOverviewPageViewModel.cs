@@ -23,26 +23,30 @@
 #endregion
 
 using System.Collections.ObjectModel;
-using Microsoft.Tools.WindowsInstallerXml.Bootstrapper;
+using MP2BootstrapperApp.Commands;
+using MP2BootstrapperApp.Models;
+using MP2BootstrapperApp.WizardSteps;
 
 namespace MP2BootstrapperApp.ViewModels
 {
-  public class InstallOverviewPageViewModel : InstallWizardPageViewModelBase
+  public class InstallOverviewPageViewModel : PageViewModelBase
   {
-    public InstallOverviewPageViewModel(InstallWizardViewModel viewModel)
+    private static string buttonNextContent = "next";
+    private static string header = "overview";
+    private readonly Package _model;
+    
+    public InstallOverviewPageViewModel(Wizard wizard, Package model) : base(header, buttonNextContent)
     {
-      viewModel.Header = "Overview";
-      viewModel.ButtonNextContent = "Install";
-      viewModel.ButtonBackContent = "Back";
-      viewModel.ButtonCancelContent = "Abort";
-      Packages = new ObservableCollection<string>();
-      foreach (var package in viewModel.BundlePackages)
+      NextCommand = new RelayCommand(o  =>
       {
-        if (package.RequestedInstallState == RequestState.Present)
-        {
-          Packages.Add(@"..\resources\" + package.GetId() + ".png");
-        }
-      }
+        wizard.NextStep = new FinishStep();
+        wizard.ChangeStep();
+      });
+      BackCommand = new RelayCommand(i =>
+      {
+        wizard.NextStep = new WelcomeStep();
+        wizard.ChangeStep();
+      });
     }
 
     public ObservableCollection<string> Packages { get; }
