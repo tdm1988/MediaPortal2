@@ -5,6 +5,6 @@ namespace MP2BootstrapperApp.WizardSteps
 {
   public interface IStep
   {
-    void Enter(Wizard wizard, InstallWizardViewModel viewModel, Package model);
+    void Enter(Wizard wizard, Package model);
   }
 }

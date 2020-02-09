@@ -89,7 +89,6 @@
     <Compile Include="InstallType.cs" />
     <Compile Include="Models\IBootstrapperApplicationModel.cs" />
     <Compile Include="Models\Package.cs" />
-    <Compile Include="ViewModels\IPage.cs" />
     <Compile Include="ViewModels\ModifyPageViewModel.cs" />
     <Compile Include="ViewModels\InProgressPageViewModel.cs" />
     <Compile Include="ViewModels\ObservableBase.cs" />
@@ -123,7 +122,6 @@
     <Compile Include="ViewModels\FinishPageViewModel.cs" />
     <Compile Include="ViewModels\InstallOverviewPageViewModel.cs" />
     <Compile Include="ViewModels\WelcomePageViewModel.cs" />
-    <Compile Include="ViewModels\InstallWizardPageViewModelBase.cs" />
     <Compile Include="ViewModels\InstallWizardViewModel.cs" />
     <Compile Include="Views\InstallExistTypePageView.xaml.cs">
       <DependentUpon>InstallExistTypePageView.xaml</DependentUpon>

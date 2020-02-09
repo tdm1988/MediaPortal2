@@ -5,12 +5,10 @@ namespace MP2BootstrapperApp.WizardSteps
 {
   public class Wizard
   {
-    private readonly InstallWizardViewModel _viewModel;
     private readonly Package _model;
     
-    public Wizard(InstallWizardViewModel viewModel, Package model)
+    public Wizard(Package model)
     {
-      _viewModel = viewModel;
       _model = model;
     }
 
@@ -19,12 +17,12 @@ namespace MP2BootstrapperApp.WizardSteps
     public void Start()
     {
       NextStep = new WelcomeStep();
-      NextStep.Enter(this, _viewModel, _model);
+      NextStep.Enter(this, _model);
     }
 
     public void ChangeStep()
     {
-      NextStep.Enter(this, _viewModel, _model);
+      NextStep.Enter(this, _model);
     }
   }
 }

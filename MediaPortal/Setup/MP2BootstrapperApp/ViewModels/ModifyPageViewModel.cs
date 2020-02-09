@@ -22,16 +22,29 @@
 
 #endregion
 
+using MP2BootstrapperApp.Commands;
+using MP2BootstrapperApp.Models;
+using MP2BootstrapperApp.WizardSteps;
+
 namespace MP2BootstrapperApp.ViewModels
 {
-  public class ModifyPageViewModel : InstallWizardPageViewModelBase
+  public class ModifyPageViewModel : PageViewModelBase
   {
-    public ModifyPageViewModel(InstallWizardViewModel viewModel)
+    private static string buttonNextContent = "next";
+    private static string header = "finish";
+    private readonly Package _model;
+    public ModifyPageViewModel(Wizard wizard, Package model) : base(header, buttonNextContent)
     {
-      viewModel.Header = "Modify Installation";
-      viewModel.ButtonNextContent = "Next";
-      viewModel.ButtonBackContent = "Back";
-      viewModel.ButtonCancelContent = "Abort";
+      NextCommand = new RelayCommand(o  =>
+      {
+        wizard.NextStep = new FinishStep();
+        wizard.ChangeStep();
+      });
+      BackCommand = new RelayCommand(i =>
+      {
+        wizard.NextStep = new WelcomeStep();
+        wizard.ChangeStep();
+      });
     }
   }
 }

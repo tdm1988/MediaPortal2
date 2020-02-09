@@ -57,10 +57,10 @@ namespace MP2BootstrapperApp
 
       _model = new BootstrapperApplicationModel(this);
       _package = new Package();
-      _viewModel = new InstallWizardViewModel(_model, _dispatcher);
+      _wizard = new Wizard(_package);
+      _viewModel = new InstallWizardViewModel(_wizard, _package);
       InstallWizardView view = new InstallWizardView(_viewModel);
-      
-      _wizard = new Wizard(_viewModel, _package);
+
       _wizard.Start();
 
       WireUpEventHandlers();

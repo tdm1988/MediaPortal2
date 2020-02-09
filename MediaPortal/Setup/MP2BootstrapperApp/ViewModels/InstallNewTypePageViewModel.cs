@@ -23,19 +23,32 @@
 #endregion
 
 using System.Windows.Input;
+using MP2BootstrapperApp.Commands;
+using MP2BootstrapperApp.Models;
+using MP2BootstrapperApp.WizardSteps;
 
 namespace MP2BootstrapperApp.ViewModels
 {
-  public class InstallNewTypePageViewModel : InstallWizardPageViewModelBase
+  public class InstallNewTypePageViewModel : PageViewModelBase
   {
+    private static string buttonNextContent = "next";
+    private static string header = "finish";
+    private readonly Package _model;
+    
     private InstallType _installType = InstallType.ClientServer;
 
-    public InstallNewTypePageViewModel(InstallWizardViewModel viewModel)
+    public InstallNewTypePageViewModel(Wizard wizard, Package model) : base(header, buttonNextContent)
     {
-      viewModel.Header = "New Installation";
-      viewModel.ButtonNextContent = "Next";
-      viewModel.ButtonBackContent = "Back";
-      viewModel.ButtonCancelContent = "Abort";
+      NextCommand = new RelayCommand(o  =>
+      {
+        wizard.NextStep = new FinishStep();
+        wizard.ChangeStep();
+      });
+      BackCommand = new RelayCommand(i =>
+      {
+        wizard.NextStep = new WelcomeStep();
+        wizard.ChangeStep();
+      });
     }
     
     public InstallType InstallType
@@ -50,5 +63,6 @@ namespace MP2BootstrapperApp.ViewModels
       get { return _cm; }
       set { Set(ref _cm, value); }
     }
+    
   }
 }

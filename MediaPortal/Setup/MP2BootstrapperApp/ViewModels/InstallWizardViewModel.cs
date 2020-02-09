@@ -34,10 +34,11 @@ using Microsoft.Tools.WindowsInstallerXml.Bootstrapper;
 using MP2BootstrapperApp.BootstrapperWrapper;
 using MP2BootstrapperApp.ChainPackages;
 using MP2BootstrapperApp.Models;
+using MP2BootstrapperApp.WizardSteps;
 
 namespace MP2BootstrapperApp.ViewModels
 {
-  public class InstallWizardViewModel : ViewModelBase
+  public class InstallWizardViewModel : PageViewModelBase
   {
     public enum InstallState
     {
@@ -62,33 +63,25 @@ namespace MP2BootstrapperApp.ViewModels
     private readonly PackageContext _packageContext;
     private readonly IDispatcher _dispatcher;
 
+    private static string buttonNextContent = "next";
+    private static string header = "finish";
+    private readonly Package _model;
+    
     private InstallType _installType;
     private EActionType _actionType;
 
-    private IPage content;
+    private PageViewModelBase _content;
     
-    public IPage Content
+    public PageViewModelBase Content
     {
-      get { return content; }
-      set { Set(ref content, value); }
+      get { return _content; }
+      set { Set(ref _content, value); }
     }
 
-  /*  public RelayCommand<int> NavigateCommand
+    public InstallWizardViewModel(Wizard wizard, Package model) : base(header, buttonNextContent)
     {
-      get { return new RelayCommand<int>(Navigate, CanExecute); }
-    } */
-
-   /* private readonly Dictionary<int, Lazy<IPage>> pages = new Dictionary<int, Lazy<IPage>>
-    {
-      [1] = new Lazy<IPage>(() => new OverviewViewModel()),
-      [2] = new Lazy<IPage>(() => new Page2ViewModel())
-    }; */
-    
-    public InstallWizardViewModel(IBootstrapperApplicationModel model, IDispatcher dispatcher)
-    {
-
-      _bootstrapperApplicationModel = model;
-      _dispatcher = dispatcher;
+    //  _bootstrapperApplicationModel = model;
+     // _dispatcher = dispatcher;
       State = InstallState.Initializing;
       _packageContext = new PackageContext();
 

@@ -2,7 +2,7 @@ using System.Windows.Input;
 
 namespace MP2BootstrapperApp.ViewModels
 {
-  public abstract class PageViewModelBase : IPage
+  public abstract class PageViewModelBase : ObservableBase
   {
     public PageViewModelBase(string header, string buttonNextContent)
     {
