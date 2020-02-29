@@ -5,24 +5,34 @@ namespace MP2BootstrapperApp.WizardSteps
 {
   public class Wizard
   {
-    private readonly Package _model;
-    
-    public Wizard(Package model)
-    {
-      _model = model;
-    }
-
     public IStep NextStep { get; set; }
 
-    public void Start()
+    public void Start(InstallWizardViewModel viewModel, Package package, IBootstrapperApplicationModel applicationModel)
     {
       NextStep = new WelcomeStep();
-      NextStep.Enter(this, _model);
+      NextStep.Enter(this, viewModel, package, applicationModel);
+    }
+    
+    public void Finish(InstallWizardViewModel viewModel, Package package, IBootstrapperApplicationModel applicationModel)
+    {
+      NextStep = new FinishStep();
+      NextStep.Enter(this, viewModel, package, applicationModel);
+    }
+    
+    public void Install(InstallWizardViewModel viewModel, Package package, IBootstrapperApplicationModel applicationModel)
+    {
+      NextStep = new InstallStep();
+      NextStep.Enter(this, viewModel, package, applicationModel);
     }
 
-    public void ChangeStep()
+    public void ChangeStep(InstallWizardViewModel viewModel, Package package, IBootstrapperApplicationModel applicationModel)
     {
-      NextStep.Enter(this, _model);
+      NextStep.Enter(this, viewModel, package, applicationModel);
+    }
+
+    public void InstallClient(InstallWizardViewModel viewModel, Package package, IBootstrapperApplicationModel applicationModel)
+    {
+      throw new System.NotImplementedException();
     }
   }
 }

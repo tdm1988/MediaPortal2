@@ -5,10 +5,9 @@ namespace MP2BootstrapperApp.WizardSteps
 {
   public class WelcomeStep : IStep
   {
-    public void Enter(Wizard wizard, Package model)
+    public void Enter(Wizard wizard, InstallWizardViewModel viewModel, Package model, IBootstrapperApplicationModel applicationModel)
     {
-      //viewModel.Content = null;
-      wizard.NextStep = null;
+      viewModel.Content = null;
     }
   }
 }

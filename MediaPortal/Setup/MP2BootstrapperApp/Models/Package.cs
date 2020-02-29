@@ -15,5 +15,7 @@ namespace MP2BootstrapperApp.Models
     public RequestState RequestState { get; set; } 
     
     public PackageState PackageState { get; set; }
+
+    public InstallType InstallType { get; set; }
   }
 }

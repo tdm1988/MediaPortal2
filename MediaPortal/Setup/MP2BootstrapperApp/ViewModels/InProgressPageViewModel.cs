@@ -11,18 +11,8 @@ namespace MP2BootstrapperApp.ViewModels
     private static string header = "finish";
     private readonly Package _model;
     
-    public InProgressPageViewModel(Wizard wizard, Package model) : base(header, buttonNextContent)
+    public InProgressPageViewModel(Package model) : base(header)
     {
-      NextCommand = new RelayCommand(o  =>
-      {
-        wizard.NextStep = new FinishStep();
-        wizard.ChangeStep();
-      });
-      BackCommand = new RelayCommand(i =>
-      {
-        wizard.NextStep = new WelcomeStep();
-        wizard.ChangeStep();
-      });
     }
   }
 }

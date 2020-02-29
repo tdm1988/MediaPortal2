@@ -31,6 +31,7 @@ using System.Windows;
 using System.Xml.Linq;
 using Microsoft.Tools.WindowsInstallerXml.Bootstrapper;
 using MP2BootstrapperApp.BootstrapperWrapper;
+using MP2BootstrapperApp.Commands;
 using MP2BootstrapperApp.Models;
 using MP2BootstrapperApp.WizardSteps;
 using MP2BootstrapperApp.ViewModels;
@@ -44,7 +45,7 @@ namespace MP2BootstrapperApp
   public class MP2BootstrapperApplication : BootstrapperApplicationWrapper
   {
     private IDispatcher _dispatcher;
-    private IBootstrapperApplicationModel _model;
+    private IBootstrapperApplicationModel _bootstrapperAppModel;
     private Package _package;
     private Wizard _wizard;
     private InstallWizardViewModel _viewModel;
@@ -55,28 +56,28 @@ namespace MP2BootstrapperApp
 
       MessageBox.Show("dd");
 
-      _model = new BootstrapperApplicationModel(this);
+      _bootstrapperAppModel = new BootstrapperApplicationModel(this);
       _package = new Package();
-      _wizard = new Wizard(_package);
-      _viewModel = new InstallWizardViewModel(_wizard, _package);
+      _wizard = new Wizard();
+      _viewModel = new InstallWizardViewModel(_wizard, _package, _bootstrapperAppModel);
       InstallWizardView view = new InstallWizardView(_viewModel);
 
-      _wizard.Start();
+      _wizard.Start(_viewModel, _package, _bootstrapperAppModel);
 
       WireUpEventHandlers();
       
-      _model.SetWindowHandle(view);
+      _bootstrapperAppModel.SetWindowHandle(view);
 
       Engine.Detect();
 
       view.Show();
       _dispatcher.Run();
-      Engine.Quit(_model.FinalResult);
+      Engine.Quit(_bootstrapperAppModel.FinalResult);
     }
     
     private void WireUpEventHandlers()
     {
-      _model.BootstrapperApplication.WrapperDetectRelatedBundle += DetectRelatedBundle2;
+      _bootstrapperAppModel.BootstrapperApplication.WrapperDetectRelatedBundle += DetectRelatedBundle2;
   /*    _model.BootstrapperApplication.WrapperDetectPackageComplete += DetectedPackageComplete;
       _model.BootstrapperApplication.WrapperPlanComplete += PlanComplete;
       _model.BootstrapperApplication.WrapperApplyComplete += ApplyComplete;
@@ -92,7 +93,7 @@ namespace MP2BootstrapperApp
     private void DetectRelatedBundle2(object sender, DetectRelatedBundleEventArgs e)
     {
       _wizard.NextStep = new ProductExistsStep();
-      _wizard.ChangeStep();
+      _wizard.ChangeStep(_viewModel, _package, _bootstrapperAppModel);
     }
     
     private IList<BundlePackage> ComputeBundlePackages()

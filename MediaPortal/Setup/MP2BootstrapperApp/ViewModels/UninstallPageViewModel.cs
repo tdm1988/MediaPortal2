@@ -34,18 +34,8 @@ namespace MP2BootstrapperApp.ViewModels
     private static string header = "finish";
     private readonly Package _model;
     
-    public UninstallPageViewModel(Wizard wizard, Package model) : base(header, buttonNextContent)
+    public UninstallPageViewModel(Package model) : base(header)
     {
-      NextCommand = new RelayCommand(o  =>
-      {
-        wizard.NextStep = new FinishStep();
-        wizard.ChangeStep();
-      });
-      BackCommand = new RelayCommand(i =>
-      {
-        wizard.NextStep = new WelcomeStep();
-        wizard.ChangeStep();
-      });
     }
     
   }

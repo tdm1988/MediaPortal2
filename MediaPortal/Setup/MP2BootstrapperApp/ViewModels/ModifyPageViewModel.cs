@@ -33,18 +33,8 @@ namespace MP2BootstrapperApp.ViewModels
     private static string buttonNextContent = "next";
     private static string header = "finish";
     private readonly Package _model;
-    public ModifyPageViewModel(Wizard wizard, Package model) : base(header, buttonNextContent)
+    public ModifyPageViewModel(Package model) : base(header)
     {
-      NextCommand = new RelayCommand(o  =>
-      {
-        wizard.NextStep = new FinishStep();
-        wizard.ChangeStep();
-      });
-      BackCommand = new RelayCommand(i =>
-      {
-        wizard.NextStep = new WelcomeStep();
-        wizard.ChangeStep();
-      });
     }
   }
 }

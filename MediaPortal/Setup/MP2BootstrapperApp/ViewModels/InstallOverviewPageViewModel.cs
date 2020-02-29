@@ -35,18 +35,8 @@ namespace MP2BootstrapperApp.ViewModels
     private static string header = "overview";
     private readonly Package _model;
     
-    public InstallOverviewPageViewModel(Wizard wizard, Package model) : base(header, buttonNextContent)
+    public InstallOverviewPageViewModel(Package model) : base(header)
     {
-      NextCommand = new RelayCommand(o  =>
-      {
-        wizard.NextStep = new FinishStep();
-        wizard.ChangeStep();
-      });
-      BackCommand = new RelayCommand(i =>
-      {
-        wizard.NextStep = new WelcomeStep();
-        wizard.ChangeStep();
-      });
     }
 
     public ObservableCollection<string> Packages { get; }

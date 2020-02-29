@@ -36,18 +36,8 @@ namespace MP2BootstrapperApp.ViewModels
     
     private EActionType _actionType = EActionType.Install;
 
-    public InstallExistTypePageViewModel(Wizard wizard, Package model) : base(header, buttonNextContent)
+    public InstallExistTypePageViewModel(Package model) : base(header)
     {
-      NextCommand = new RelayCommand(o  =>
-      {
-        wizard.NextStep = new FinishStep();
-        wizard.ChangeStep();
-      });
-      BackCommand = new RelayCommand(i =>
-      {
-        wizard.NextStep = new WelcomeStep();
-        wizard.ChangeStep();
-      });
     }
   }
 }

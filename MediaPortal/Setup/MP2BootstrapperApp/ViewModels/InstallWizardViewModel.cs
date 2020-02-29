@@ -33,12 +33,13 @@ using System.Xml.Linq;
 using Microsoft.Tools.WindowsInstallerXml.Bootstrapper;
 using MP2BootstrapperApp.BootstrapperWrapper;
 using MP2BootstrapperApp.ChainPackages;
+using MP2BootstrapperApp.Commands;
 using MP2BootstrapperApp.Models;
 using MP2BootstrapperApp.WizardSteps;
 
 namespace MP2BootstrapperApp.ViewModels
 {
-  public class InstallWizardViewModel : PageViewModelBase
+  public class InstallWizardViewModel : ObservableBase
   {
     public enum InstallState
     {
@@ -70,99 +71,32 @@ namespace MP2BootstrapperApp.ViewModels
     private InstallType _installType;
     private EActionType _actionType;
 
-    private PageViewModelBase _content;
+    private IPage _content;
     
-    public PageViewModelBase Content
+    public IPage Content
     {
       get { return _content; }
       set { Set(ref _content, value); }
     }
+    
+    
+    public ICommand NextCommand { get; set; }
+    
+    public ICommand BackCommand { get; set; }
 
-    public InstallWizardViewModel(Wizard wizard, Package model) : base(header, buttonNextContent)
+    public InstallWizardViewModel(Wizard wizard, Package model, IBootstrapperApplicationModel bootstrapperAppModel)
     {
-    //  _bootstrapperApplicationModel = model;
-     // _dispatcher = dispatcher;
-      State = InstallState.Initializing;
-      _packageContext = new PackageContext();
-
-    //  Content = new OverviewViewModel();
-    //  WireUpEventHandlers();
-    //  ComputeBundlePackages();
-
-     // NextCommand = new RelayCommand<int>(i => _wizard.ChangeState(this));
-      //  NextCommand = new DelegateCommand(Next, () => true);  
-  //    BackCommand = new DelegateCommand(Back, () => true);
-    //  CancelCommand = new DelegateCommand(Cancel, () => State != InstallState.Canceled);
-      ButtonNextContent = "next";
-      ButtonBackContent = "back";
-      ButtonCancelContent = "cancel";
-      Navigate(1);
-    }
-
-    private void Navigate(int page)
-    {
-      //Content = pages[page].Value;
-      switch (page)
+      _model = model;
+      NextCommand = new RelayCommand(execute: o  =>
       {
-        case 1:
-          doSomethingForOne();
-          break;
-        case 2:
-          doSomethingForOne();
-          break;
-      }
-    }
-
-    private void doSomethingForOne()
-    {
-      
-    }
-
-    private void Next()
-    {
-      switch (ActionType)
+        wizard.Install(this, model, bootstrapperAppModel);
+      });
+      BackCommand = new RelayCommand(o =>
       {
-        case EActionType.Install:
-          Install();
-          break;
-        case EActionType.Update:
-          Update();
-          break;
-        case EActionType.Modify:
-          break;
-        case EActionType.Repair:
-          break;
-        case EActionType.Uninstall:
-          break;
-        default:
-          throw new ArgumentOutOfRangeException();
-      }
+        wizard.Start(this, model, bootstrapperAppModel);
+      });
     }
     
-    private void Install()
-    {
-      switch (InstallType)
-      {
-        case InstallType.ClientServer:
-          InstallClientAndServer();
-          break;
-        case InstallType.Client:
-          break;
-        case InstallType.Server:
-          break;
-        case InstallType.Custom:
-          break;
-        default:
-          throw new ArgumentOutOfRangeException();
-      }
-    }
-    
-    private void Update()
-    {
-      //update installation
-    }
-
-
     private void InstallClientAndServer()
     {
       foreach (BundlePackage package in BundlePackages)

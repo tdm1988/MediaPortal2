@@ -37,18 +37,8 @@ namespace MP2BootstrapperApp.ViewModels
     
     private InstallType _installType = InstallType.ClientServer;
 
-    public InstallNewTypePageViewModel(Wizard wizard, Package model) : base(header, buttonNextContent)
+    public InstallNewTypePageViewModel(Package model) : base(header)
     {
-      NextCommand = new RelayCommand(o  =>
-      {
-        wizard.NextStep = new FinishStep();
-        wizard.ChangeStep();
-      });
-      BackCommand = new RelayCommand(i =>
-      {
-        wizard.NextStep = new WelcomeStep();
-        wizard.ChangeStep();
-      });
     }
     
     public InstallType InstallType
@@ -63,6 +53,5 @@ namespace MP2BootstrapperApp.ViewModels
       get { return _cm; }
       set { Set(ref _cm, value); }
     }
-    
   }
 }
