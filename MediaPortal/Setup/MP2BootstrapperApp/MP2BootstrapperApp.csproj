@@ -64,6 +64,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ChainPackages\Vc2019X64.cs" />
     <Compile Include="Commands\RelayCommand.cs" />
     <Compile Include="EActionType.cs" />
     <Compile Include="PackageStateToVisibilityConverter.cs" />
@@ -81,7 +82,7 @@
     <Compile Include="ChainPackages\Vc2010.cs" />
     <Compile Include="ChainPackages\Vc2013.cs" />
     <Compile Include="ChainPackages\Vc2008Sp1.cs" />
-    <Compile Include="ChainPackages\Vc2019.cs" />
+    <Compile Include="ChainPackages\Vc2019X86.cs" />
     <Compile Include="EnumToBooleanConverter.cs" />
     <Compile Include="BootstrapperWrapper\IBootstrapperApp.cs" />
     <Compile Include="BootstrapperWrapper\IDispatcher.cs" />

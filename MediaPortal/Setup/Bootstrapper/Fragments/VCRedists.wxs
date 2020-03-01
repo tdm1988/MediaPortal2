@@ -48,7 +48,7 @@
   </Fragment>
 
   <Fragment>
-    <PackageGroup Id="redist_vc140">
+    <PackageGroup Id="redist_vc140_x86">
       <ExePackage Id="VC2019_x86" Cache="yes" PerMachine="yes" Permanent="yes" Vital="yes" Compressed="no"
                   Name="vcredist140_2019_x86.exe"
                   DownloadUrl="http://install.team-mediaportal.com/MP2/install/vc_redist_2019_x86.exe"
@@ -64,13 +64,38 @@
       </ExePackage>
     </PackageGroup>
   </Fragment>
+  
+  <Fragment>
+    <PackageGroup Id="redist_vc140_x64">
+      <ExePackage Id="VC2019_x64" 
+                  Cache="yes" 
+                  PerMachine="yes" 
+                  Permanent="yes"
+                  Vital="yes" 
+                  Compressed="no"
+                  Name="vc_redist_2019_x64.exe"
+                  DownloadUrl="http://install.team-mediaportal.com/MP2/install/vc_redist_2019_x64.exe"
+                  InstallCommand="/passive /norestart"
+                  Protocol="burn">
+      <RemotePayload 
+  		            CertificatePublicKey="6608A9DBA86701156A4C17CE63BA99BE8B932F8D" 
+  		            CertificateThumbprint="62009AAABDAE749FD47D19150958329BF6FF4B34" 
+  		            Description="Microsoft Visual C++ 2015-2019 Redistributable (x64) - 14.22.27821" 
+  		            Hash="BE4F7AD520349D9D0683AB9DD171B3A1E4DB426B" 
+  		            ProductName="Microsoft Visual C++ 2015-2019 Redistributable (x64) - 14.22.27821" 
+  		            Size="15080792" 
+  		            Version="14.22.27821.0" />
+      </ExePackage>
+    </PackageGroup>
+  </Fragment>
 
   <Fragment>
     <PackageGroup Id="redist">
       <PackageGroupRef Id="redist_vc90"/>
       <PackageGroupRef Id="redist_vc100"/>
       <PackageGroupRef Id="redist_vc120"/>
-      <PackageGroupRef Id="redist_vc140"/>
+      <PackageGroupRef Id="redist_vc140_x86"/>
+      <PackageGroupRef Id="redist_vc140_x64"/>
     </PackageGroup>
   </Fragment>
 
