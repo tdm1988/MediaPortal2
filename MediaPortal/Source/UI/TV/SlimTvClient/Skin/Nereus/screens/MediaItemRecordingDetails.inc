@@ -22,7 +22,7 @@
   </Grid.ColumnDefinitions>
 
   <tv:RecordingAspectWrapper Grid.Row="1" Grid.Column="1" MediaItem="{Binding Source={StaticResource FanArtBackgroundModel},Path=MediaItem}"
-                             HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                             HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,0,30">
     <tv:RecordingAspectWrapper.Template>
       <ControlTemplate>
         <Grid DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}">
@@ -54,7 +54,7 @@
         <ColumnDefinition Width="*"/>
       </Grid.ColumnDefinitions>
       <Label x:Name="MediaItemName" Wrap="True" HorizontalAlignment="Stretch" FontSize="{ThemeResource NormalFontSize}" Color="{ThemeResource TextColor}"
-             FontFamily="SegoeUIBold" Content="{Binding Source={StaticResource FanArtBackgroundModel}, Path=SimpleTitle}"/>
+             FontFamily="SegoeUIBold" Content="{Binding Source={StaticResource FanArtBackgroundModel}, Path=SimpleTitle}" Margin="0,0,-460,0"/>
       <media:EpisodeAspectWrapper MediaItem="{Binding Source={StaticResource FanArtBackgroundModel},Path=MediaItem}">
         <media:EpisodeAspectWrapper.Template>
           <ControlTemplate>

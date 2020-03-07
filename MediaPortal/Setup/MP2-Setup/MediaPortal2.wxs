@@ -153,9 +153,10 @@
       <Custom Action="PrepareXmlPathVariables" Before="FileCost">NOT Installed</Custom>
       <Custom Action="AttachClientToServer" After="InstallFinalize">NOT Installed</Custom>
 
-      <RemoveExistingProducts After="InstallInitialize" />
       <InstallExecute After="RemoveExistingProducts" />
     </InstallExecuteSequence>
+
+    <MajorUpgrade AllowSameVersionUpgrades="yes" DowngradeErrorMessage="You cannot downgrade to [ProductName]" Schedule="afterInstallInitialize" />
 
   </Product>
 </Wix>
