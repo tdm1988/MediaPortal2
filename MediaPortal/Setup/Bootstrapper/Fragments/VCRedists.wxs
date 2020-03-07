@@ -25,7 +25,6 @@
   </Fragment>
 
   <Fragment>
-               Variable="MFC100_Version_x86" Path="[SystemFolder]mfc100.dll"
     <PackageGroup Id="redist_vc100">
       <ExePackage Id="VC2010_x86" Cache="yes" PerMachine="yes" Permanent="yes" Vital="yes" Compressed="no"
                   Name="vcredist100_x86.exe"
