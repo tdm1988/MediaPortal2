@@ -23,7 +23,6 @@
 #endregion
 
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -31,9 +30,7 @@ using System.Windows;
 using System.Xml.Linq;
 using Microsoft.Tools.WindowsInstallerXml.Bootstrapper;
 using MP2BootstrapperApp.BootstrapperWrapper;
-using MP2BootstrapperApp.Commands;
 using MP2BootstrapperApp.Models;
-using MP2BootstrapperApp.WizardSteps;
 using MP2BootstrapperApp.ViewModels;
 using MP2BootstrapperApp.Views;
 
@@ -44,90 +41,24 @@ namespace MP2BootstrapperApp
   /// </summary>
   public class MP2BootstrapperApplication : BootstrapperApplicationWrapper
   {
-    private IDispatcher _dispatcher;
-    private IBootstrapperApplicationModel _bootstrapperAppModel;
-    private Package _package;
-    private Wizard _wizard;
-    private InstallWizardViewModel _viewModel;
-
     protected override void Run()
     {
-      _dispatcher = new DispatcherWrapper();
-
+      IDispatcher dispatcher = new DispatcherWrapper();
+      
       MessageBox.Show("dd");
 
-      _bootstrapperAppModel = new BootstrapperApplicationModel(this);
-      _package = new Package();
-      _wizard = new Wizard();
-      _viewModel = new InstallWizardViewModel(_wizard, _package, _bootstrapperAppModel);
-      InstallWizardView view = new InstallWizardView(_viewModel);
+      IBootstrapperApplicationModel model = new BootstrapperApplicationModel(this);
 
-      _wizard.Start(_viewModel, _package, _bootstrapperAppModel);
+      MainViewModel viewModel = new MainViewModel(model, dispatcher);
+      InstallWizardView view = new InstallWizardView(viewModel);
 
-      WireUpEventHandlers();
-      
-      _bootstrapperAppModel.SetWindowHandle(view);
+      model.SetWindowHandle(view);
 
       Engine.Detect();
 
       view.Show();
-      _dispatcher.Run();
-      Engine.Quit(_bootstrapperAppModel.FinalResult);
-    }
-    
-    private void WireUpEventHandlers()
-    {
-      _bootstrapperAppModel.BootstrapperApplication.WrapperDetectRelatedBundle += DetectRelatedBundle2;
-  /*    _model.BootstrapperApplication.WrapperDetectPackageComplete += DetectedPackageComplete;
-      _model.BootstrapperApplication.WrapperPlanComplete += PlanComplete;
-      _model.BootstrapperApplication.WrapperApplyComplete += ApplyComplete;
-      _model.BootstrapperApplication.WrapperApplyBegin += ApplyBegin;
-      _model.BootstrapperApplication.WrapperExecutePackageBegin += ExecutePackageBegin;
-      _model.BootstrapperApplication.WrapperExecutePackageComplete += ExecutePackageComplete;
-      _model.BootstrapperApplication.WrapperPlanPackageBegin += PlanPackageBegin;
-      _model.BootstrapperApplication.WrapperResolveSource += ResolveSource;
-      _model.BootstrapperApplication.WrapperCacheAcquireProgress += CacheAcquireProgress;
-      _model.BootstrapperApplication.WrapperExecuteProgress += ExecuteProgress; */
-    }
-    
-    private void DetectRelatedBundle2(object sender, DetectRelatedBundleEventArgs e)
-    {
-      _wizard.NextStep = new ProductExistsStep();
-      _wizard.ChangeStep(_viewModel, _package, _bootstrapperAppModel);
-    }
-    
-    private IList<BundlePackage> ComputeBundlePackages()
-    {
-      IEnumerable<BundlePackage> packages = new List<BundlePackage>();
-
-      XNamespace manifestNamespace = "http://schemas.microsoft.com/wix/2010/BootstrapperApplicationData";
-
-      string manifestPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-      if (manifestPath != null)
-      {
-        const string bootstrapperApplicationData = "BootstrapperApplicationData";
-        const string xmlExtension = ".xml";
-        string bootstrapperDataFilePath = Path.Combine(manifestPath, bootstrapperApplicationData + xmlExtension);
-        XElement bundleManifestData;
-
-        using (StreamReader reader = new StreamReader(bootstrapperDataFilePath))
-        {
-          string xml = reader.ReadToEnd();
-          XDocument xDoc = XDocument.Parse(xml);
-          bundleManifestData = xDoc.Element(manifestNamespace + bootstrapperApplicationData);
-        }
-
-        const string wixMbaPrereqInfo = "WixMbaPrereqInformation";
-        IList<BootstrapperAppPrereqPackage> mbaPrereqPackages = bundleManifestData?.Descendants(manifestNamespace + wixMbaPrereqInfo)
-          .Select(x => new BootstrapperAppPrereqPackage(x))
-          .ToList();
-
-        const string wixPackageProperties = "WixPackageProperties";
-        packages = bundleManifestData?.Descendants(manifestNamespace + wixPackageProperties)
-          .Select(x => new BundlePackage(x))
-          .Where(pkg => mbaPrereqPackages.All(preReq => preReq.PackageId != pkg.GetId()));
-      }
-      return packages != null ? packages.ToList() : new List<BundlePackage>();
+      dispatcher.Run();
+      Engine.Quit(model.FinalResult);
     }
   }
 }

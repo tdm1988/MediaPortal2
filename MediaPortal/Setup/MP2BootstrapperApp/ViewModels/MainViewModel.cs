@@ -35,11 +35,10 @@ using MP2BootstrapperApp.BootstrapperWrapper;
 using MP2BootstrapperApp.ChainPackages;
 using MP2BootstrapperApp.Commands;
 using MP2BootstrapperApp.Models;
-using MP2BootstrapperApp.WizardSteps;
 
 namespace MP2BootstrapperApp.ViewModels
 {
-  public class InstallWizardViewModel : ObservableBase
+  public class MainViewModel : ObservableBase
   {
     public enum InstallState
     {
@@ -50,120 +49,51 @@ namespace MP2BootstrapperApp.ViewModels
       Canceled
     }
 
-    private readonly IBootstrapperApplicationModel _bootstrapperApplicationModel;
+    private readonly IBootstrapperApplicationModel _model;
+    private readonly IDispatcher _dispatcher;
     private string _header;
-    private bool _canExec;
-    private string _buttonNextContent;
-    private string _buttonBackContent;
-    private string _buttonCancelContent;
-    private string _errorCode;
     private InstallState _state;
     private int _progress;
     private int _cacheProgress;
     private int _executeProgress;
     private readonly PackageContext _packageContext;
-    private readonly IDispatcher _dispatcher;
 
-    private static string buttonNextContent = "next";
-    private static string header = "finish";
-    private readonly Package _model;
-    
-    private InstallType _installType;
-    private EActionType _actionType;
+    private readonly InstallViewModel _installViewModel;
+    private readonly UpdateViewModel _updateViewModel;
 
     private IPage _content;
+
+    public MainViewModel(IBootstrapperApplicationModel model, IDispatcher dispatcher)
+    {
+      _model = model;
+      _dispatcher = dispatcher;
+      _packageContext = new PackageContext();
+      _updateViewModel = new UpdateViewModel(this, model);
+      _installViewModel = new InstallViewModel(this, model);
+      Content = _updateViewModel; // set to a initialization view 
+      WireUpEventHandlers();
+      ComputeBundlePackages();
+    }
     
     public IPage Content
     {
       get { return _content; }
       set { Set(ref _content, value); }
     }
-    
-    
-    public ICommand NextCommand { get; set; }
-    
-    public ICommand BackCommand { get; set; }
 
-    public InstallWizardViewModel(Wizard wizard, Package model, IBootstrapperApplicationModel bootstrapperAppModel)
-    {
-      _model = model;
-      NextCommand = new RelayCommand(execute: o  =>
-      {
-        wizard.Install(this, model, bootstrapperAppModel);
-      });
-      BackCommand = new RelayCommand(o =>
-      {
-        wizard.Start(this, model, bootstrapperAppModel);
-      });
-    }
-    
-    private void InstallClientAndServer()
-    {
-      foreach (BundlePackage package in BundlePackages)
-      {
-        if (package.CurrentInstallState != PackageState.Present)
-        {
-          package.RequestedInstallState = RequestState.Present;
-        }
-      }
-      _bootstrapperApplicationModel.PlanAction(LaunchAction.Install);
-    }
-    
     public InstallState State
     {
       get { return _state; }
       private set { Set(ref _state, value); }
     }
-
+  
     public string Header
     {
       get { return _header; }
       set { Set(ref _header, value); }
     }
-    
-    public bool CanExec
-    {
-      get { return _canExec; }
-      set { Set(ref _canExec, value); }
-    }
-
-    public string ButtonNextContent
-    {
-      get { return _buttonNextContent; }
-      set { Set(ref _buttonNextContent, value); }
-    }
-
-    public string ButtonBackContent
-    {
-      get { return _buttonBackContent; }
-      set { Set(ref _buttonBackContent, value); }
-    }
-
-    public string ButtonCancelContent
-    {
-      get { return _buttonCancelContent; }
-      set { Set(ref _buttonCancelContent, value); }
-    }
-    
-    public string ErrorCode
-    {
-      get { return _errorCode; }
-      set { Set(ref _errorCode, value); }
-    }
 
     public ICommand CancelCommand { get; }
-
-    public InstallType InstallType
-    {
-      get { return _installType; }
-      set { Set(ref _installType, value); }
-    }
-    
-    public EActionType ActionType
-    {
-      get { return _actionType; }
-      set { Set(ref _actionType, value); }
-    }
     
     public IList<BundlePackage> BundlePackages { get; set; }
 
@@ -226,17 +156,17 @@ namespace MP2BootstrapperApp.ViewModels
 
     private void DetectRelatedBundle(object sender, DetectRelatedBundleEventArgs e)
     {
-      //CurrentPage = new InstallExistTypePageViewModel(this);
+      
     }
 
     private void PlanComplete(object sender, PlanCompleteEventArgs e)
-    {
+    {  
       if (State == InstallState.Canceled)
       {
         _dispatcher.InvokeShutdown();
         return;
       }
-      _bootstrapperApplicationModel.ApplyAction();
+      _model.ApplyAction();
     }
 
     private void ApplyBegin(object sender, ApplyBeginEventArgs e)
@@ -262,14 +192,24 @@ namespace MP2BootstrapperApp.ViewModels
 
     private void ApplyComplete(object sender, ApplyCompleteEventArgs e)
     {
-
-      _bootstrapperApplicationModel.FinalResult = e.Status;
-      ErrorCode = "Error code: 0x" + e.Status.ToString("x8");
+      _model.FinalResult = e.Status;
     }
 
     private void PlanPackageBegin(object sender, PlanPackageBeginEventArgs planPackageBeginEventArgs)
     {
       UpdatePackageRequestState(planPackageBeginEventArgs);
+    }
+    
+    private void InstallClientAndServer()
+    {
+      foreach (BundlePackage package in BundlePackages)
+      {
+        if (package.CurrentInstallState != PackageState.Present)
+        {
+          package.RequestedInstallState = RequestState.Present;
+        }
+      }
+      _model.PlanAction(LaunchAction.Install);
     }
 
     private void UpdatePackageRequestState(PlanPackageBeginEventArgs planPackageBeginEventArgs)
@@ -303,54 +243,54 @@ namespace MP2BootstrapperApp.ViewModels
 
     private void WireUpEventHandlers()
     {
-      _bootstrapperApplicationModel.BootstrapperApplication.WrapperDetectRelatedBundle += DetectRelatedBundle;
-      _bootstrapperApplicationModel.BootstrapperApplication.WrapperDetectPackageComplete += DetectedPackageComplete;
-      _bootstrapperApplicationModel.BootstrapperApplication.WrapperPlanComplete += PlanComplete;
-      _bootstrapperApplicationModel.BootstrapperApplication.WrapperApplyComplete += ApplyComplete;
-      _bootstrapperApplicationModel.BootstrapperApplication.WrapperApplyBegin += ApplyBegin;
-      _bootstrapperApplicationModel.BootstrapperApplication.WrapperExecutePackageBegin += ExecutePackageBegin;
-      _bootstrapperApplicationModel.BootstrapperApplication.WrapperExecutePackageComplete += ExecutePackageComplete;
-      _bootstrapperApplicationModel.BootstrapperApplication.WrapperPlanPackageBegin += PlanPackageBegin;
-      _bootstrapperApplicationModel.BootstrapperApplication.WrapperResolveSource += ResolveSource;
-      _bootstrapperApplicationModel.BootstrapperApplication.WrapperCacheAcquireProgress += CacheAcquireProgress;
-      _bootstrapperApplicationModel.BootstrapperApplication.WrapperExecuteProgress += ExecuteProgress;
+      _model.BootstrapperApplication.WrapperDetectRelatedBundle += DetectRelatedBundle;
+      _model.BootstrapperApplication.WrapperDetectPackageComplete += DetectedPackageComplete;
+      _model.BootstrapperApplication.WrapperPlanComplete += PlanComplete;
+      _model.BootstrapperApplication.WrapperApplyComplete += ApplyComplete;
+      _model.BootstrapperApplication.WrapperApplyBegin += ApplyBegin;
+      _model.BootstrapperApplication.WrapperExecutePackageBegin += ExecutePackageBegin;
+      _model.BootstrapperApplication.WrapperExecutePackageComplete += ExecutePackageComplete;
+      _model.BootstrapperApplication.WrapperPlanPackageBegin += PlanPackageBegin;
+      _model.BootstrapperApplication.WrapperResolveSource += ResolveSource;
+      _model.BootstrapperApplication.WrapperCacheAcquireProgress += CacheAcquireProgress;
+      _model.BootstrapperApplication.WrapperExecuteProgress += ExecuteProgress;
     }
 
-    // private void ComputeBundlePackages()
-    // {
-    //   IEnumerable<BundlePackage> packages = new List<BundlePackage>();
-    //
-    //   XNamespace manifestNamespace = "http://schemas.microsoft.com/wix/2010/BootstrapperApplicationData";
-    //
-    //   string manifestPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-    //   if (manifestPath != null)
-    //   {
-    //     const string bootstrapperApplicationData = "BootstrapperApplicationData";
-    //     const string xmlExtension = ".xml";
-    //     string bootstrapperDataFilePath = Path.Combine(manifestPath, bootstrapperApplicationData + xmlExtension);
-    //     XElement bundleManifestData;
-    //
-    //     using (StreamReader reader = new StreamReader(bootstrapperDataFilePath))
-    //     {
-    //       string xml = reader.ReadToEnd();
-    //       XDocument xDoc = XDocument.Parse(xml);
-    //       bundleManifestData = xDoc.Element(manifestNamespace + bootstrapperApplicationData);
-    //     }
-    //
-    //     const string wixMbaPrereqInfo = "WixMbaPrereqInformation";
-    //     IList<BootstrapperAppPrereqPackage> mbaPrereqPackages = bundleManifestData?.Descendants(manifestNamespace + wixMbaPrereqInfo)
-    //       .Select(x => new BootstrapperAppPrereqPackage(x))
-    //       .ToList();
-    //
-    //     const string wixPackageProperties = "WixPackageProperties";
-    //     packages = bundleManifestData?.Descendants(manifestNamespace + wixPackageProperties)
-    //       .Select(x => new BundlePackage(x))
-    //       .Where(pkg => mbaPrereqPackages.All(preReq => preReq.PackageId != pkg.GetId()));
-    //   }
-    //
-    //   BundlePackages = packages != null
-    //     ? new ReadOnlyCollection<BundlePackage>(packages.ToList())
-    //     : new ReadOnlyCollection<BundlePackage>(new List<BundlePackage>());
-    // }
+    private void ComputeBundlePackages()
+    {
+      IEnumerable<BundlePackage> packages = new List<BundlePackage>();
+    
+      XNamespace manifestNamespace = "http://schemas.microsoft.com/wix/2010/BootstrapperApplicationData";
+    
+      string manifestPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+      if (manifestPath != null)
+      {
+        const string bootstrapperApplicationData = "BootstrapperApplicationData";
+        const string xmlExtension = ".xml";
+        string bootstrapperDataFilePath = Path.Combine(manifestPath, bootstrapperApplicationData + xmlExtension);
+        XElement bundleManifestData;
+    
+        using (StreamReader reader = new StreamReader(bootstrapperDataFilePath))
+        {
+          string xml = reader.ReadToEnd();
+          XDocument xDoc = XDocument.Parse(xml);
+          bundleManifestData = xDoc.Element(manifestNamespace + bootstrapperApplicationData);
+        }
+    
+        const string wixMbaPrereqInfo = "WixMbaPrereqInformation";
+        IList<BootstrapperAppPrereqPackage> mbaPrereqPackages = bundleManifestData?.Descendants(manifestNamespace + wixMbaPrereqInfo)
+          .Select(x => new BootstrapperAppPrereqPackage(x))
+          .ToList();
+    
+        const string wixPackageProperties = "WixPackageProperties";
+        packages = bundleManifestData?.Descendants(manifestNamespace + wixPackageProperties)
+          .Select(x => new BundlePackage(x))
+          .Where(pkg => mbaPrereqPackages.All(preReq => preReq.PackageId != pkg.GetId()));
+      }
+    
+      BundlePackages = packages != null
+        ? new ReadOnlyCollection<BundlePackage>(packages.ToList())
+        : new ReadOnlyCollection<BundlePackage>(new List<BundlePackage>());
+    }
   }
 }

@@ -91,63 +91,24 @@
     <Compile Include="Models\IBootstrapperApplicationModel.cs" />
     <Compile Include="Models\Package.cs" />
     <Compile Include="ViewModels\IPage.cs" />
-    <Compile Include="ViewModels\ModifyPageViewModel.cs" />
-    <Compile Include="ViewModels\InProgressPageViewModel.cs" />
     <Compile Include="ViewModels\ObservableBase.cs" />
-    <Compile Include="ViewModels\PageViewModelBase.cs" />
-    <Compile Include="ViewModels\RepairPageViewModel.cs" />
-    <Compile Include="ViewModels\UninstallPageViewModel.cs" />
-    <Compile Include="ViewModels\UpdatePageViewModel.cs" />
-    <Compile Include="Views\InstallationInProgressPageView.xaml.cs">
-      <DependentUpon>InstallationInProgressPageView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\ModifyPageView.xaml.cs">
-      <DependentUpon>ModifyPageView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\RepairPageView.xaml.cs">
-      <DependentUpon>RepairPageView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\UninstallView.xaml.cs">
-      <DependentUpon>UninstallView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\UpdatePageView.xaml.cs">
-      <DependentUpon>UpdatePageView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Models\BundlePackage.cs" />
     <Compile Include="Models\BootstrapperAppPrereqPackage.cs" />
     <Compile Include="MP2BootstrapperApplication.cs" />
     <Compile Include="Models\BootstrapperApplicationModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ViewModels\InstallExistTypePageViewModel.cs" />
-    <Compile Include="ViewModels\InstallNewTypePageViewModel.cs" />
-    <Compile Include="ViewModels\FinishPageViewModel.cs" />
-    <Compile Include="ViewModels\InstallOverviewPageViewModel.cs" />
-    <Compile Include="ViewModels\WelcomePageViewModel.cs" />
-    <Compile Include="ViewModels\InstallWizardViewModel.cs" />
-    <Compile Include="Views\InstallExistTypePageView.xaml.cs">
-      <DependentUpon>InstallExistTypePageView.xaml</DependentUpon>
+    <Compile Include="ViewModels\UpdateViewModel.cs" />
+    <Compile Include="ViewModels\InstallViewModel.cs" />
+    <Compile Include="ViewModels\MainViewModel.cs" />
+    <Compile Include="Views\UpdateView.xaml.cs">
+      <DependentUpon>UpdateView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\InstallFinishPageView.xaml.cs">
-      <DependentUpon>InstallFinishPageView.xaml</DependentUpon>
+    <Compile Include="Views\InstallView.xaml.cs">
+      <DependentUpon>InstallView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\InstallNewTypePageView.xaml.cs">
-      <DependentUpon>InstallNewTypePageView.xaml</DependentUpon>
+    <Compile Include="Views\MainView.xaml.cs">
+      <DependentUpon>MainView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\InstallOverviewPageView.xaml.cs">
-      <DependentUpon>InstallOverviewPageView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\InstallWelcomePageView.xaml.cs">
-      <DependentUpon>InstallWelcomePageView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\InstallWizardView.xaml.cs">
-      <DependentUpon>InstallWizardView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="WizardSteps\FinishStep.cs" />
-    <Compile Include="WizardSteps\InstallStep.cs" />
-    <Compile Include="WizardSteps\IStep.cs" />
-    <Compile Include="WizardSteps\ProductExistsStep.cs" />
-    <Compile Include="WizardSteps\WelcomeStep.cs" />
-    <Compile Include="WizardSteps\Wizard.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="BootstrapperCore.config">
@@ -157,47 +118,15 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Views\InstallationInProgressPageView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\InstallExistTypePageView.xaml">
+    <Page Include="Views\UpdateView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\InstallFinishPageView.xaml">
+    <Page Include="Views\InstallView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\InstallNewTypePageView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\InstallOverviewPageView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\InstallWelcomePageView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\InstallWizardView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\ModifyPageView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\RepairPageView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\UninstallView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\UpdatePageView.xaml">
+    <Page Include="Views\MainView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -247,9 +176,6 @@
   <ItemGroup>
     <Resource Include="Resources\absent.png" />
     <Resource Include="Resources\present.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\MainWindow.xaml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -27,11 +27,11 @@ using System.Windows.Controls;
 namespace MP2BootstrapperApp.Views
 {
   /// <summary>
-  /// Interaction logic for UninstallView.xaml
+  /// Interaction logic for InstallationTypeView.xaml
   /// </summary>
-  public partial class UninstallView : UserControl
+  public partial class InstallView : UserControl
   {
-    public UninstallView()
+    public InstallView()
     {
       InitializeComponent();
     }

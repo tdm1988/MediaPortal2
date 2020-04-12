@@ -22,18 +22,38 @@
 
 #endregion
 
-using System.Windows.Controls;
+using System.Windows;
+using System.Windows.Input;
+using MP2BootstrapperApp.ViewModels;
 
 namespace MP2BootstrapperApp.Views
 {
   /// <summary>
-  /// Interaction logic for ModifyPageView.xaml
+  /// Interaction logic for InstallWizardBaseView.xaml
   /// </summary>
-  public partial class ModifyPageView : UserControl
+  public partial class InstallWizardView : Window
   {
-    public ModifyPageView()
+    public InstallWizardView(MainViewModel viewModel)
     {
       InitializeComponent();
+      DataContext = viewModel;
+
+      Closed += (sender, e) => viewModel.CancelCommand.Execute(this);
+    }
+
+    /// <summary>
+    /// Workaround method to allow move the main window.
+    /// Needed because WindowsStyle is set to "None"
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void Window_MouseDown(object sender, MouseButtonEventArgs e)
+    {
+      if (e.LeftButton == MouseButtonState.Pressed)
+      {
+        DragMove();
+      }
+
     }
   }
 }

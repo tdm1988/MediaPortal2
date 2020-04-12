@@ -22,21 +22,53 @@
 
 #endregion
 
+using System.Windows.Input;
 using MP2BootstrapperApp.Commands;
 using MP2BootstrapperApp.Models;
-using MP2BootstrapperApp.WizardSteps;
 
 namespace MP2BootstrapperApp.ViewModels
 {
-  public class RepairPageViewModel : PageViewModelBase
+  public class InstallViewModel : ObservableBase, IPage
   {
-    private static string buttonNextContent = "next";
-    private static string header = "finish";
+    private ICommand _installClientAndServerCommand;
+    private ICommand _installClient;
+    private ICommand _installServer;
     private readonly Package _model;
-    
-    public RepairPageViewModel(Package model) : base(header)
+
+    public InstallViewModel(MainViewModel viewModel, IBootstrapperApplicationModel model)
     {
     }
     
+    public string Header
+    {
+      get { return "Install"; }
+    }
+
+    public ICommand InstallClientAndServerCommand
+    {
+      get { return _installClientAndServerCommand ?? (_installClientAndServerCommand = new RelayCommand(o => InstallClientAndServer())); }
+    }
+    
+    public ICommand InstallClientCommand
+    {
+      get { return _installClient ?? (_installClient = new RelayCommand(o => InstallClient())); }
+    }
+
+    public ICommand InstallServerCommand
+    {
+      get { return _installServer ?? (_installServer = new RelayCommand(o => InstallServer())); }
+    }
+
+    private void InstallClient()
+    {
+    }
+    
+    private void InstallServer()
+    {
+    }
+
+    private void InstallClientAndServer()
+    {
+    }
   }
 }

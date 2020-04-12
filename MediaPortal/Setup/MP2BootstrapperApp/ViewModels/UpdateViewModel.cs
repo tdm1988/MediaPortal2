@@ -25,33 +25,56 @@
 using System.Windows.Input;
 using MP2BootstrapperApp.Commands;
 using MP2BootstrapperApp.Models;
-using MP2BootstrapperApp.WizardSteps;
+
 
 namespace MP2BootstrapperApp.ViewModels
 {
-  public class InstallNewTypePageViewModel : PageViewModelBase
+  public class UpdateViewModel : ObservableBase, IPage
   {
-    private static string buttonNextContent = "next";
-    private static string header = "finish";
-    private readonly Package _model;
+    private readonly IBootstrapperApplicationModel _model;
+    private readonly MainViewModel _viewModel;
     
-    private InstallType _installType = InstallType.ClientServer;
+    private ICommand _updateCommand;
+    private ICommand _repairCommand;
+    private ICommand _uninstallCommand;
+    
 
-    public InstallNewTypePageViewModel(Package model) : base(header)
+    public UpdateViewModel(MainViewModel viewModel, IBootstrapperApplicationModel model)
+    {
+      _viewModel = viewModel;
+      _model = model;
+    }
+
+    public string Header
+    {
+      get { return "Update"; }
+    }
+    
+    public ICommand UpdateCommand
+    {
+      get { return _updateCommand ?? (_updateCommand = new RelayCommand(o => Update())); }
+    }
+    
+    public ICommand RepairCommand
+    {
+      get { return _repairCommand ?? (_repairCommand = new RelayCommand(o => Repair())); }
+    }
+
+    public ICommand UninstallCommand
+    {
+      get { return _uninstallCommand ?? (_uninstallCommand = new RelayCommand(o => Uninstall())); }
+    }
+    
+    private void Update()
     {
     }
     
-    public InstallType InstallType
+    private void Repair()
     {
-      get { return _installType; }
-      set { Set(ref _installType, value); }
     }
 
-    private ICommand _cm;
-    public ICommand InstallType2
+    private void Uninstall()
     {
-      get { return _cm; }
-      set { Set(ref _cm, value); }
     }
   }
 }

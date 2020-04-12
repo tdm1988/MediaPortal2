@@ -22,19 +22,18 @@
 
 #endregion
 
-using MP2BootstrapperApp.Commands;
-using MP2BootstrapperApp.Models;
-using MP2BootstrapperApp.WizardSteps;
+using System.Windows.Controls;
 
-namespace MP2BootstrapperApp.ViewModels
+namespace MP2BootstrapperApp.Views
 {
-  public class ModifyPageViewModel : PageViewModelBase
+  /// <summary>
+  /// Interaction logic for InstallExistTypePageView.xaml
+  /// </summary>
+  public partial class UpdateView : UserControl
   {
-    private static string buttonNextContent = "next";
-    private static string header = "finish";
-    private readonly Package _model;
-    public ModifyPageViewModel(Package model) : base(header)
+    public UpdateView()
     {
+      InitializeComponent();
     }
   }
 }
