@@ -66,7 +66,7 @@
   <ItemGroup>
     <Compile Include="ChainPackages\Vc2019X64.cs" />
     <Compile Include="Commands\RelayCommand.cs" />
-    <Compile Include="EActionType.cs" />
+    <Compile Include="InstallState.cs" />
     <Compile Include="PackageStateToVisibilityConverter.cs" />
     <Compile Include="BootstrapperWrapper\BootstrapperApplicationWrapper.cs" />
     <Compile Include="ChainPackages\Dokan.cs" />
@@ -87,9 +87,8 @@
     <Compile Include="BootstrapperWrapper\IBootstrapperApp.cs" />
     <Compile Include="BootstrapperWrapper\IDispatcher.cs" />
     <Compile Include="BootstrapperWrapper\DispatcherWrapper.cs" />
-    <Compile Include="InstallType.cs" />
     <Compile Include="Models\IBootstrapperApplicationModel.cs" />
-    <Compile Include="Models\Package.cs" />
+    <Compile Include="ViewModels\InitializeViewModel.cs" />
     <Compile Include="ViewModels\IPage.cs" />
     <Compile Include="ViewModels\ObservableBase.cs" />
     <Compile Include="Models\BundlePackage.cs" />

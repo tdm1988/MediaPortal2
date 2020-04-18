@@ -40,40 +40,25 @@ namespace MP2BootstrapperApp.ViewModels
 {
   public class MainViewModel : ObservableBase
   {
-    public enum InstallState
-    {
-      Initializing,
-      Present,
-      NotPresent,
-      Applaying,
-      Canceled
-    }
-
-    private readonly IBootstrapperApplicationModel _model;
-    private readonly IDispatcher _dispatcher;
     private string _header;
     private InstallState _state;
+    private readonly IDispatcher _dispatcher;
     private int _progress;
-    private int _cacheProgress;
-    private int _executeProgress;
-    private readonly PackageContext _packageContext;
-
-    private readonly InstallViewModel _installViewModel;
-    private readonly UpdateViewModel _updateViewModel;
+    private ICommand _cancelCommand;
 
     private IPage _content;
 
     public MainViewModel(IBootstrapperApplicationModel model, IDispatcher dispatcher)
     {
-      _model = model;
       _dispatcher = dispatcher;
-      _packageContext = new PackageContext();
-      _updateViewModel = new UpdateViewModel(this, model);
-      _installViewModel = new InstallViewModel(this, model);
-      Content = _updateViewModel; // set to a initialization view 
-      WireUpEventHandlers();
-      ComputeBundlePackages();
+      InstallViewModel = new InstallViewModel(this, model, dispatcher);
+      UpdateViewModel = new UpdateViewModel(this, model);
+      Content = new InitializeViewModel(); 
     }
+    
+    public InstallViewModel InstallViewModel { get; }
+    
+    public UpdateViewModel UpdateViewModel { get; }
     
     public IPage Content
     {
@@ -84,213 +69,31 @@ namespace MP2BootstrapperApp.ViewModels
     public InstallState State
     {
       get { return _state; }
-      private set { Set(ref _state, value); }
-    }
-  
-    public string Header
-    {
-      get { return _header; }
-      set { Set(ref _header, value); }
+      set { Set(ref _state, value); }
     }
 
-    public ICommand CancelCommand { get; }
-    
-    public IList<BundlePackage> BundlePackages { get; set; }
+    public ICommand CancelCommand
+    {
+      get
+      {
+        return _cancelCommand ?? (_cancelCommand = new RelayCommand(o =>
+        {
+          if (State == InstallState.Applaying)
+          {
+            State = InstallState.Canceled;
+          }
+          else
+          {
+            _dispatcher.InvokeShutdown();
+          }
+        }, o  => State != InstallState.Canceled));
+      }
+    }
 
     public int Progress
     {
       get { return _progress; }
       set { Set(ref _progress, value); }
-    }
-
-    private void Cancel()
-    {
-      if (State == InstallState.Applaying)
-      {
-        State = InstallState.Canceled;
-      }
-      else
-      {
-        _dispatcher.InvokeShutdown();
-      }
-    }
-
-    private void DetectedPackageComplete(object sender, DetectPackageCompleteEventArgs detectPackageCompleteEventArgs)
-    {
-      UpdatePackageCurrentState(detectPackageCompleteEventArgs);
-    }
-
-    private void UpdatePackageCurrentState(DetectPackageCompleteEventArgs detectPackageCompleteEventArgs)
-    {
-      if (Enum.TryParse(detectPackageCompleteEventArgs.PackageId, out PackageId detectedPackageId))
-      {
-        BundlePackage bundlePackage = BundlePackages.FirstOrDefault(pkg => pkg.GetId() == detectedPackageId);
-        if (bundlePackage != null)
-        {
-          PackageId bundlePackageId = bundlePackage.GetId();
-          Version installed = _packageContext.GetInstalledVersion(bundlePackageId);
-          bundlePackage.InstalledVersion = installed;
-          bundlePackage.CurrentInstallState = GetInstallState(installed, bundlePackage.GetVersion());
-        }
-      }
-    }
-
-    private PackageState GetInstallState(Version installed, Version bundled)
-    {
-      PackageState state;
-      int comparisonResult = installed.CompareTo(bundled);
-      if (comparisonResult > 0)
-      {
-        state = PackageState.Present;
-      }
-      else if (comparisonResult < 0)
-      {
-        state = PackageState.Absent;
-      }
-      else
-      {
-        state = PackageState.Present;
-      }
-      return state;
-    }
-
-    private void DetectRelatedBundle(object sender, DetectRelatedBundleEventArgs e)
-    {
-      
-    }
-
-    private void PlanComplete(object sender, PlanCompleteEventArgs e)
-    {  
-      if (State == InstallState.Canceled)
-      {
-        _dispatcher.InvokeShutdown();
-        return;
-      }
-      _model.ApplyAction();
-    }
-
-    private void ApplyBegin(object sender, ApplyBeginEventArgs e)
-    {
-      State = InstallState.Applaying;
-    }
-
-    private void ExecutePackageBegin(object sender, ExecutePackageBeginEventArgs e)
-    {
-      if (State == InstallState.Canceled)
-      {
-        e.Result = Result.Cancel;
-      }
-    }
-
-    private void ExecutePackageComplete(object sender, ExecutePackageCompleteEventArgs e)
-    {
-      if (State == InstallState.Canceled)
-      {
-        e.Result = Result.Cancel;
-      }
-    }
-
-    private void ApplyComplete(object sender, ApplyCompleteEventArgs e)
-    {
-      _model.FinalResult = e.Status;
-    }
-
-    private void PlanPackageBegin(object sender, PlanPackageBeginEventArgs planPackageBeginEventArgs)
-    {
-      UpdatePackageRequestState(planPackageBeginEventArgs);
-    }
-    
-    private void InstallClientAndServer()
-    {
-      foreach (BundlePackage package in BundlePackages)
-      {
-        if (package.CurrentInstallState != PackageState.Present)
-        {
-          package.RequestedInstallState = RequestState.Present;
-        }
-      }
-      _model.PlanAction(LaunchAction.Install);
-    }
-
-    private void UpdatePackageRequestState(PlanPackageBeginEventArgs planPackageBeginEventArgs)
-    {
-      if (Enum.TryParse(planPackageBeginEventArgs.PackageId, out PackageId id))
-      {
-        BundlePackage bundlePackage = BundlePackages.FirstOrDefault(p => p.GetId() == id);
-        if (bundlePackage != null)
-        {
-          planPackageBeginEventArgs.State = bundlePackage.RequestedInstallState;
-        }
-      }
-    }
-
-    private void ResolveSource(object sender, ResolveSourceEventArgs e)
-    {
-      e.Result = !string.IsNullOrEmpty(e.DownloadSource) ? Result.Download : Result.Ok;
-    }
-
-    private void CacheAcquireProgress(object sender, CacheAcquireProgressEventArgs e)
-    {
-      _cacheProgress = e.OverallPercentage;
-      Progress = (_cacheProgress + _executeProgress) / 2;
-    }
-
-    private void ExecuteProgress(object sender, ExecuteProgressEventArgs e)
-    {
-      _executeProgress = e.OverallPercentage;
-      Progress = (_cacheProgress + _executeProgress) / 2;
-    }
-
-    private void WireUpEventHandlers()
-    {
-      _model.BootstrapperApplication.WrapperDetectRelatedBundle += DetectRelatedBundle;
-      _model.BootstrapperApplication.WrapperDetectPackageComplete += DetectedPackageComplete;
-      _model.BootstrapperApplication.WrapperPlanComplete += PlanComplete;
-      _model.BootstrapperApplication.WrapperApplyComplete += ApplyComplete;
-      _model.BootstrapperApplication.WrapperApplyBegin += ApplyBegin;
-      _model.BootstrapperApplication.WrapperExecutePackageBegin += ExecutePackageBegin;
-      _model.BootstrapperApplication.WrapperExecutePackageComplete += ExecutePackageComplete;
-      _model.BootstrapperApplication.WrapperPlanPackageBegin += PlanPackageBegin;
-      _model.BootstrapperApplication.WrapperResolveSource += ResolveSource;
-      _model.BootstrapperApplication.WrapperCacheAcquireProgress += CacheAcquireProgress;
-      _model.BootstrapperApplication.WrapperExecuteProgress += ExecuteProgress;
-    }
-
-    private void ComputeBundlePackages()
-    {
-      IEnumerable<BundlePackage> packages = new List<BundlePackage>();
-    
-      XNamespace manifestNamespace = "http://schemas.microsoft.com/wix/2010/BootstrapperApplicationData";
-    
-      string manifestPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-      if (manifestPath != null)
-      {
-        const string bootstrapperApplicationData = "BootstrapperApplicationData";
-        const string xmlExtension = ".xml";
-        string bootstrapperDataFilePath = Path.Combine(manifestPath, bootstrapperApplicationData + xmlExtension);
-        XElement bundleManifestData;
-    
-        using (StreamReader reader = new StreamReader(bootstrapperDataFilePath))
-        {
-          string xml = reader.ReadToEnd();
-          XDocument xDoc = XDocument.Parse(xml);
-          bundleManifestData = xDoc.Element(manifestNamespace + bootstrapperApplicationData);
-        }
-    
-        const string wixMbaPrereqInfo = "WixMbaPrereqInformation";
-        IList<BootstrapperAppPrereqPackage> mbaPrereqPackages = bundleManifestData?.Descendants(manifestNamespace + wixMbaPrereqInfo)
-          .Select(x => new BootstrapperAppPrereqPackage(x))
-          .ToList();
-    
-        const string wixPackageProperties = "WixPackageProperties";
-        packages = bundleManifestData?.Descendants(manifestNamespace + wixPackageProperties)
-          .Select(x => new BundlePackage(x))
-          .Where(pkg => mbaPrereqPackages.All(preReq => preReq.PackageId != pkg.GetId()));
-      }
-    
-      BundlePackages = packages != null
-        ? new ReadOnlyCollection<BundlePackage>(packages.ToList())
-        : new ReadOnlyCollection<BundlePackage>(new List<BundlePackage>());
     }
   }
 }

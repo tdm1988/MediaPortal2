@@ -46,11 +46,12 @@ namespace MP2BootstrapperApp
       IDispatcher dispatcher = new DispatcherWrapper();
       
       MessageBox.Show("dd");
-
-      IBootstrapperApplicationModel model = new BootstrapperApplicationModel(this);
+      
+      IList<BundlePackage> bundlePackages = ComputeBundlePackages();
+      IBootstrapperApplicationModel model = new BootstrapperApplicationModel(this, bundlePackages);
 
       MainViewModel viewModel = new MainViewModel(model, dispatcher);
-      InstallWizardView view = new InstallWizardView(viewModel);
+      MainWizardView view = new MainWizardView(viewModel);
 
       model.SetWindowHandle(view);
 
@@ -59,6 +60,43 @@ namespace MP2BootstrapperApp
       view.Show();
       dispatcher.Run();
       Engine.Quit(model.FinalResult);
+    }
+    
+    private IList<BundlePackage> ComputeBundlePackages()
+    {
+      IEnumerable<BundlePackage> packages = new List<BundlePackage>();
+    
+      XNamespace manifestNamespace = "http://schemas.microsoft.com/wix/2010/BootstrapperApplicationData";
+    
+      string manifestPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+      if (manifestPath != null)
+      {
+        const string bootstrapperApplicationData = "BootstrapperApplicationData";
+        const string xmlExtension = ".xml";
+        string bootstrapperDataFilePath = Path.Combine(manifestPath, bootstrapperApplicationData + xmlExtension);
+        XElement bundleManifestData;
+    
+        using (StreamReader reader = new StreamReader(bootstrapperDataFilePath))
+        {
+          string xml = reader.ReadToEnd();
+          XDocument xDoc = XDocument.Parse(xml);
+          bundleManifestData = xDoc.Element(manifestNamespace + bootstrapperApplicationData);
+        }
+    
+        const string wixMbaPrereqInfo = "WixMbaPrereqInformation";
+        IList<BootstrapperAppPrereqPackage> mbaPrereqPackages = bundleManifestData?.Descendants(manifestNamespace + wixMbaPrereqInfo)
+          .Select(x => new BootstrapperAppPrereqPackage(x))
+          .ToList();
+    
+        const string wixPackageProperties = "WixPackageProperties";
+        packages = bundleManifestData?.Descendants(manifestNamespace + wixPackageProperties)
+          .Select(x => new BundlePackage(x))
+          .Where(pkg => mbaPrereqPackages.All(preReq => preReq.PackageId != pkg.GetId()));
+      }
+    
+      return packages != null
+        ? packages.ToList()
+        : new List<BundlePackage>();
     }
   }
 }

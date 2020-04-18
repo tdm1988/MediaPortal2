@@ -31,9 +31,9 @@ namespace MP2BootstrapperApp.Views
   /// <summary>
   /// Interaction logic for InstallWizardBaseView.xaml
   /// </summary>
-  public partial class InstallWizardView : Window
+  public partial class MainWizardView : Window
   {
-    public InstallWizardView(MainViewModel viewModel)
+    public MainWizardView(MainViewModel viewModel)
     {
       InitializeComponent();
       DataContext = viewModel;

@@ -23,6 +23,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Interop;
 using Microsoft.Tools.WindowsInstallerXml.Bootstrapper;
@@ -37,13 +38,16 @@ namespace MP2BootstrapperApp.Models
   {
     private IntPtr _hwnd;
     
-    public BootstrapperApplicationModel(IBootstrapperApp bootstreApplication)
+    public BootstrapperApplicationModel(IBootstrapperApp bootstrapperApplication, IList<BundlePackage> bundlePackages)
     {
-      BootstrapperApplication = bootstreApplication;
+      BootstrapperApplication = bootstrapperApplication;
+      BundlePackages = bundlePackages;
       _hwnd = IntPtr.Zero;
     }
 
     public IBootstrapperApp BootstrapperApplication { get; }
+    
+    public IList<BundlePackage> BundlePackages { get; }
    
     public int FinalResult { get; set; }
 

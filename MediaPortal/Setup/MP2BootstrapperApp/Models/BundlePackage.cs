@@ -40,32 +40,7 @@ namespace MP2BootstrapperApp.Models
     {
       _packageElement = packageElement;
     }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public PackageId GetId()
-    {
-      return Enum.TryParse(_packageElement.Attribute("Package")?.Value, out PackageId packageId) ? packageId : PackageId.Unknown;
-    }
-
-    public string Id
-    {
-      get
-      {
-        PackageId id = Enum.TryParse(_packageElement.Attribute("Package")?.Value, out PackageId packageId) ? packageId : PackageId.Unknown;
-        return id.ToString();
-      }
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public Version GetVersion()
-    {
-      return Version.TryParse(_packageElement.Attribute("Version")?.Value, out Version result) ? result : new Version();
-    }
-
+    
     /// <summary>
     /// 
     /// </summary>
@@ -80,5 +55,21 @@ namespace MP2BootstrapperApp.Models
     /// 
     /// </summary>
     public RequestState RequestedInstallState { get; set; }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public PackageId GetId()
+    {
+      return Enum.TryParse(_packageElement.Attribute("Package")?.Value, out PackageId packageId) ? packageId : PackageId.Unknown;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public Version GetVersion()
+    {
+      return Version.TryParse(_packageElement.Attribute("Version")?.Value, out Version result) ? result : new Version();
+    }
   }
 }

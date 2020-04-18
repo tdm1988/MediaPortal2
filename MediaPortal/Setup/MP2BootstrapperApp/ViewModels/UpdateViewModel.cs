@@ -23,6 +23,7 @@
 #endregion
 
 using System.Windows.Input;
+using Microsoft.Tools.WindowsInstallerXml.Bootstrapper;
 using MP2BootstrapperApp.Commands;
 using MP2BootstrapperApp.Models;
 
@@ -37,12 +38,12 @@ namespace MP2BootstrapperApp.ViewModels
     private ICommand _updateCommand;
     private ICommand _repairCommand;
     private ICommand _uninstallCommand;
-    
 
     public UpdateViewModel(MainViewModel viewModel, IBootstrapperApplicationModel model)
     {
       _viewModel = viewModel;
       _model = model;
+      WireUpEventHandlers();
     }
 
     public string Header
@@ -52,29 +53,27 @@ namespace MP2BootstrapperApp.ViewModels
     
     public ICommand UpdateCommand
     {
-      get { return _updateCommand ?? (_updateCommand = new RelayCommand(o => Update())); }
+      get { return _updateCommand ?? (_updateCommand = new RelayCommand(o => _model.PlanAction(LaunchAction.UpdateReplace))); }
     }
     
     public ICommand RepairCommand
     {
-      get { return _repairCommand ?? (_repairCommand = new RelayCommand(o => Repair())); }
+      get { return _repairCommand ?? (_repairCommand = new RelayCommand(o => _model.PlanAction(LaunchAction.Repair))); }
     }
 
     public ICommand UninstallCommand
     {
-      get { return _uninstallCommand ?? (_uninstallCommand = new RelayCommand(o => Uninstall())); }
+      get { return _uninstallCommand ?? (_uninstallCommand = new RelayCommand(o => _model.PlanAction(LaunchAction.Uninstall))); }
     }
     
-    private void Update()
+    private void WireUpEventHandlers()
     {
-    }
-    
-    private void Repair()
-    {
+      _model.BootstrapperApplication.WrapperDetectRelatedBundle += DetectRelatedBundle;
     }
 
-    private void Uninstall()
+    private void DetectRelatedBundle(object sender, DetectRelatedBundleEventArgs e)
     {
+      _viewModel.Content = _viewModel.UpdateViewModel;
     }
   }
 }
