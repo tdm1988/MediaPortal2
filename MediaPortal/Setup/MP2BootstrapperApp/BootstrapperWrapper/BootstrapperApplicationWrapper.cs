@@ -70,5 +70,11 @@ namespace MP2BootstrapperApp.BootstrapperWrapper
       add { ExecuteProgress += value; }
       remove { ExecuteProgress -= value; }
     }
+
+    public event EventHandler<DetectCompleteEventArgs> WrapperDetectComplete
+    {
+      add { DetectComplete += value; }
+      remove { DetectComplete -= value; }
+    }
   }
 }

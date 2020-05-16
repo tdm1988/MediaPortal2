@@ -40,23 +40,23 @@ namespace MP2BootstrapperApp.ViewModels
 {
   public class MainViewModel : ObservableBase
   {
-    private string _header;
     private InstallState _state;
     private readonly IDispatcher _dispatcher;
     private int _progress;
     private ICommand _cancelCommand;
-
     private IPage _content;
+    private readonly PackageContext _packageContext;
 
     public MainViewModel(IBootstrapperApplicationModel model, IDispatcher dispatcher)
     {
       _dispatcher = dispatcher;
-      InstallViewModel = new InstallViewModel(this, model, dispatcher);
-      UpdateViewModel = new UpdateViewModel(this, model);
-      Content = new InitializeViewModel(); 
+      _packageContext = new PackageContext();
+      InstallViewModel = new InstallViewModel(this, model, _packageContext, dispatcher);
+      UpdateViewModel = new UpdateViewModel(this, model, _packageContext);
+      Content = InstallViewModel;
     }
-    
-    public InstallViewModel InstallViewModel { get; }
+
+    private InstallViewModel InstallViewModel { get; }
     
     public UpdateViewModel UpdateViewModel { get; }
     

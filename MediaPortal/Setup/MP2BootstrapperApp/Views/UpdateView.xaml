@@ -68,7 +68,7 @@
     
     <TextBlock Grid.Column="1" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Path=Header}" />
     
-    <StackPanel Orientation="Vertical" Grid.Column="0" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10">
+    <StackPanel Orientation="Vertical" Grid.Column="0" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center">
       <Button Name="Radio1" Style="{StaticResource ActionButton}" Content="..\resources\InstallTypes\update.png"
               Command="{Binding UpdateCommand}"
               HorizontalAlignment="Center" HorizontalContentAlignment="Center" VerticalAlignment="Top"/>
@@ -76,7 +76,7 @@
              Opacity="{Binding Opacity, ElementName=Radio1, Mode=Default}"/>
     </StackPanel>
 
-    <StackPanel Orientation="Vertical" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10">
+    <StackPanel Orientation="Vertical" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center">
       <Button Name="Radio3" Style="{StaticResource ActionButton}" Content="..\resources\InstallTypes\repair.png"
               Command="{Binding RepairCommand}"
               HorizontalAlignment="Center" HorizontalContentAlignment="Center" VerticalAlignment="Top" />
@@ -84,7 +84,7 @@
              Opacity="{Binding Opacity, ElementName=Radio3, Mode=Default}"/>
     </StackPanel>
 
-    <StackPanel Orientation="Vertical" Grid.Column="2" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10">
+    <StackPanel Orientation="Vertical" Grid.Column="2" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center">
       <Button Name="Radio4" Style="{StaticResource ActionButton}" Content="..\resources\InstallTypes\uninstall.png"
               Command="{Binding UninstallCommand}"
               HorizontalAlignment="Center" HorizontalContentAlignment="Center" VerticalAlignment="Top" />

@@ -17,5 +17,6 @@ namespace MP2BootstrapperApp.BootstrapperWrapper
     event EventHandler<ResolveSourceEventArgs> WrapperResolveSource;
     event EventHandler<CacheAcquireProgressEventArgs> WrapperCacheAcquireProgress;
     event EventHandler<ExecuteProgressEventArgs> WrapperExecuteProgress;
+    event EventHandler<DetectCompleteEventArgs> WrapperDetectComplete;
   }
 }

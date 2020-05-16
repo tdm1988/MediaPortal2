@@ -43,15 +43,14 @@ namespace MP2BootstrapperApp.ViewModels
     private ICommand _installServerCommand;
     private int _cacheProgress;
     private int _executeProgress;
-
     private readonly PackageContext _packageContext;
 
-    public InstallViewModel(MainViewModel viewModel, IBootstrapperApplicationModel model, IDispatcher dispatcher)
+    public InstallViewModel(MainViewModel viewModel, IBootstrapperApplicationModel model, PackageContext packageContext, IDispatcher dispatcher)
     {
       _dispatcher = dispatcher;
       _viewModel = viewModel;
       _model = model;
-      _packageContext = new PackageContext();
+      _packageContext = packageContext;
       WireUpEventHandlers();
     }
 
@@ -111,6 +110,11 @@ namespace MP2BootstrapperApp.ViewModels
         package.RequestedInstallState = RequestState.Present;
       }
       _model.PlanAction(LaunchAction.Install);
+    }
+    
+    private void DetectComplete(object sender, DetectCompleteEventArgs e)
+    {
+
     }
     
     private void ResolveSource(object sender, ResolveSourceEventArgs e)
@@ -196,9 +200,9 @@ namespace MP2BootstrapperApp.ViewModels
         if (bundlePackage != null)
         {
           PackageId bundlePackageId = bundlePackage.GetId();
-          Version installed = _packageContext.GetInstalledVersion(bundlePackageId);
-          bundlePackage.InstalledVersion = installed;
-          bundlePackage.CurrentInstallState = GetInstallState(installed, bundlePackage.GetVersion());
+          Version installedVersion = _packageContext.GetInstalledVersion(bundlePackageId);
+          bundlePackage.InstalledVersion = installedVersion;
+          bundlePackage.CurrentInstallState = GetInstallState(installedVersion, bundlePackage.GetVersion());
         }
       }
     }
@@ -224,6 +228,7 @@ namespace MP2BootstrapperApp.ViewModels
     
     private void WireUpEventHandlers()
     {
+      _model.BootstrapperApplication.WrapperDetectComplete += DetectComplete; 
       _model.BootstrapperApplication.WrapperDetectPackageComplete += DetectedPackageComplete;
       _model.BootstrapperApplication.WrapperPlanComplete += PlanComplete;
       _model.BootstrapperApplication.WrapperApplyComplete += ApplyComplete;
