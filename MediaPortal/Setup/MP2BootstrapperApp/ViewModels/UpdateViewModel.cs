@@ -60,6 +60,27 @@ namespace MP2BootstrapperApp.ViewModels
     {
       get { return _updateCommand ?? (_updateCommand = new RelayCommand(o => Update())); }
     }
+    
+    public ICommand RepairCommand
+    {
+      get { return _repairCommand ?? (_repairCommand = new RelayCommand(o => Repair())); }
+    }
+    
+    public ICommand UninstallCommand
+    {
+      get { return _uninstallCommand ?? (_uninstallCommand = new RelayCommand(o => Uninstall())); }
+    }
+    
+    private void WireUpEventHandlers()
+    {
+      _model.BootstrapperApplication.WrapperDetectRelatedBundle += DetectRelatedBundle;
+    }
+
+    private void DetectRelatedBundle(object sender, DetectRelatedBundleEventArgs e)
+    {
+      _viewModel.Content = _viewModel.UpdateViewModel;
+      _viewModel.State = InstallState.Present;
+    }
 
     private void Update()
     {
@@ -70,54 +91,23 @@ namespace MP2BootstrapperApp.ViewModels
           BundlePackage bundlePackage = _model.BundlePackages.FirstOrDefault(pkg => pkg.GetId() == id);
           if (bundlePackage != null)
           {
-            PackageId bundlePackageId = bundlePackage.GetId();
-            Version installedVersion = _packageContext.GetInstalledVersion(bundlePackageId);
-            PackageState installedPackageState = GetInstallState(installedVersion, bundlePackage.GetVersion());
-            
-            if (IsNotInstalled(installedPackageState))
-            {
-              bundlePackage.RequestedInstallState = RequestState.Present;
-            }
+            SetRequestState(bundlePackage, RequestState.Present);
           }
         }
       }
       _model.PlanAction(LaunchAction.UpdateReplace);
     }
 
-    private bool IsNotInstalled(PackageState packageState)
+    private void SetRequestState(BundlePackage bundlePackage, RequestState requestState)
     {
-      return packageState == PackageState.Unknown || packageState == PackageState.Absent || packageState == PackageState.Obsolete;
-    }
+      PackageId bundlePackageId = bundlePackage.GetId();
+      Version installedVersion = _packageContext.GetInstalledVersion(bundlePackageId);
+      PackageState installedPackageState = GetInstallState(installedVersion, bundlePackage.GetVersion());
 
-    public ICommand RepairCommand
-    {
-      get { return _repairCommand ?? (_repairCommand = new RelayCommand(o => Repair())); }
-    }
-
-    private void Repair()
-    {
-      _model.PlanAction(LaunchAction.Repair);
-    }
-
-    public ICommand UninstallCommand
-    {
-      get { return _uninstallCommand ?? (_uninstallCommand = new RelayCommand(o => Uninstall())); }
-    }
-
-    private void Uninstall()
-    {
-      _model.PlanAction(LaunchAction.Uninstall);
-    }
-
-    private void WireUpEventHandlers()
-    {
-      _model.BootstrapperApplication.WrapperDetectRelatedBundle += DetectRelatedBundle;
-    }
-
-    private void DetectRelatedBundle(object sender, DetectRelatedBundleEventArgs e)
-    {
-      _viewModel.Content = _viewModel.UpdateViewModel;
-      _viewModel.State = InstallState.Present;
+      if (IsMediaPortalPackage(bundlePackageId) && installedPackageState == PackageState.Present)
+      {
+        bundlePackage.RequestedInstallState = requestState;
+      }
     }
     
     private PackageState GetInstallState(Version installed, Version bundled)
@@ -137,6 +127,43 @@ namespace MP2BootstrapperApp.ViewModels
         state = PackageState.Present;
       }
       return state;
+    }
+    
+    private bool IsMediaPortalPackage(PackageId bundlePackageId)
+    {
+      return bundlePackageId == PackageId.MP2Client || bundlePackageId == PackageId.MP2Common || bundlePackageId == PackageId.MP2Server;
+    }
+
+    private void Repair()
+    {
+      foreach (BundlePackage package in _model.BundlePackages)
+      {
+        if (Enum.TryParse(package.GetId().ToString(), out PackageId id))
+        {
+          BundlePackage bundlePackage = _model.BundlePackages.FirstOrDefault(pkg => pkg.GetId() == id);
+          if (bundlePackage != null)
+          {
+            SetRequestState(bundlePackage, RequestState.Repair);
+          }
+        }
+      }
+      _model.PlanAction(LaunchAction.Repair);
+    }
+
+    private void Uninstall()
+    {
+      foreach (BundlePackage package in _model.BundlePackages)
+      {
+        if (Enum.TryParse(package.GetId().ToString(), out PackageId id))
+        {
+          BundlePackage bundlePackage = _model.BundlePackages.FirstOrDefault(pkg => pkg.GetId() == id);
+          if (bundlePackage != null)
+          {
+            SetRequestState(bundlePackage, RequestState.ForceAbsent);
+          }
+        }
+      }
+      _model.PlanAction(LaunchAction.Uninstall);
     }
   }
 }
