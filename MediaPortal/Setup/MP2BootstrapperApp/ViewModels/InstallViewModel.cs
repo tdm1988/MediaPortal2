@@ -41,8 +41,6 @@ namespace MP2BootstrapperApp.ViewModels
     private ICommand _installClientAndServerCommand;
     private ICommand _installClientCommand;
     private ICommand _installServerCommand;
-    private int _cacheProgress;
-    private int _executeProgress;
     private readonly PackageContext _packageContext;
 
     public InstallViewModel(MainViewModel viewModel, IBootstrapperApplicationModel model, PackageContext packageContext, IDispatcher dispatcher)
@@ -121,19 +119,7 @@ namespace MP2BootstrapperApp.ViewModels
     {
       e.Result = !string.IsNullOrEmpty(e.DownloadSource) ? Result.Download : Result.Ok;
     }
-
-    private void CacheAcquireProgress(object sender, CacheAcquireProgressEventArgs e)
-    {
-      _cacheProgress = e.OverallPercentage;
-      _viewModel.Progress = (_cacheProgress + _executeProgress) / 2;
-    }
-
-    private void ExecuteProgress(object sender, ExecuteProgressEventArgs e)
-    {
-      _executeProgress = e.OverallPercentage;
-      _viewModel.Progress = (_cacheProgress + _executeProgress) / 2;
-    }
-
+    
     private void PlanComplete(object sender, PlanCompleteEventArgs e)
     {  
       if (_viewModel.State == InstallState.Canceled)
@@ -146,7 +132,8 @@ namespace MP2BootstrapperApp.ViewModels
 
     private void ApplyBegin(object sender, ApplyBeginEventArgs e)
     {
-      _viewModel.State = InstallState.Applaying;
+      _viewModel.State = InstallState.Applying;
+      _viewModel.Content = _viewModel.ProgressViewModel;
     }
 
     private void ExecutePackageBegin(object sender, ExecutePackageBeginEventArgs e)
@@ -168,6 +155,8 @@ namespace MP2BootstrapperApp.ViewModels
     private void ApplyComplete(object sender, ApplyCompleteEventArgs e)
     {
       _model.FinalResult = e.Status;
+      _viewModel.State = e.Status >= 0 ? InstallState.Applied : InstallState.Failed;
+      _viewModel.Content = _viewModel.CompleteViewModel;
     }
 
     private void PlanPackageBegin(object sender, PlanPackageBeginEventArgs planPackageBeginEventArgs)
@@ -237,8 +226,8 @@ namespace MP2BootstrapperApp.ViewModels
       _model.BootstrapperApplication.WrapperExecutePackageComplete += ExecutePackageComplete;
       _model.BootstrapperApplication.WrapperPlanPackageBegin += PlanPackageBegin;
       _model.BootstrapperApplication.WrapperResolveSource += ResolveSource;
-      _model.BootstrapperApplication.WrapperCacheAcquireProgress += CacheAcquireProgress;
-      _model.BootstrapperApplication.WrapperExecuteProgress += ExecuteProgress;
+
+
     }
   }
 }

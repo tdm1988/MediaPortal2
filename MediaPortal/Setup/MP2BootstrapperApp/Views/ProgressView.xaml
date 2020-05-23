@@ -1,0 +1,32 @@
+﻿<UserControl x:Class="MP2BootstrapperApp.Views.ProgressView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:MP2BootstrapperApp.Views"
+             xmlns:conv="clr-namespace:MP2BootstrapperApp" Margin="10,20,10,0">
+
+  <Grid>
+    
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="*" />
+      <ColumnDefinition Width="*" />
+      <ColumnDefinition Width="*" />
+    </Grid.ColumnDefinitions>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="*" />
+      <RowDefinition Height="*" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+    
+    <TextBlock Grid.Column="1" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Path=Header}" />
+    
+    <StackPanel Orientation="Vertical" Grid.Column="0" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+      <TextBlock  HorizontalAlignment="Center" VerticalAlignment="Center">some animation while installing...</TextBlock>
+    </StackPanel>
+    
+    <ProgressBar Grid.Column="0" Grid.Row="2" HorizontalAlignment="Left" Height="5"  VerticalAlignment="Bottom" 
+                 Width="1000" Foreground="#FFE8641B" Minimum="0" Value="{Binding Path=Progress}" BorderThickness="0"/>
+  </Grid>
+</UserControl>
+

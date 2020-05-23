@@ -5,7 +5,9 @@ namespace MP2BootstrapperApp
     Initializing,
     Present,
     NotPresent,
-    Applaying,
-    Canceled
+    Applying,
+    Canceled,
+    Applied,
+    Failed
   }
 }

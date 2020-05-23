@@ -42,23 +42,27 @@ namespace MP2BootstrapperApp.ViewModels
   {
     private InstallState _state;
     private readonly IDispatcher _dispatcher;
-    private int _progress;
     private ICommand _cancelCommand;
     private IPage _content;
-    private readonly PackageContext _packageContext;
 
     public MainViewModel(IBootstrapperApplicationModel model, IDispatcher dispatcher)
     {
       _dispatcher = dispatcher;
-      _packageContext = new PackageContext();
-      InstallViewModel = new InstallViewModel(this, model, _packageContext, dispatcher);
-      UpdateViewModel = new UpdateViewModel(this, model, _packageContext);
+      PackageContext packageContext = new PackageContext();
+      InstallViewModel = new InstallViewModel(this, model, packageContext, dispatcher);
+      UpdateViewModel = new UpdateViewModel(this, model, packageContext);
+      ProgressViewModel = new ProgressViewModel(model);
+      CompleteViewModel = new CompleteViewModel(this);
       Content = InstallViewModel;
     }
 
     private InstallViewModel InstallViewModel { get; }
     
     public UpdateViewModel UpdateViewModel { get; }
+    
+    public ProgressViewModel ProgressViewModel { get; }
+    
+    public CompleteViewModel CompleteViewModel { get; }
     
     public IPage Content
     {
@@ -78,7 +82,7 @@ namespace MP2BootstrapperApp.ViewModels
       {
         return _cancelCommand ?? (_cancelCommand = new RelayCommand(o =>
         {
-          if (State == InstallState.Applaying)
+          if (State == InstallState.Applying)
           {
             State = InstallState.Canceled;
           }
@@ -88,12 +92,6 @@ namespace MP2BootstrapperApp.ViewModels
           }
         }, o  => State != InstallState.Canceled));
       }
-    }
-
-    public int Progress
-    {
-      get { return _progress; }
-      set { Set(ref _progress, value); }
     }
   }
 }
