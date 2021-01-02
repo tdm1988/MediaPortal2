@@ -35,6 +35,14 @@
         <Command x:Key="Menu_Command" Source="{StaticResource MediaModel}" Path="Select"
             Parameters="{LateBoundValue BindingValue={Binding}}"/>
       </ListView.Resources>
+      <ListView.Margin>
+          <MultiBinding Converter="{StaticResource ExpressionMultiValueConverter}" ConverterParameter="{}{0} == {LayoutType}.{GridLayout} &amp;&amp; {1} ? {2} : {3}">
+            <Binding Source="{StaticResource ViewModeModel}" Path="LayoutType"/>
+            <Binding Source="{StaticResource SkinSettingsModel}" Path="![Nereus].EnableGridDetails"/>
+            <Binding Source="0,0,35,0"/>
+            <Binding Source="0,0,0,0"/>
+          </MultiBinding>
+      </ListView.Margin>
     </ListView>
 
     <DockPanel DataContext="{Binding Source={Model 4CDD601F-E280-43b9-AD0A-6D7B2403C856},Path=NavigationData.CurrentScreenData}"
@@ -83,7 +91,7 @@
     </StackPanel>
 
     <!---GridView w/o Details-->
-    <Border HorizontalAlignment="Stretch" VerticalAlignment="Bottom" BorderThickness="0" Height="100" Width="{SkinWidth}" Margin="-33,0,0,-30">
+    <Border HorizontalAlignment="Stretch" VerticalAlignment="Bottom" BorderThickness="0" Height="100" Width="{SkinWidth}" Margin="-34,0,0,-30">
       <Border.Background>
         <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
           <GradientStop Color="#00000000" Offset="0" />

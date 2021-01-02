@@ -34,8 +34,8 @@
   <string name="Nereus.Configuration.GridViewType.Poster">Posters</string>
   <string name="Nereus.Configuration.GridViewType.Banner">Banners</string>
   <string name="Nereus.Configuration.GridViewType.Thumbnail">Thumbnails</string>
-  <string name="Nereus.Configuration.EnableMediaItemDetailsView">Enable Media Item Details View</string>
-  <string name="Nereus.Configuration.EnableMediaItemDetailsView.Help">Whether to show media item details instead of playing media item directly.</string>
+  <string name="Nereus.Configuration.EnableMediaItemDetailsView">Enable transparent backgrounds in grid view</string>
+  <string name="Nereus.Configuration.EnableMediaItemDetailsView.Help">Whether to show unfocused media items semi-transparent to see underlayed FanArt.</string>
 
   <string name="Nereus.Home.LatestAdded">Latest Added</string>
   <string name="Nereus.Home.LatestPlayed">Latest Played</string>

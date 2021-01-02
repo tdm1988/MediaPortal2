@@ -114,7 +114,7 @@
     <Compile Include="Settings\Configuration\EnableLoopScrollingConfiguration.cs" />
     <Compile Include="Settings\Configuration\EnableHelpTextConfiguration.cs" />
     <Compile Include="Settings\Configuration\EnableCertificationLogosConfiguration.cs" />
-    <Compile Include="Settings\Configuration\EnableMediaItemDetailsViewConfiguration.cs" />
+    <Compile Include="Settings\Configuration\EnableTransparentGridBackgroundConfiguration.cs" />
     <Compile Include="Settings\Configuration\EnableWatchedFlagsConfiguration.cs" />
     <Compile Include="Settings\Configuration\EnableFanartConfiguration.cs" />
     <Compile Include="Settings\Configuration\FanartOverlayOpacityConfiguration.cs" />

@@ -168,11 +168,11 @@
         HelpText="[Nereus.Configuration.SeasonGridViewType.Help]"
         ClassName="MediaPortal.UiComponents.Nereus.Settings.Configuration.SeasonGridViewTypeConfiguration"/>
 
-    <!--ConfigSetting
-        Id="NereusEnableMediaItemDetailsView"
-        Text="[Nereus.Configuration.EnableMediaItemDetailsView]"
-        HelpText="[Nereus.Configuration.EnableMediaItemDetailsView.Help]"
-        ClassName="MediaPortal.UiComponents.Nereus.Settings.Configuration.EnableMediaItemDetailsViewConfiguration"/-->
+    <ConfigSetting
+        Id="NereusEnableTransparentGridBackground"
+        Text="[Nereus.Configuration.EnableTransparentGridBackground]"
+        HelpText="[Nereus.Configuration.EnableTransparentGridBackground.Help]"
+        ClassName="MediaPortal.UiComponents.Nereus.Settings.Configuration.EnableTransparentGridBackgroundConfiguration"/>
   </Register>
 
 </Plugin>

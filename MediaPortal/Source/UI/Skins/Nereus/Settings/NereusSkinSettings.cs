@@ -69,7 +69,7 @@ namespace MediaPortal.UiComponents.Nereus.Settings
     public GridViewType SeasonGridViewType { get; set; }
 
     [Setting(SettingScope.User, false)]
-    public bool EnableMediaItemDetailsView { get; set; }
+    public bool EnableTransparentGridBackground { get; set; }
 
     [Setting(SettingScope.User, true)]
     public bool EnableAgeCertificationLogos { get; set; }

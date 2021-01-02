@@ -7,10 +7,10 @@
   <ResourceWrapper x:Key="THUMBNAIL_GRID_WIDTH" Resource="275"/>
   <ResourceWrapper x:Key="THUMBNAIL_GRID_HEIGHT" Resource="168"/>
 
-  <ResourceWrapper x:Key="BANNER_GRID_WIDTH" Resource="417"/>
-  <ResourceWrapper x:Key="BANNER_GRID_HEIGHT" Resource="95"/>
+  <ResourceWrapper x:Key="BANNER_GRID_WIDTH" Resource="427"/>
+  <ResourceWrapper x:Key="BANNER_GRID_HEIGHT" Resource="100"/>
 
-  <ResourceWrapper x:Key="POSTER_GRID_WIDTH" Resource="162.5"/>
+  <ResourceWrapper x:Key="POSTER_GRID_WIDTH" Resource="161"/>
   <ResourceWrapper x:Key="POSTER_GRID_HEIGHT" Resource="250"/>
 
   <ResourceWrapper x:Key="AUDIO_GRID_WIDTH" Resource="205"/>

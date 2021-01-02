@@ -32,9 +32,9 @@ using System.Threading.Tasks;
 
 namespace MediaPortal.UiComponents.Nereus.Settings.Configuration
 {
-  public class EnableMediaItemDetailsViewConfiguration : YesNo, IDisposable
+  public class EnableTransparentGridBackgroundConfiguration : YesNo, IDisposable
   {
-    public EnableMediaItemDetailsViewConfiguration()
+    public EnableTransparentGridBackgroundConfiguration()
     {
       SkinChangeMonitor.Instance.RegisterConfiguration(NereusSkinSettings.SKIN_NAME, this);
     }
@@ -42,14 +42,14 @@ namespace MediaPortal.UiComponents.Nereus.Settings.Configuration
     public override void Load()
     {
       base.Load();
-      _yes = SettingsManager.Load<NereusSkinSettings>().EnableMediaItemDetailsView;
+      _yes = SettingsManager.Load<NereusSkinSettings>().EnableTransparentGridBackground;
     }
 
     public override void Save()
     {
       base.Save();
       var settings = SettingsManager.Load<NereusSkinSettings>();
-      settings.EnableMediaItemDetailsView = _yes;
+      settings.EnableTransparentGridBackground = _yes;
       SettingsManager.Save(settings);
     }
 
