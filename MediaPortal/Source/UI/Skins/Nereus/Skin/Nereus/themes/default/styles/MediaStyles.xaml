@@ -1458,20 +1458,27 @@
         <RowDefinition Height="*"/>
       </Grid.RowDefinitions>
 
-      <Grid x:Name="PosterGrid" Width="{StaticResource POSTER_GRID_WIDTH}" Height="{StaticResource POSTER_GRID_HEIGHT}">
+      <Grid x:Name="PosterGrid" Height="{StaticResource POSTER_GRID_HEIGHT}">
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
           <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-
-        <Grid.Triggers>
-          <DataTrigger Binding="{Binding Source={StaticResource SkinSettingsModel},Path=[Nereus].EnableTransparentGridBackground}" Value="True">
-            <Setter TargetName="PosterGrid" Property="Width" Value="174"/>
-            <Setter TargetName="PosterGrid" Property="Margin" Value="-7"/>
-          </DataTrigger>
-        </Grid.Triggers>
+        <Grid.Width>
+          <MultiBinding Converter="{StaticResource ExpressionMultiValueConverter}" ConverterParameter="{}{0} ? {1} : {2}">
+            <Binding Source="{StaticResource SkinSettingsModel}" Path="[Nereus].EnableTransparentGridBackground"/>
+            <Binding Source="174"/>
+            <Binding Source="{StaticResource POSTER_GRID_WIDTH}"/>
+          </MultiBinding>
+        </Grid.Width>
+        <Grid.Margin>
+          <MultiBinding Converter="{StaticResource ExpressionMultiValueConverter}" ConverterParameter="{}{0} ? {1} : {2}">
+            <Binding Source="{StaticResource SkinSettingsModel}" Path="[Nereus].EnableTransparentGridBackground"/>
+            <Binding Source="-7"/>
+            <Binding Source="0"/>
+          </MultiBinding>
+        </Grid.Margin>
 
         <Grid.IsVisible>
           <Binding Source="{StaticResource SkinSettingsModel}" Path="[Nereus].SeriesGridViewType"
@@ -1534,21 +1541,28 @@
                 IsVisible="{Binding Source={StaticResource SkinSettingsModel}, Path=[Nereus].EnableTransparentGridBackground}"/>
       </Grid>
 
-      <Grid x:Name="BannerGrid" Width="{StaticResource BANNER_GRID_WIDTH}" Height="{StaticResource BANNER_GRID_HEIGHT}">
+      <Grid x:Name="BannerGrid" Height="{StaticResource BANNER_GRID_HEIGHT}">
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
           <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-
-        <Grid.Triggers>
-          <DataTrigger Binding="{Binding Source={StaticResource SkinSettingsModel},Path=[Nereus].EnableTransparentGridBackground}" Value="True">
-            <Setter TargetName="BannerGrid" Property="Width" Value="434"/>
-            <Setter TargetName="BannerGrid" Property="Margin" Value="-7"/>
-          </DataTrigger>
-        </Grid.Triggers>
-
+        <Grid.Width>
+          <MultiBinding Converter="{StaticResource ExpressionMultiValueConverter}" ConverterParameter="{}{0} ? {1} : {2}">
+            <Binding Source="{StaticResource SkinSettingsModel}" Path="[Nereus].EnableTransparentGridBackground"/>
+            <Binding Source="434"/>
+            <Binding Source="{StaticResource BANNER_GRID_WIDTH}"/>
+          </MultiBinding>
+        </Grid.Width>
+        <Grid.Margin>
+          <MultiBinding Converter="{StaticResource ExpressionMultiValueConverter}" ConverterParameter="{}{0} ? {1} : {2}">
+            <Binding Source="{StaticResource SkinSettingsModel}" Path="[Nereus].EnableTransparentGridBackground"/>
+            <Binding Source="-7"/>
+            <Binding Source="0"/>
+          </MultiBinding>
+        </Grid.Margin>
+        
         <Grid.IsVisible>
           <Binding Source="{StaticResource SkinSettingsModel}" Path="[Nereus].SeriesGridViewType"
                    Converter="{StaticResource ExpressionValueConverter}" ConverterParameter="{}{0} == {GridViewType}.{Banner}"/>
@@ -1607,21 +1621,28 @@
                 IsVisible="{Binding Source={StaticResource SkinSettingsModel}, Path=[Nereus].EnableTransparentGridBackground}"/>
       </Grid>
 
-      <Grid x:Name="ThumbnailGrid" Width="{StaticResource THUMBNAIL_GRID_WIDTH}" Height="{StaticResource THUMBNAIL_GRID_HEIGHT}">
+      <Grid x:Name="ThumbnailGrid" Height="{StaticResource THUMBNAIL_GRID_HEIGHT}">
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
           <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-
-        <Grid.Triggers>
-          <DataTrigger Binding="{Binding Source={StaticResource SkinSettingsModel},Path=[Nereus].EnableTransparentGridBackground}" Value="True">
-            <Setter TargetName="ThumbnailGrid" Property="Width" Value="288"/>
-            <Setter TargetName="ThumbnailGrid" Property="Margin" Value="-7"/>
-          </DataTrigger>
-        </Grid.Triggers>
-
+        <Grid.Width>
+          <MultiBinding Converter="{StaticResource ExpressionMultiValueConverter}" ConverterParameter="{}{0} ? {1} : {2}">
+            <Binding Source="{StaticResource SkinSettingsModel}" Path="[Nereus].EnableTransparentGridBackground"/>
+            <Binding Source="288"/>
+            <Binding Source="{StaticResource THUMBNAIL_GRID_WIDTH}"/>
+          </MultiBinding>
+        </Grid.Width>
+        <Grid.Margin>
+          <MultiBinding Converter="{StaticResource ExpressionMultiValueConverter}" ConverterParameter="{}{0} ? {1} : {2}">
+            <Binding Source="{StaticResource SkinSettingsModel}" Path="[Nereus].EnableTransparentGridBackground"/>
+            <Binding Source="-7"/>
+            <Binding Source="0"/>
+          </MultiBinding>
+        </Grid.Margin>
+        
         <Grid.IsVisible>
           <Binding Source="{StaticResource SkinSettingsModel}" Path="[Nereus].SeriesGridViewType"
                    Converter="{StaticResource ExpressionValueConverter}" ConverterParameter="{}{0} == {GridViewType}.{Thumbnail}"/>
@@ -1819,21 +1840,28 @@
         <RowDefinition Height="*"/>
       </Grid.RowDefinitions>
 
-      <Grid x:Name="PosterGrid" Width="{StaticResource POSTER_GRID_WIDTH}" Height="{StaticResource POSTER_GRID_HEIGHT}">
+      <Grid x:Name="PosterGrid" Height="{StaticResource POSTER_GRID_HEIGHT}">
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
           <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-
-        <Grid.Triggers>
-          <DataTrigger Binding="{Binding Source={StaticResource SkinSettingsModel},Path=[Nereus].EnableTransparentGridBackground}" Value="True">
-            <Setter TargetName="PosterGrid" Property="Width" Value="174"/>
-            <Setter TargetName="PosterGrid" Property="Margin" Value="-7"/>
-          </DataTrigger>
-        </Grid.Triggers>
-
+        <Grid.Width>
+          <MultiBinding Converter="{StaticResource ExpressionMultiValueConverter}" ConverterParameter="{}{0} ? {1} : {2}">
+            <Binding Source="{StaticResource SkinSettingsModel}" Path="[Nereus].EnableTransparentGridBackground"/>
+            <Binding Source="174"/>
+            <Binding Source="{StaticResource POSTER_GRID_WIDTH}"/>
+          </MultiBinding>
+        </Grid.Width>
+        <Grid.Margin>
+          <MultiBinding Converter="{StaticResource ExpressionMultiValueConverter}" ConverterParameter="{}{0} ? {1} : {2}">
+            <Binding Source="{StaticResource SkinSettingsModel}" Path="[Nereus].EnableTransparentGridBackground"/>
+            <Binding Source="-7"/>
+            <Binding Source="0"/>
+          </MultiBinding>
+        </Grid.Margin>
+        
         <Grid.IsVisible>
           <Binding Source="{StaticResource SkinSettingsModel}" Path="[Nereus].SeasonGridViewType"
                    Converter="{StaticResource ExpressionValueConverter}" ConverterParameter="{}{0} == {GridViewType}.{Poster}"/>
@@ -1892,20 +1920,27 @@
                 IsVisible="{Binding Source={StaticResource SkinSettingsModel}, Path=[Nereus].EnableTransparentGridBackground}"/>
       </Grid>
 
-      <Grid x:Name="BannerGrid" Width="{StaticResource BANNER_GRID_WIDTH}" Height="{StaticResource BANNER_GRID_HEIGHT}">
+      <Grid x:Name="BannerGrid" Height="{StaticResource BANNER_GRID_HEIGHT}">
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
           <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-
-        <Grid.Triggers>
-          <DataTrigger Binding="{Binding Source={StaticResource SkinSettingsModel},Path=[Nereus].EnableTransparentGridBackground}" Value="True">
-            <Setter TargetName="BannerGrid" Property="Width" Value="434"/>
-            <Setter TargetName="BannerGrid" Property="Margin" Value="-7"/>
-          </DataTrigger>
-        </Grid.Triggers>
+        <Grid.Width>
+          <MultiBinding Converter="{StaticResource ExpressionMultiValueConverter}" ConverterParameter="{}{0} ? {1} : {2}">
+            <Binding Source="{StaticResource SkinSettingsModel}" Path="[Nereus].EnableTransparentGridBackground"/>
+            <Binding Source="434"/>
+            <Binding Source="{StaticResource BANNER_GRID_WIDTH}"/>
+          </MultiBinding>
+        </Grid.Width>
+        <Grid.Margin>
+          <MultiBinding Converter="{StaticResource ExpressionMultiValueConverter}" ConverterParameter="{}{0} ? {1} : {2}">
+            <Binding Source="{StaticResource SkinSettingsModel}" Path="[Nereus].EnableTransparentGridBackground"/>
+            <Binding Source="-7"/>
+            <Binding Source="0"/>
+          </MultiBinding>
+        </Grid.Margin>
 
         <Grid.IsVisible>
           <Binding Source="{StaticResource SkinSettingsModel}" Path="[Nereus].SeasonGridViewType"
@@ -1959,21 +1994,28 @@
                 IsVisible="{Binding Source={StaticResource SkinSettingsModel}, Path=[Nereus].EnableTransparentGridBackground}"/>
       </Grid>
 
-      <Grid x:Name="ThumbnailGrid" Width="{StaticResource THUMBNAIL_GRID_WIDTH}" Height="{StaticResource THUMBNAIL_GRID_HEIGHT}">
+      <Grid x:Name="ThumbnailGrid" Height="{StaticResource THUMBNAIL_GRID_HEIGHT}">
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
           <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-
-        <Grid.Triggers>
-          <DataTrigger Binding="{Binding Source={StaticResource SkinSettingsModel},Path=[Nereus].EnableTransparentGridBackground}" Value="True">
-            <Setter TargetName="ThumbnailGrid" Property="Width" Value="288"/>
-            <Setter TargetName="ThumbnailGrid" Property="Margin" Value="-7"/>
-          </DataTrigger>
-        </Grid.Triggers>
-
+        <Grid.Width>
+          <MultiBinding Converter="{StaticResource ExpressionMultiValueConverter}" ConverterParameter="{}{0} ? {1} : {2}">
+            <Binding Source="{StaticResource SkinSettingsModel}" Path="[Nereus].EnableTransparentGridBackground"/>
+            <Binding Source="288"/>
+            <Binding Source="{StaticResource THUMBNAIL_GRID_WIDTH}"/>
+          </MultiBinding>
+        </Grid.Width>
+        <Grid.Margin>
+          <MultiBinding Converter="{StaticResource ExpressionMultiValueConverter}" ConverterParameter="{}{0} ? {1} : {2}">
+            <Binding Source="{StaticResource SkinSettingsModel}" Path="[Nereus].EnableTransparentGridBackground"/>
+            <Binding Source="-7"/>
+            <Binding Source="0"/>
+          </MultiBinding>
+        </Grid.Margin>
+        
         <Grid.IsVisible>
           <Binding Source="{StaticResource SkinSettingsModel}" Path="[Nereus].SeasonGridViewType"
                    Converter="{StaticResource ExpressionValueConverter}" ConverterParameter="{}{0} == {GridViewType}.{Thumbnail}"/>
@@ -2276,20 +2318,27 @@
         <RowDefinition Height="*"/>
       </Grid.RowDefinitions>
 
-      <Grid x:Name="PosterGrid" Width="{StaticResource POSTER_GRID_WIDTH}" Height="{StaticResource POSTER_GRID_HEIGHT}">
+      <Grid x:Name="PosterGrid" Height="{StaticResource POSTER_GRID_HEIGHT}">
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
           <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-
-        <Grid.Triggers>
-          <DataTrigger Binding="{Binding Source={StaticResource SkinSettingsModel},Path=[Nereus].EnableTransparentGridBackground}" Value="True">
-            <Setter TargetName="PosterGrid" Property="Width" Value="174"/>
-            <Setter TargetName="PosterGrid" Property="Margin" Value="-7"/>
-          </DataTrigger>
-        </Grid.Triggers>
+        <Grid.Width>
+          <MultiBinding Converter="{StaticResource ExpressionMultiValueConverter}" ConverterParameter="{}{0} ? {1} : {2}">
+            <Binding Source="{StaticResource SkinSettingsModel}" Path="[Nereus].EnableTransparentGridBackground"/>
+            <Binding Source="174"/>
+            <Binding Source="{StaticResource POSTER_GRID_WIDTH}"/>
+          </MultiBinding>
+        </Grid.Width>
+        <Grid.Margin>
+          <MultiBinding Converter="{StaticResource ExpressionMultiValueConverter}" ConverterParameter="{}{0} ? {1} : {2}">
+            <Binding Source="{StaticResource SkinSettingsModel}" Path="[Nereus].EnableTransparentGridBackground"/>
+            <Binding Source="-7"/>
+            <Binding Source="0"/>
+          </MultiBinding>
+        </Grid.Margin>
 
         <Grid.IsVisible>
           <Binding Source="{StaticResource SkinSettingsModel}" Path="[Nereus].MovieGridViewType"
@@ -2350,21 +2399,28 @@
                 IsVisible="{Binding Source={StaticResource SkinSettingsModel}, Path=[Nereus].EnableTransparentGridBackground}"/>
       </Grid>
 
-      <Grid x:Name="BannerGrid" Width="{StaticResource BANNER_GRID_WIDTH}" Height="{StaticResource BANNER_GRID_HEIGHT}">
+      <Grid x:Name="BannerGrid" Height="{StaticResource BANNER_GRID_HEIGHT}">
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
           <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-
-        <Grid.Triggers>
-          <DataTrigger Binding="{Binding Source={StaticResource SkinSettingsModel},Path=[Nereus].EnableTransparentGridBackground}" Value="True">
-            <Setter TargetName="BannerGrid" Property="Width" Value="434"/>
-            <Setter TargetName="BannerGrid" Property="Margin" Value="-7"/>
-          </DataTrigger>
-        </Grid.Triggers>
-
+        <Grid.Width>
+          <MultiBinding Converter="{StaticResource ExpressionMultiValueConverter}" ConverterParameter="{}{0} ? {1} : {2}">
+            <Binding Source="{StaticResource SkinSettingsModel}" Path="[Nereus].EnableTransparentGridBackground"/>
+            <Binding Source="434"/>
+            <Binding Source="{StaticResource BANNER_GRID_WIDTH}"/>
+          </MultiBinding>
+        </Grid.Width>
+        <Grid.Margin>
+          <MultiBinding Converter="{StaticResource ExpressionMultiValueConverter}" ConverterParameter="{}{0} ? {1} : {2}">
+            <Binding Source="{StaticResource SkinSettingsModel}" Path="[Nereus].EnableTransparentGridBackground"/>
+            <Binding Source="-7"/>
+            <Binding Source="0"/>
+          </MultiBinding>
+        </Grid.Margin>
+        
         <Grid.IsVisible>
           <Binding Source="{StaticResource SkinSettingsModel}" Path="[Nereus].MovieGridViewType"
                    Converter="{StaticResource ExpressionValueConverter}" ConverterParameter="{}{0} == {GridViewType}.{Banner}"/>
@@ -2423,21 +2479,28 @@
                 IsVisible="{Binding Source={StaticResource SkinSettingsModel}, Path=[Nereus].EnableTransparentGridBackground}"/>
       </Grid>
 
-      <Grid x:Name="ThumbnailGrid" Width="{StaticResource THUMBNAIL_GRID_WIDTH}" Height="{StaticResource THUMBNAIL_GRID_HEIGHT}">
+      <Grid x:Name="ThumbnailGrid" Height="{StaticResource THUMBNAIL_GRID_HEIGHT}">
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
           <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-
-        <Grid.Triggers>
-          <DataTrigger Binding="{Binding Source={StaticResource SkinSettingsModel},Path=[Nereus].EnableTransparentGridBackground}" Value="True">
-            <Setter TargetName="ThumbnailGrid" Property="Width" Value="288"/>
-            <Setter TargetName="ThumbnailGrid" Property="Margin" Value="-7"/>
-          </DataTrigger>
-        </Grid.Triggers>
-
+        <Grid.Width>
+          <MultiBinding Converter="{StaticResource ExpressionMultiValueConverter}" ConverterParameter="{}{0} ? {1} : {2}">
+            <Binding Source="{StaticResource SkinSettingsModel}" Path="[Nereus].EnableTransparentGridBackground"/>
+            <Binding Source="288"/>
+            <Binding Source="{StaticResource THUMBNAIL_GRID_WIDTH}"/>
+          </MultiBinding>
+        </Grid.Width>
+        <Grid.Margin>
+          <MultiBinding Converter="{StaticResource ExpressionMultiValueConverter}" ConverterParameter="{}{0} ? {1} : {2}">
+            <Binding Source="{StaticResource SkinSettingsModel}" Path="[Nereus].EnableTransparentGridBackground"/>
+            <Binding Source="-7"/>
+            <Binding Source="0"/>
+          </MultiBinding>
+        </Grid.Margin>
+        
         <Grid.IsVisible>
           <Binding Source="{StaticResource SkinSettingsModel}" Path="[Nereus].MovieGridViewType"
                    Converter="{StaticResource ExpressionValueConverter}" ConverterParameter="{}{0} == {GridViewType}.{Thumbnail}"/>
@@ -2627,20 +2690,28 @@
         <RowDefinition Height="*"/>
       </Grid.RowDefinitions>
       
-      <Grid x:Name="PosterGrid" Width="{StaticResource POSTER_GRID_WIDTH}" Height="{StaticResource POSTER_GRID_HEIGHT}">
+      <Grid x:Name="PosterGrid" Height="{StaticResource POSTER_GRID_HEIGHT}">
+        <Grid.Width>
+          <MultiBinding Converter="{StaticResource ExpressionMultiValueConverter}" ConverterParameter="{}{0} ? {1} : {2}">
+            <Binding Source="{StaticResource SkinSettingsModel}" Path="[Nereus].EnableTransparentGridBackground"/>
+            <Binding Source="174"/>
+            <Binding Source="{StaticResource POSTER_GRID_WIDTH}"/>
+          </MultiBinding>
+        </Grid.Width>
+        <Grid.Margin>
+          <MultiBinding Converter="{StaticResource ExpressionMultiValueConverter}" ConverterParameter="{}{0} ? {1} : {2}">
+            <Binding Source="{StaticResource SkinSettingsModel}" Path="[Nereus].EnableTransparentGridBackground"/>
+            <Binding Source="-7"/>
+            <Binding Source="0"/>
+          </MultiBinding>
+        </Grid.Margin>
+        
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
           <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-
-        <Grid.Triggers>
-          <DataTrigger Binding="{Binding Source={StaticResource SkinSettingsModel},Path=[Nereus].EnableTransparentGridBackground}" Value="True">
-            <Setter TargetName="PosterGrid" Property="Width" Value="174"/>
-            <Setter TargetName="PosterGrid" Property="Margin" Value="-7"/>
-          </DataTrigger>
-        </Grid.Triggers>
         
         <Grid.IsVisible>
           <Binding Source="{StaticResource SkinSettingsModel}" Path="[Nereus].MovieGridViewType"
@@ -2704,20 +2775,27 @@
                 IsVisible="{Binding Source={StaticResource SkinSettingsModel}, Path=[Nereus].EnableTransparentGridBackground}"/>
       </Grid>
 
-      <Grid x:Name="BannerGrid" Width="{StaticResource BANNER_GRID_WIDTH}" Height="{StaticResource BANNER_GRID_HEIGHT}">
+      <Grid x:Name="BannerGrid" Height="{StaticResource BANNER_GRID_HEIGHT}">
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
           <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-
-        <Grid.Triggers>
-          <DataTrigger Binding="{Binding Source={StaticResource SkinSettingsModel},Path=[Nereus].EnableTransparentGridBackground}" Value="True">
-            <Setter TargetName="BannerGrid" Property="Width" Value="434"/>
-            <Setter TargetName="BannerGrid" Property="Margin" Value="-7"/>
-          </DataTrigger>
-        </Grid.Triggers>
+        <Grid.Width>
+          <MultiBinding Converter="{StaticResource ExpressionMultiValueConverter}" ConverterParameter="{}{0} ? {1} : {2}">
+            <Binding Source="{StaticResource SkinSettingsModel}" Path="[Nereus].EnableTransparentGridBackground"/>
+            <Binding Source="434"/>
+            <Binding Source="{StaticResource BANNER_GRID_WIDTH}"/>
+          </MultiBinding>
+        </Grid.Width>
+        <Grid.Margin>
+          <MultiBinding Converter="{StaticResource ExpressionMultiValueConverter}" ConverterParameter="{}{0} ? {1} : {2}">
+            <Binding Source="{StaticResource SkinSettingsModel}" Path="[Nereus].EnableTransparentGridBackground"/>
+            <Binding Source="-7"/>
+            <Binding Source="0"/>
+          </MultiBinding>
+        </Grid.Margin>
 
         <Grid.IsVisible>
           <Binding Source="{StaticResource SkinSettingsModel}" Path="[Nereus].MovieGridViewType"
@@ -2779,20 +2857,27 @@
                 IsVisible="{Binding Source={StaticResource SkinSettingsModel}, Path=[Nereus].EnableTransparentGridBackground}"/>
       </Grid>
 
-      <Grid x:Name="ThumbnailGrid" Width="{StaticResource THUMBNAIL_GRID_WIDTH}" Height="{StaticResource THUMBNAIL_GRID_HEIGHT}">
+      <Grid x:Name="ThumbnailGrid" Height="{StaticResource THUMBNAIL_GRID_HEIGHT}">
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
           <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-
-        <Grid.Triggers>
-          <DataTrigger Binding="{Binding Source={StaticResource SkinSettingsModel},Path=[Nereus].EnableTransparentGridBackground}" Value="True">
-            <Setter TargetName="ThumbnailGrid" Property="Width" Value="288"/>
-            <Setter TargetName="ThumbnailGrid" Property="Margin" Value="-7"/>
-          </DataTrigger>
-        </Grid.Triggers>
+        <Grid.Width>
+          <MultiBinding Converter="{StaticResource ExpressionMultiValueConverter}" ConverterParameter="{}{0} ? {1} : {2}">
+            <Binding Source="{StaticResource SkinSettingsModel}" Path="[Nereus].EnableTransparentGridBackground"/>
+            <Binding Source="288"/>
+            <Binding Source="{StaticResource THUMBNAIL_GRID_WIDTH}"/>
+          </MultiBinding>
+        </Grid.Width>
+        <Grid.Margin>
+          <MultiBinding Converter="{StaticResource ExpressionMultiValueConverter}" ConverterParameter="{}{0} ? {1} : {2}">
+            <Binding Source="{StaticResource SkinSettingsModel}" Path="[Nereus].EnableTransparentGridBackground"/>
+            <Binding Source="-7"/>
+            <Binding Source="0"/>
+          </MultiBinding>
+        </Grid.Margin>
 
         <Grid.IsVisible>
           <Binding Source="{StaticResource SkinSettingsModel}" Path="[Nereus].MovieGridViewType"
@@ -4439,17 +4524,12 @@
               <ItemsPresenter.HorizontalAlignment>
                 <MultiBinding Converter="{StaticResource ExpressionMultiValueConverter}" ConverterParameter="{}{0} == {LayoutType}.{GridLayout} ? {1} : {2}">
                   <Binding Source="{StaticResource ViewModeModel}" Path="LayoutType"/>
-                  <Binding Source="Center"/> <!--Grid-->
-                  <Binding Source="Stretch"/> <!--List & Cover-->
+                  <Binding Source="Center"/>
+                  <!--Grid-->
+                  <Binding Source="Stretch"/>
+                  <!--List & Cover-->
                 </MultiBinding>
               </ItemsPresenter.HorizontalAlignment>
-              <!--ItemsPresenter.MinWidth>
-                <MultiBinding Converter="{StaticResource ExpressionMultiValueConverter}" ConverterParameter="{}({0} == {LayoutType}.{GridLayout} &amp;&amp; {1}) ? ({2}*0.58) : ({2}*0.95)">
-                  <Binding Source="{StaticResource ViewModeModel}" Path="LayoutType"/>
-                  <Binding Source="{StaticResource SkinSettingsModel}" Path="[Nereus].EnableGridDetails"/>
-                  <Binding Source="{SkinWidth}"/>
-                </MultiBinding>
-              </ItemsPresenter.MinWidth-->
             </ItemsPresenter>
           </ScrollViewer>
         </ControlTemplate>
