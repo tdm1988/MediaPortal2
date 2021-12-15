@@ -209,6 +209,7 @@ namespace MediaPortal.UiComponents.Media.Models.NavigationModel
 
       LayoutType nextLayoutType = nextScreenConfig?.LayoutType ?? LayoutType.GridLayout;
       LayoutSize nextLayoutSize = nextScreenConfig?.LayoutSize ?? LayoutSize.Large;
+      MediaDictionary<string, string> nextProperties = nextScreenConfig.AdditionalProperties ?? new MediaDictionary<string, string>();
 
       navigationData = new NavigationData(null, viewName, MediaNavigationRootState,
         MediaNavigationRootState, rootViewSpecification, nextScreen, _availableScreens, nextSortingMode, nextGroupingMode)
@@ -217,7 +218,7 @@ namespace MediaPortal.UiComponents.Media.Models.NavigationModel
         AvailableGroupings = _availableGroupings,
         LayoutType = nextLayoutType,
         LayoutSize = nextLayoutSize,
-        AdditionalProperties = nextScreenConfig.AdditionalProperties
+        AdditionalProperties = nextProperties
       };
       mediaNavigationMode = MediaNavigationMode;
     }
