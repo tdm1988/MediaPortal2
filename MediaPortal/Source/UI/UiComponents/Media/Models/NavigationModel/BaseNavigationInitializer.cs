@@ -135,7 +135,7 @@ namespace MediaPortal.UiComponents.Media.Models.NavigationModel
         {
           //Use the configured root screen to load the next screen from the hierarchy
           //and remove it from the list of available screens
-          AbstractScreenData configRoot = config.RootScreenType != null ? _availableScreens.FirstOrDefault(s => s?.GetType() == config.RootScreenType) : null;
+          AbstractScreenData configRoot = config.RootScreenType != null ? _availableScreens.FirstOrDefault(s => s.GetType() == config.RootScreenType) : null;
           if (configRoot != null)
           {
             viewName = configRoot.GetType().ToString();
@@ -143,7 +143,7 @@ namespace MediaPortal.UiComponents.Media.Models.NavigationModel
           }
 
           //Use the configured default screen if there is no saved screen hierarchy
-          AbstractScreenData configDefault = config.DefaultScreenType != null ? _availableScreens.FirstOrDefault(s => s?.GetType() == config.DefaultScreenType) : null;
+          AbstractScreenData configDefault = config.DefaultScreenType != null ? _availableScreens.FirstOrDefault(s => s.GetType() == config.DefaultScreenType) : null;
           if (configDefault != null)
           {
             _defaultScreen = configDefault;
@@ -165,7 +165,7 @@ namespace MediaPortal.UiComponents.Media.Models.NavigationModel
       if (_optionalMias != null)
         optionalMIATypeIDs = optionalMIATypeIDs.Union(_optionalMias).Except(_necessaryMias);
 
-      // Try to load the preferred next screen from settings if not already set.
+      // Try to load the prefered next screen from settings if not already set.
       if (nextScreen == null && NavigationData.LoadScreenHierarchy(viewName, out string nextScreenName))
       {
         // Support for browsing mode.
@@ -173,7 +173,7 @@ namespace MediaPortal.UiComponents.Media.Models.NavigationModel
           SetBrowseMode(optionalMIATypeIDs);
 
         if (_availableScreens != null)
-          nextScreen = _availableScreens.FirstOrDefault(s => s?.GetType().ToString() == nextScreenName);
+          nextScreen = _availableScreens.FirstOrDefault(s => s.GetType().ToString() == nextScreenName);
       }
 
       if (_applyUserFilter)
@@ -199,25 +199,31 @@ namespace MediaPortal.UiComponents.Media.Models.NavigationModel
         nextScreen = _defaultScreen;
 
       ScreenConfig nextScreenConfig;
-      NavigationData.LoadLayoutSettings(nextScreen.GetType().ToString(), out nextScreenConfig);
+      if (!NavigationData.LoadLayoutSettings(nextScreen.GetType().ToString(), out nextScreenConfig))
+      {
+        ServiceRegistration.Get<ILogger>().Warn("BaseNavigationInitializer: Could not find valid next screen config for type '{0}'", nextScreen.GetType().ToString());
+      }
 
-      Sorting.Sorting nextSortingMode = _availableSortings.FirstOrDefault(sorting => sorting?.GetType().ToString() == nextScreenConfig.Sorting) ?? _defaultSorting;
-      Sorting.Sorting nextGroupingMode = _availableGroupings == null || String.IsNullOrEmpty(nextScreenConfig.Grouping) ? null : _availableGroupings.FirstOrDefault(grouping => grouping?.GetType().ToString() == nextScreenConfig.Grouping) ?? _defaultGrouping;
+      Sorting.Sorting nextSortingMode = _availableSortings.FirstOrDefault(sorting => sorting.GetType().ToString() == nextScreenConfig?.Sorting) ?? _defaultSorting;
+      Sorting.Sorting nextGroupingMode = _availableGroupings == null || String.IsNullOrEmpty(nextScreenConfig?.Grouping) ? null : _availableGroupings.FirstOrDefault(grouping => grouping.GetType().ToString() == nextScreenConfig?.Grouping) ?? _defaultGrouping;
+
+      LayoutType nextLayoutType = nextScreenConfig?.LayoutType ?? LayoutType.GridLayout;
+      LayoutSize nextLayoutSize = nextScreenConfig?.LayoutSize ?? LayoutSize.Large;
 
       navigationData = new NavigationData(null, viewName, MediaNavigationRootState,
         MediaNavigationRootState, rootViewSpecification, nextScreen, _availableScreens, nextSortingMode, nextGroupingMode)
       {
         AvailableSortings = _availableSortings,
         AvailableGroupings = _availableGroupings,
-        LayoutType = nextScreenConfig.LayoutType,
-        LayoutSize = nextScreenConfig.LayoutSize,
+        LayoutType = nextLayoutType,
+        LayoutSize = nextLayoutSize,
         AdditionalProperties = nextScreenConfig.AdditionalProperties
       };
       mediaNavigationMode = MediaNavigationMode;
     }
 
     /// <summary>
-    /// Switches to browsing by MediaLibray shares, limited to restricted MediaCategories.
+    /// Switches to browsing by MediaLibrary shares, limited to restricted MediaCategories.
     /// </summary>
     /// <param name="optionalMIATypeIDs">Optional MIAs to use.</param>
     protected void SetBrowseMode(IEnumerable<Guid> optionalMIATypeIDs)
