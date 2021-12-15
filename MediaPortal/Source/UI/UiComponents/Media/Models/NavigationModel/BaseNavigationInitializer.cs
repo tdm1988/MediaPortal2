@@ -201,7 +201,7 @@ namespace MediaPortal.UiComponents.Media.Models.NavigationModel
       ScreenConfig nextScreenConfig;
       if (!NavigationData.LoadLayoutSettings(nextScreen.GetType().ToString(), out nextScreenConfig))
       {
-        ServiceRegistration.Get<ILogger>().Warn("BaseNavigationInitializer: Could not find valid next screen config for type '{0}'", nextScreen.GetType().ToString());
+        ServiceRegistration.Get<ILogger>().Debug("BaseNavigationInitializer: Could not find user layout config for screen '{0}', applying defaults.", nextScreen.GetType().ToString());
       }
 
       Sorting.Sorting nextSortingMode = _availableSortings.FirstOrDefault(sorting => sorting.GetType().ToString() == nextScreenConfig?.Sorting) ?? _defaultSorting;
@@ -209,7 +209,7 @@ namespace MediaPortal.UiComponents.Media.Models.NavigationModel
 
       LayoutType nextLayoutType = nextScreenConfig?.LayoutType ?? LayoutType.GridLayout;
       LayoutSize nextLayoutSize = nextScreenConfig?.LayoutSize ?? LayoutSize.Large;
-      MediaDictionary<string, string> nextProperties = nextScreenConfig.AdditionalProperties ?? new MediaDictionary<string, string>();
+      MediaDictionary<string, string> nextProperties = nextScreenConfig?.AdditionalProperties ?? new MediaDictionary<string, string>();
 
       navigationData = new NavigationData(null, viewName, MediaNavigationRootState,
         MediaNavigationRootState, rootViewSpecification, nextScreen, _availableScreens, nextSortingMode, nextGroupingMode)
