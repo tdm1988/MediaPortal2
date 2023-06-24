@@ -54,6 +54,7 @@ namespace MediaPortal.UI.Control.InputManager
     public static readonly Key TeleText = new Key("TeleText");
     public static readonly Key Power = new Key("Power");
     public static readonly Key Fullscreen = new Key("Fullscreen");
+    public static readonly Key AlwaysOnTop = new Key("AlwaysOnTop");
 
     public static readonly Key ZoomMode = new Key("ZoomMode");
     public static readonly Key Play = new Key("Play");

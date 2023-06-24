@@ -82,6 +82,13 @@ namespace MediaPortal.UI.SkinEngine
           ServiceRegistration.Get<ILogger>().Info("SkinEngine: Switching screen mode from current '{0}' to '{1}'", sc.CurrentScreenMode, newMode);
           sc.SwitchMode(newMode);
         });
+      inputManager.AddKeyBinding(Key.AlwaysOnTop, () =>
+        {
+          //switch between "Always on top" and normal window mode
+          IScreenControl sc = ServiceRegistration.Get<IScreenControl>();
+          sc.ForceAlwaysOnTop = !sc.ForceAlwaysOnTop;
+          ServiceRegistration.Get<ILogger>().Info("SkinEngine: Switching ForceAlwaysOnTop mode to '{0}'", sc.ForceAlwaysOnTop);
+        });
     }
 
     protected static void UnregisterGlobalKeyBindings()

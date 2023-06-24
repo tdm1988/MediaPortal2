@@ -106,7 +106,7 @@ namespace MediaPortal.UI.SkinEngine.GUI
     private const int WM_MOUSEMOVE = 0x0200;
     private const int WM_SETCURSOR = 0x0020;
     private const int WM_NCHITTEST = 0x0084;
-    
+
     private bool _renderThreadStopped;
     private ISharpDXVideoPlayer _synchronizedVideoPlayer = null;
     private readonly AutoResetEvent _videoRenderFrameEvent = new AutoResetEvent(false);
@@ -124,7 +124,7 @@ namespace MediaPortal.UI.SkinEngine.GUI
     private bool _forceOnTop = false;
     private bool _hasFocus = false;
     private readonly ScreenManager _screenManager;
-    private IDictionary<int, MessageRateInfo> _highVolumeMessageCheck = new Dictionary<int,MessageRateInfo>();
+    private IDictionary<int, MessageRateInfo> _highVolumeMessageCheck = new Dictionary<int, MessageRateInfo>();
 
 
     protected bool _isScreenSaverEnabled = true;
@@ -365,16 +365,6 @@ namespace MediaPortal.UI.SkinEngine.GUI
 
     protected void SwitchToWindowedSize(ScreenMode mode, Point location, Size clientSize, bool maximize)
     {
-      if (mode == ScreenMode.WindowedOnTop)
-      {
-        _forceOnTop = true;
-        FormBorderStyle = FormBorderStyle.SizableToolWindow;
-      }
-      else
-      {
-        FormBorderStyle = FormBorderStyle.Sizable;
-        _forceOnTop = false;
-      }
       WindowState = FormWindowState.Normal;
       Location = location;
       ClientSize = clientSize;
@@ -382,6 +372,7 @@ namespace MediaPortal.UI.SkinEngine.GUI
       // non-maximized bounds
       WindowState = maximize ? FormWindowState.Maximized : FormWindowState.Normal;
       _mode = mode;
+      SetFormBorderStyle();
     }
 
     public void DisposeDirectX()
@@ -448,7 +439,7 @@ namespace MediaPortal.UI.SkinEngine.GUI
 #if DEBUG
       TopMost = _forceOnTop;
 #else
-      TopMost = !_disableTopMost && (_forceOnTop || IsFullScreen && (force || this == ActiveForm));
+      TopMost = !_disableTopMost && (_forceOnTop || _mode == ScreenMode.FullScreen && (force || this == ActiveForm));
       if (force)
       {
         this.SafeActivate();
@@ -691,14 +682,27 @@ namespace MediaPortal.UI.SkinEngine.GUI
       }
     }
 
-    public bool IsFullScreen
-    {
-      get { return _mode == ScreenMode.FullScreen; }
-    }
-
     public ScreenMode CurrentScreenMode
     {
       get { return _mode; }
+    }
+
+    public bool ForceAlwaysOnTop
+    {
+      get => _forceOnTop;
+      set
+      {
+        _forceOnTop = value;
+        SetFormBorderStyle();
+      }
+    }
+
+    private void SetFormBorderStyle()
+    {
+      if (_mode == ScreenMode.FullScreen)
+        return;
+
+      FormBorderStyle = _forceOnTop ? FormBorderStyle.SizableToolWindow : FormBorderStyle.Sizable;
     }
 
     public bool IsScreenSaverActive
@@ -799,7 +803,7 @@ namespace MediaPortal.UI.SkinEngine.GUI
         }
 
         // If we are in fullscreen mode, we may control the mouse cursor, else reset it to visible state, if state was switched
-        ShowMouseCursor(!IsFullScreen || inputManager.IsMouseUsed);
+        ShowMouseCursor(CurrentScreenMode != ScreenMode.FullScreen || inputManager.IsMouseUsed);
       }
       catch (Exception ex)
       {

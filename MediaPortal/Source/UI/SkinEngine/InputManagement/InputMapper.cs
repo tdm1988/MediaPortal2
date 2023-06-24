@@ -99,7 +99,8 @@ namespace MediaPortal.UI.SkinEngine.InputManagement
           case Keys.F4:
             return Key.Close;
         }
-      } else if (control && !(shift || alt))
+      } 
+      else if (control && !(shift || alt))
       {
         switch (keycode)
         {
@@ -109,6 +110,12 @@ namespace MediaPortal.UI.SkinEngine.InputManagement
             return Key.Copy;
           case Keys.V:
             return Key.Paste;
+          case Keys.Enter:
+            if (!Keyboard.IsKeyDown(Keys.LWin))
+            {
+              return Key.AlwaysOnTop;
+            }
+            break;
         }
       } else if (shift && !(alt || control))
       {
